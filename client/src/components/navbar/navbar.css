@@ -1,0 +1,166 @@
+.navContainer {
+    font-family: 'Roboto', sans-serif;
+}
+
+.navWrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+
+    @media (min-width: 768px) {
+        width: 750px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    @media (min-width: 992px) {
+        width: 970px;
+    }
+
+    @media (min-width: 1200px) {
+        width: 1170px;
+    }
+}
+
+.top {
+    color: black;
+    background: none;
+    background-color: transparent;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+}
+
+.topLeft {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    @media (min-width: 900px) {
+        justify-content: flex-start;
+    }
+}
+
+.topRight {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    @media (min-width: 900px) {
+        justify-content: flex-end;
+    }
+}
+
+.contact {
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+    margin-left: 8px;
+    font-size: 14px;
+}
+
+.description {
+    font-size: 14px;
+    font-weight: bold;
+    text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	
+	@supports (-webkit-line-clamp: 1) {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: initial;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+    }
+}
+
+.bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+}
+
+.bottomCenter {
+    display: none;
+    
+    @media (min-width: 768px) {
+        display: block;
+    }
+}
+
+.bottomRight {
+    display: block;
+    
+    @media (min-width: 768px) {
+        display: none;
+    }
+
+    @media (min-width: 992px) {
+        display: block;
+    }
+}
+
+.logoImage {
+    height: 60px;
+    width: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+
+    @media (min-width: 768px) {
+        height: 85px;
+        width: 85px;
+    }
+}
+
+.tabList {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.tab {
+    color: black;
+    margin-left: 15px;
+    margin-right: 15px;
+    font-size: 17px;
+    font-weight: 350;
+    cursor: pointer;
+}
+
+.drawerButton {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    width: 40px;
+    border: none;
+    background-color: white;
+    color: black;
+    border-radius: 10%;
+
+    @media (min-width: 992px) {
+        display: none;
+    }
+}
+
+.signUpButton {
+    display: none;
+    align-items: center;
+    height: 40px;
+    padding: 10px 20px;
+    background-color: white;
+    border: dashed 0.5px lightblue;
+    border-radius: 45px;
+    font-size: 14px;
+
+    @media (min-width: 992px) {
+        display: flex;
+    }
+}
