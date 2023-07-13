@@ -1,15 +1,15 @@
-.postContainer {
+.servicePostContainer {
     position: relative;
     text-align: center;
 }
 
-.postImage {
+.servicePostImage {
     width: 100%;
     height: 220px;
     object-fit: cover;
 }
 
-.postTitle {
+.servicePostTitle {
     position: absolute;
     width: 100%;
     margin: 0;

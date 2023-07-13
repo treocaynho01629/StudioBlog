@@ -1,6 +1,7 @@
-import { AppBar, Stack, Grid, Collapse, useScrollTrigger, Typography } from '@mui/material'
-import { Phone as PhoneIcon, Mail as MailIcon, Menu as MenuIcon, Contactless as ContactlessIcon } from '@mui/icons-material'
+import { AppBar, Stack, Grid, Collapse, useScrollTrigger, Typography, Container } from '@mui/material'
+import { Phone as PhoneIcon, Mail as MailIcon, Menu as MenuIcon } from '@mui/icons-material'
 import './navbar.css'
+import { Link } from 'react-router-dom';
 
 function HideOnScroll(props) {
     const { children, window } = props;
@@ -21,7 +22,7 @@ export default function NavBar(props) {
   return (
     <div className="navContainer">
         <AppBar sx={{backgroundColor: 'white'}} position="fixed">
-            <div className="navWrapper">
+            <Container fluid maxWidth="lg">
                 <Stack sx={{width: '100%'}}>
                     <HideOnScroll {...props}>
                         <div className="top">
@@ -48,12 +49,12 @@ export default function NavBar(props) {
                         </div>
                         <div className="bottomCenter">
                             <ul className="tabList">
-                                <li className="tab">TRANG CHỦ</li>
-                                <li className="tab">GIỚI THIỆU</li>
-                                <li className="tab">DỊCH VỤ</li>
-                                <li className="tab">VIDEO</li>
-                                <li className="tab">TIN TỨC</li>
-                                <li className="tab">LIÊN HỆ</li>
+                                <li className="tab"><Link className="link" to="/">TRANG CHỦ</Link></li>
+                                <li className="tab"><Link className="link" to="/">GIỚI THIỆU</Link></li>
+                                <li className="tab"><Link className="link" to="/">DỊCH VỤ</Link></li>
+                                <li className="tab"><Link className="link" to="/new-post">VIDEO</Link></li>
+                                <li className="tab"><Link className="link" to="/post/1">TIN TỨC</Link></li>
+                                <li className="tab"><Link className="link" to="/login">LIÊN HỆ</Link></li>
                             </ul>
                         </div>
                         <div className="bottomRight">
@@ -62,12 +63,12 @@ export default function NavBar(props) {
                             </button>
                             <button className="signUpButton">
                                 Đăng ký
-                                <ContactlessIcon sx={{fontSize: 26, marginLeft: 1}}/>
+                                <MailIcon sx={{fontSize: 26, marginLeft: 1}}/>
                             </button>
                         </div>
                     </div>
                 </Stack>
-            </div>
+            </Container>
         </AppBar>
     </div>
   )

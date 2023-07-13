@@ -1,0 +1,20 @@
+.breadCrumbsContainer {
+    border: 0.05px solid lightgray;
+    padding: 10px 5px;
+    margin-bottom: 10px;
+}
+
+.crumb {
+    text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	
+	@supports (-webkit-line-clamp: 1) {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: initial;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+    }
+}

@@ -1,0 +1,50 @@
+.footerContainer {
+    font-family: 'Roboto', sans-serif;
+    background-color: whitesmoke;
+    margin-top: 30px;
+    padding: 10px 0;
+    width: 100%;
+}
+
+.footerTop {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 450;
+    padding-bottom: 15px;
+    border-bottom: 0.5px solid lightgray;
+}
+
+.fullLogoImage {
+    height: 120px;
+    width: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.fullLogo {
+    display: flex;
+    align-items: center;
+    font-size: 25px;
+    font-weight: bold;
+    color: orange;
+}
+
+.footerInfoList {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.footerInfo {
+    color: black;
+    font-size: 18px;
+    font-weight: 350;
+    margin: 10px 0;
+}
+
+.footerMap {
+    border: 0.5px solid lightgray;
+    padding: 7px;
+}

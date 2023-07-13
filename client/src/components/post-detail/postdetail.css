@@ -1,8 +1,84 @@
 .postDetailContainer {
-
+    font-family: 'Roboto', sans-serif;
 }
 
 .postDetailTitle {
-    font-size: 16px;
-    font-weight: bold;
+    width: 100%;
+    text-align: left;
+    margin: 10px 0 0 0;
+    font-size: 22px;
+    font-weight: 450;
+    color: #333333;
 }
+
+.postDetailInfo {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 12px 0px;
+}
+
+.info {
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+    color: #666666;
+}
+
+.infoButton {
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    margin-left: 15px;
+    height: 35px;
+    border-radius: 40px;
+    border: dashed 1px;
+}
+
+.postDetailContent {
+    width: 100%;
+    padding: 10px 0;
+}
+
+.postDetailImage {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border: 1px solid lightsteelblue;
+    padding: 10px;
+}
+
+.postDetailMarkdown {
+    font-size: 18px;
+    line-height: 25px;
+}
+
+.authorInfo {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    color: gray;
+    font-style: italic;
+}
+
+.tagInfo {
+    display: flex;
+    align-items: center;
+}
+
+.tag {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    color: #333333;
+    margin-right: 10px;
+}
+
+.smallTag {
+    background-color: lightgray;
+    padding: 5px 10px;
+    border-radius: 15px;
+    margin-right: 10px;
+}
+
+
