@@ -10,11 +10,22 @@
     font-size: 18px;
     font-weight: bold;
     text-transform: uppercase;
-    width: 100%;
+    width: 50%;
     display: flex;
     align-items: center;
     justify-content: flex-start;
     padding: 10px 0;
+}
+
+.fileButton {
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    margin-left: 15px;
+    height: 35px;
+    border-radius: 40px;
+    border: dashed 1px;
+    cursor: pointer;
 }
 
 .newPostContent {
@@ -32,7 +43,21 @@
     color: white;
     border: none;
     padding: 10px;
-    margin: 20px 0;
+    margin: 20px 10px 20px 0;
     width: 150px;
     font-size: 16px;
+    cursor: pointer;
+}
+
+.submitButton:hover {
+    background-color: #387e5d;
+}
+
+.thumbnailPreview {
+    width: 90%;
+    height: auto;
+    object-fit: cover;
+    border: 1px solid lightsteelblue;
+    padding: 10px;
+    margin-bottom: 15px;
 }

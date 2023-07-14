@@ -20,7 +20,7 @@ router.get("/", async (req, res) => {
         let posts;
         if (username){
             posts = await Post.find({username});
-        } else if (cate) {
+        } else if (categories) {
             posts = await Post.find({categories: {
                 $in: [categories]
             }});

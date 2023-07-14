@@ -1,10 +1,15 @@
 import './servicepost.css'
+import { Link } from 'react-router-dom';
 
-export default function ServicePost() {
+export default function ServicePost({post}) {
+  const PF = "http://localhost:5000/images/"
+
   return (
-    <div className="servicePostContainer">
-        <img className="servicePostImage" alt="post" src="https://tamproduction.com/wp-content/uploads/2023/06/378A1587-1536x1024.jpg" />
-        <div className="servicePostTitle">Quay phim chụp ảnh Pre-wedding Đà Lạt</div>
-    </div>
+    <Link className="link" to={`/post/${post._id}`}>
+      <div className="servicePostContainer">
+          <img className="servicePostImage" alt="post" src={PF + post.thumbnail} />
+          <div className="servicePostTitle">{post.title}</div>
+      </div>
+    </Link>
   )
 }

@@ -25,10 +25,10 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
     try {
         const user = await User.findOne({username: req.body.username}) //Find by username
-        !user && res.status(400).json("Invalid Credential!");
+        if (!user) return res.status(400).json("Invalid Credential!");
 
         const passValid = await bcrypt.compare(req.body.password, user.password);
-        !passValid && res.status(400).json("Invalid Credential!");
+        if (!passValid) return res.status(400).json("Invalid Credential!");
 
         const { password, ...others } = user._doc; //orbit
         res.status(200).json(others);

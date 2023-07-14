@@ -138,10 +138,17 @@
     border: dashed 0.5px #2f6b4f;
     border-radius: 45px;
     font-size: 14px;
+    cursor: pointer;
 
     @media (min-width: 900px) {
         display: flex;
     }
+}
+
+.signUpButton:hover {
+    border-color: #387e5d;
+    border-style: solid;
+    background-color: whitesmoke;
 }
 
 .link {

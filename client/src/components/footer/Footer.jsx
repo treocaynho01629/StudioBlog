@@ -27,13 +27,15 @@ export default function Footer() {
                 </Grid>
                 <Grid item xs={12} sm={5} md={6} sx={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-end'}}>
                     <div className="footerMap">
-                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3903.246518852702!2d108.4266311!3d11.9574266!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x317113b07111e0b3%3A0x4d7fb786e7ac7e20!2zUXVheSBwaGltIMSQw6AgTOG6oXQgVEFNIFBST0RVQ1RJT04!5e0!3m2!1svi!2s!4v1686801166420!5m2!1svi!2s" 
+                        <iframe title="map"
+                            className="mapFrame"
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3903.246518852702!2d108.4266311!3d11.9574266!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x317113b07111e0b3%3A0x4d7fb786e7ac7e20!2zUXVheSBwaGltIMSQw6AgTOG6oXQgVEFNIFBST0RVQ1RJT04!5e0!3m2!1svi!2s!4v1686801166420!5m2!1svi!2s" 
                             width="100%" 
                             height="200" 
                             style={{border: '0px'}}
-                            allowfullscreen="" 
+                            allowFullScreen="" 
                             loading="lazy" 
-                            referrerpolicy="no-referrer-when-downgrade">
+                            referrerPolicy="no-referrer-when-downgrade">
                         </iframe>
                     </div>
                 </Grid>

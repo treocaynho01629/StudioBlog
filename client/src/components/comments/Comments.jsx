@@ -79,7 +79,7 @@ export default function Comments() {
         </div>
         <form className="leaveComment">
             <p className="leaveTitle">Để lại ý kiến</p>
-            <p class="rememberComment">
+            <p className="rememberComment">
                 <input type="checkbox" value="remember"/> 
                 <label>Lưu tên và email của tôi trong trình duyệt này cho lần bình luận kế tiếp.</label>
             </p>
@@ -109,7 +109,7 @@ export default function Comments() {
                 placeholder="Ý kiến của bạn ..."
                 className="commentTextarea"
             />
-            <button className="submitButton">
+            <button className="commentButton">
                 Gửi ý kiến
             </button>
             </Box>

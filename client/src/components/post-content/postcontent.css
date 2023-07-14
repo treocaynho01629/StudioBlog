@@ -1,8 +1,8 @@
-.postDetailContainer {
+.postContentContainer {
     font-family: 'Roboto', sans-serif;
 }
 
-.postDetailTitle {
+.postContentTitle {
     width: 100%;
     text-align: left;
     margin: 10px 0 0 0;
@@ -11,7 +11,7 @@
     color: #333333;
 }
 
-.postDetailInfo {
+.postContentInfo {
     display: flex;
     justify-content: space-between;
     width: 100%;
@@ -33,22 +33,29 @@
     height: 35px;
     border-radius: 40px;
     border: dashed 1px;
+    cursor: pointer;
 }
 
-.postDetailContent {
+.infoButton:hover {
+    border-color: lightblue;
+    border-style: solid;
+    background-color: whitesmoke;
+}
+
+.postContent {
     width: 100%;
     padding: 10px 0;
 }
 
-.postDetailImage {
-    width: 100%;
+.postContentThumbnail {
+    width: 95%;
     height: auto;
     object-fit: cover;
     border: 1px solid lightsteelblue;
     padding: 10px;
 }
 
-.postDetailMarkdown {
+.postContentMarkdown {
     font-size: 18px;
     line-height: 25px;
 }

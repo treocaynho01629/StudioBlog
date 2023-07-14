@@ -1,0 +1,67 @@
+.loginContainer {
+    margin: 250px auto 150px auto;
+    font-family: 'Roboto', sans-serif;
+}
+
+.login {
+    width: 500px;
+    display: flex;
+    justify-content: center;
+}
+
+.loginBox {
+    background-color: whitesmoke;
+    width: 100%;
+    padding: 30px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.loginTitle {
+    width: 100%;
+    text-align: center;
+    font-size: 22px;
+    font-weight: 450;
+    color: #333333;
+}
+
+.loginButton {
+    background-color: #2f6b4f;
+    color: white;
+    border: none;
+    padding: 15px 10px;
+    margin: 20px 0;
+    width: 250px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.loginButton:hover {
+    background-color: #387e5d;
+}
+
+.loginButton:disabled {
+    background-color: #3d4944;
+    color: gray;
+}
+
+.persistCheck {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.persist {
+    display: flex;
+    align-items: center;
+}
+
+.forgot {
+    color: #387e5d;
+    text-decoration: underline;
+    cursor: pointer;
+}

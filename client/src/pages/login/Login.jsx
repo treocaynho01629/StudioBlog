@@ -1,12 +1,18 @@
 import './login.css'
-import { Box, Container, TextField, TextareaAutosize } from '@mui/material';
+import { Container, IconButton, InputAdornment, Paper, TextField } from '@mui/material';
 import styled from '@emotion/styled';
+import { Context } from '../../context/Context';
+import { useState } from 'react';
+import { useContext } from 'react';
+import axios from 'axios';
+import { LoginSuccess } from '../../context/Action';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const CustomInput = styled(TextField)(({ theme }) => ({
     '& .MuiInputBase-root': {
         borderRadius: 0,
         backgroundColor: 'white',
-        color: 'black',
+        color: 'black'
     },
     '& label.Mui-focused': {
         color: '#b4a0a8'
@@ -48,33 +54,86 @@ const CustomInput = styled(TextField)(({ theme }) => ({
 }));
 
 export default function Login() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const { dispatch, isLoading } = useContext(Context);
+
+  const handleClick = () => setShowPassword((showPassword) => !showPassword);
+
+  const handleMouseDown = (e) => {
+      e.preventDefault();
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    dispatch({type: "LOGIN_START"});
+    try{
+      const res = await axios.post("/auth/login", {
+        username: username,
+        password: password
+      })
+      dispatch(LoginSuccess(res.data))
+    } catch(err) {
+      dispatch({type: "LOGIN_FAIL"});
+    }
+  }
+
+  const endAdornment=
+  <InputAdornment position="end">
+      <IconButton
+          aria-label="toggle password visibility"
+          onClick={handleClick}
+          onMouseDown={handleMouseDown}
+          edge="end"
+          sx={{
+          "&:focus": {
+              outline: 'none',
+          }}}
+      >
+          {showPassword ? <VisibilityOff /> : <Visibility />}
+      </IconButton>
+  </InputAdornment>
+
   return (
-    <div className="newPostContainer">
-      <Container fluid maxWidth="lg">
-        <form className="newPost">
-          <p className="newPostTitle">Đăng nhập</p>
-          <Box display="flex" flexDirection="column">
+    <div className="loginContainer">
+      <Container fluid maxWidth="lg" sx={{display: 'flex', justifyContent: 'center'}}>
+        <form className="login" onSubmit={handleSubmit}>
+          <Paper square elevation={3} className="loginBox">
+            <p className="loginTitle">ĐĂNG NHẬP</p>
             <CustomInput
-                error
                 fullWidth
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 id="username"
                 label="Tên đăng nhập"
-                helperText="Không được bỏ trống"
-                sx={{marginBottom: '15px'}}
+                // helperText="Không được bỏ trống"
+                sx={{marginBottom: '15px', maxWidth: '400px'}}
             />
             <CustomInput
-                error
                 fullWidth
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 id="password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 label="Mật khẩu"
-                helperText="Không được bỏ trống"
-                sx={{marginBottom: '15px'}}
+                // helperText="Không được bỏ trống"
+                sx={{marginBottom: '15px', maxWidth: '400px'}}
+                InputProps={{
+                  endAdornment: endAdornment
+                }}
             />
-            <button className="submitButton">
+             <div className="persistCheck">
+                <p className="persist">
+                    <input type="checkbox" value="persist"/> 
+                    <label>Lưu đăng nhập</label>
+                </p>
+                <div className="forgot">Quên mật khẩu</div>
+            </div>
+            <button className="loginButton" disabled={isLoading}>
               Đăng nhập
             </button>
-          </Box>
+          </Paper>
         </form>
       </Container>
     </div>

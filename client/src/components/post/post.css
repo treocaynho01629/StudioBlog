@@ -1,0 +1,56 @@
+.postContainer {
+    margin: 20px 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+.postThumbnail {
+    max-width: 350px;
+    width: 95%;
+    height: auto;
+    padding: 5px;
+    border: 0.5px solid lightblue;
+}
+
+.postTitle {
+    color: inherit;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.postTitle:hover {
+    color: #387e5d;
+}
+
+.postSummary {
+    font-size: 14px;
+    text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	
+	@supports (-webkit-line-clamp: 2) {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: initial;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+}
+
+.readmoreButton {
+    background-color: #2f6b4f;
+    color: white;
+    border: none;
+    padding: 10px;
+    margin: 20px 10px 20px 0;
+    width: 150px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.readmoreButton:hover {
+    background-color: #387e5d;
+}
