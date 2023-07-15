@@ -1,24 +1,58 @@
 import './serviceposts.css'
-import Carousel from 'react-grid-carousel'
 import ServicePost from '../../components/service-post/ServicePost'
+import Slider from 'react-slick';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
-export default function ServicePosts({posts}) {
-  return (
-    <div className="servicePostsContainer">
-        <Carousel cols={3} rows={2} gap={15} mobileBreakpoint={412} hideArrow loop responsiveLayout={[{
+const settings = {
+    infinite: true,
+    lazyLoad: true,
+    speed: 500,
+    rows: 2,
+    slidesPerRow: 3,
+    responsive: [
+        {
+            breakpoint: 1200,
+            settings: {
+                rows: 1,
+                slidesPerRow: 2,
+                slidesToScroll: 2,
+                infinite: true,
+                dots: true,
+                autoplay: true,
+                autoplaySpeed: 5000,
+                pauseOnHover: true,
+                lazyLoad: true,
+            }
+        },
+        {
             breakpoint: 900,
-            cols: 1,
-            rows: 1,
-            loop: true,
-            showDots: true,
-            autoplay: 10000
-        }]}>
-            {posts.map((post) => (
-                <Carousel.Item>
-                    <ServicePost key={post.id} post={post}/>
-                </Carousel.Item>
-            ))}
-        </Carousel>
-    </div>
-  )
+            settings: {
+                rows: 1,
+                slidesPerRow: 1,
+                slidesToScroll: 1,
+                initialSlide: 0,
+                infinite: true,
+                dots: true,
+                autoplay: true,
+                autoplaySpeed: 5000,
+                pauseOnHover: true,
+                lazyLoad: true,
+            }
+        }
+    ]
+};
+
+export default function ServicePosts({ posts }) {
+    return (
+        <div className="servicePostsContainer">
+            <Slider {...settings}>
+                {posts.map((post) => (
+                    <div className="servicePostsWrapper">
+                        <ServicePost key={post.id} post={post}/>
+                    </div>
+                ))}
+            </Slider>
+        </div>
+    )
 }

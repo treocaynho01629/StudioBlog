@@ -18,7 +18,7 @@ export default function PostDetail() {
       setPost(res.data);
     };
     getPost();
-  })
+  }, []);
 
   return (
     <div className="postDetailContainer">

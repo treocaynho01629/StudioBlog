@@ -1,0 +1,10 @@
+.bannerSliderContainer {
+    box-shadow: 6px 6px 10px hsl(206.5, 0%, 75%);
+}
+
+.bannerImage {
+    max-height: 50%;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}

@@ -1,6 +1,6 @@
+import './navbar.css'
 import { AppBar, Stack, Grid, Collapse, useScrollTrigger, Typography, Container, Menu, MenuItem, ListItemIcon } from '@mui/material'
 import { Phone as PhoneIcon, Mail as MailIcon, Menu as MenuIcon, Logout, AddCircleOutline, Person } from '@mui/icons-material'
-import './navbar.css'
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Context } from '../../context/Context';
