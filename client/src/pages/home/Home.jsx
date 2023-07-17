@@ -1,12 +1,12 @@
 import './home.css'
 import { useEffect, useState } from 'react'
 import { Container, Grid } from '@mui/material';
-import { Lightbulb, AttachMoney, HelpCenter } from '@mui/icons-material';
+import { Lightbulb, AttachMoney, HelpCenter, ArrowRight } from '@mui/icons-material';
 import ServicePosts from '../../components/service-posts/ServicePosts';
 import BannerSlider from '../../components/banner-slider/BannerSlider';
 import YoutubeEmbed from '../../components/youtube-embed/YoutubeEmbed';
 import useFetch from '../../hooks/useFetch';
-import Review from '../../components/review/Review';
+import Reviews from '../../components/Reviews/Reviews';
 
 export default function Home() {
     const [posts, setPosts] = useState([]);
@@ -96,13 +96,15 @@ export default function Home() {
             </Container>
             <div className="alterBox">
                 <Container fluid maxWidth="lg">
-                    <div className="videoContainer">
-                        <h1 className="mainTitle">SẢN PHẨM NỔI BẬT</h1>
-                    {reviews.map((review) => (
-                        <Review review={review} />
-                    ))}
+                    <div className="reviewContainer">
+                        <h1 className="mainTitle">PHẢN HỒI KHÁCH HÀNG</h1>
+                        <Reviews reviews={reviews}/>
                     </div>
                 </Container>
+            </div>
+            <div className="contactTab">
+                <h3 className="contactTitle">Đăng ký nhận báo giá các gói dịch vụ của chúng tôi!</h3>
+                <button className="contactButton">Liên hệ ngay<ArrowRight/></button>
             </div>
         </div>
     )

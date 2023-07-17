@@ -3,7 +3,7 @@ import { Box } from '@mui/material';
 import { CalendarMonth, Chat as ChatIcon, Edit as EditIcon, Delete as DeleteIcon, Sell as SellIcon } from '@mui/icons-material';
 import { useContext } from 'react';
 import { Context } from '../../context/Context';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 export default function PostContent({ post, previewMode }) {
@@ -13,7 +13,7 @@ export default function PostContent({ post, previewMode }) {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`/posts/${post._id}`, {
+      await axios.delete(`/posts/${post.slug}`, {
         data: {username: auth.username}
       });
       navigate('/');
@@ -40,10 +40,12 @@ export default function PostContent({ post, previewMode }) {
         </Box>
         { (auth?.username === post.username && !previewMode) && (
           <Box className="rightInfo" display="flex" alignItems="center">
-            <Box className="infoButton" sx={{ color: '#2f6b4f', borderColor: '#2f6b4f' }}>
-              <EditIcon sx={{ marginRight: 1 }} />
-              Chỉnh sửa
-            </Box>
+            <Link to={`/edit-post/${post.slug}`} style={{textDecoration: 'none'}}>
+              <Box className="infoButton" sx={{ color: '#0f3e3c', borderColor: '#0f3e3c' }}>
+                <EditIcon sx={{ marginRight: 1 }} />
+                Chỉnh sửa
+              </Box>
+            </Link>
             <Box className="infoButton" 
             sx={{ color: '#f25a5a', borderColor: '#f25a5a' }}
             onClick={handleDelete}>
@@ -59,9 +61,7 @@ export default function PostContent({ post, previewMode }) {
             src={PF + post.thumbnail}
           />
         </Box>
-        <p className="postContentMarkdown">
-          {post.content}
-        </p>
+        <div className="postContentMarkdown" dangerouslySetInnerHTML={{ __html: post.sanitizedHtml }}/>
       </div>
       <figure className="authorInfo">
         <figcaption>- Người viết: {post.username}</figcaption>
@@ -71,9 +71,10 @@ export default function PostContent({ post, previewMode }) {
           <SellIcon />
           Từ khoá:
         </div>
-        <div className="smallTag">
-          hoho
-        </div>
+        {post.tags.map((tag, index) => (
+            <div key={index} className="smallTag">{tag}</div>
+        ))}
+        
       </div>
     </div>
   )

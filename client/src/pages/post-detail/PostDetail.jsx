@@ -9,12 +9,12 @@ import axios from 'axios'
 import { useState } from 'react'
 
 export default function PostDetail() {
-  const {id} = useParams();
+  const {slug} = useParams();
   const [post, setPost] = useState([]);
 
   useEffect(() => {
     const getPost = async () => {
-      const res = await axios.get(`/posts/${id}`);
+      const res = await axios.get(`/posts/${slug}`);
       setPost(res.data);
     };
     getPost();

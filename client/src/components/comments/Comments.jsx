@@ -41,7 +41,7 @@ const CustomInput = styled(TextField)(({ theme }) => ({
         borderWidth: 1,
     },
     '& input:valid:focus + fieldset': {
-        borderColor: '#2f6b4f',
+        borderColor: '#0f3e3c',
         borderLeftWidth: 4,
         borderRadius: 0,
         padding: '4px !important', 

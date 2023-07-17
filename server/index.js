@@ -19,7 +19,7 @@ app.use("/images", express.static(path.join(__dirname, "/images")));
 
 mongoose.connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
-    useUnifiedTopology: true,
+    useUnifiedTopology: true
 }).then(console.log("Connected to MongoDB"))
 .catch(err => console.log(err));
 
@@ -43,11 +43,18 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
 })
 
 app.get("/api/videos", async (req, res, next) => {
+    let amount = req.query.amount;
+
     try {
+        if (!amount){
+            amount = 5;
+        }
+
         const response = await youtube.playlistItems.list({
             part: "snippet",
             type: "video",
             playlistId: "PLQvl7FIVVS7Ra5zXDWp1tp0D-5mM50DOR",
+            maxResults: amount
         });
 
         const videos = response.data.items.map((item) => { 

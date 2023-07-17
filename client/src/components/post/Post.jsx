@@ -16,9 +16,9 @@ export default function Post({ post }) {
                     </Grid>
                     <Grid item xs={12} sm={8} sx={{display: 'flex', alignItems: 'center'}}>
                         <Box p={3}>
-                            <Link to={`/post/${post._id}`} className="postTitle">{post.title}</Link>
+                            <Link to={`/post/${post.slug}`} className="postTitle">{post.title}</Link>
                             <p className="postSummary">{post.content}</p>
-                            <Link to={`/post/${post._id}`} className="postTitle">
+                            <Link to={`/post/${post.slug}`} className="postTitle">
                                 <button className="readmoreButton">Đọc tiếp</button>
                             </Link>
                         </Box>

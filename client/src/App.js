@@ -8,6 +8,7 @@ import Login from "./pages/login/Login";
 import { Route, Routes } from "react-router-dom";
 import { useContext } from "react";
 import { Context } from "./context/Context";
+import EditPost from "./pages/edit-post/EditPost";
 
 function App() {
   const { auth } = useContext(Context);
@@ -20,7 +21,8 @@ function App() {
         <Route path="/category/:cate" element={<Category/>}/>
         <Route path="/login" element={auth ? <Home/> : <Login/>}/>
         <Route path="/new-post" element={auth ? <NewPost/> : <Login />}/>
-        <Route path="/post/:id" element={<PostDetail/>}/>
+        <Route path="/edit-post/:slug" element={auth ? <EditPost/> : <Login />}/>
+        <Route path="/post/:slug" element={<PostDetail/>}/>
       </Routes>
       <Footer/>
     </>

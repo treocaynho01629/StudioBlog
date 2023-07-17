@@ -1,17 +1,15 @@
-import './newpost.css';
-import { Autocomplete, Box, Chip, Container, Dialog, DialogActions, DialogContent, Grid, MenuItem, TextField, TextareaAutosize, useMediaQuery, useTheme } from '@mui/material';
-import { AddCircleOutline as AddCircleOutlineIcon, Visibility, Done } from '@mui/icons-material';
+import './editpost.css';
+import { Box, Container, Dialog, DialogActions, DialogContent, TextField, TextareaAutosize, useMediaQuery, useTheme } from '@mui/material';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useContext } from 'react';
 import { Context } from '../../context/Context';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useRef } from 'react';
 import { marked } from "marked";
 import PostContent from '../../components/post-content/PostContent';
-import useFetch from '../../hooks/useFetch';
-
 
 const CustomInput = styled(TextField)(({ theme }) => ({
   '& .MuiInputBase-root': {
@@ -58,14 +56,14 @@ const CustomInput = styled(TextField)(({ theme }) => ({
   },
 }));
 
-export default function NewPost() {
+const PF = "http://localhost:5000/images/"
+export default function EditPost() {
+  const {slug} = useParams();
+  const [post, setPost] = useState([]);
   const inputFile = useRef(null);
-  const [categories, setCategories] = useState([]);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [markdown, setMarkdown] = useState("");
-  const [cate, setCate] = useState("");
-  const [tags, setTags] = useState([]);
+  const [title, setTitle] = useState(post?.title);
+  const [content, setContent] = useState(post?.content);
+  const [thumbnail, setThumbnail] = useState(post?.thumbnail);
   const [file, setFile] = useState(null);
   const [open, setOpen] = useState(false);
   const [preview, setPreview] = useState(null);
@@ -73,22 +71,23 @@ export default function NewPost() {
   const navigate = useNavigate();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
-  const { data: dataCategories, isLoading: loadingCategories } = useFetch("/categories");
 
   useEffect(() => {
-      if (!loadingCategories && dataCategories){
-          setCategories(dataCategories);
-          setCate(dataCategories[0].type)
-      }
-  }, [dataCategories])
+    const getPost = async () => {
+      const res = await axios.get(`/posts/${slug}`);
+      setPost(res.data);
+      setTitle(res.data.title);
+      setContent(res.data.content);
+      setThumbnail(res.data.thumbnail);
+    };
+    getPost();
+  }, []);
 
   const handlePreview = () => {
     const previewPost = {
       title,
-      description,
-      sanitizedHtml: marked.parse(markdown),
+      sanitizedHtml: marked.parse(content),
       thumbnail: 'test.png',
-      tags,
       username: auth.username
     }
     setPreview(previewPost);
@@ -103,22 +102,13 @@ export default function NewPost() {
     inputFile.current.click();
   }
 
-  const handleDelete = item => () => {
-    const newTags = [...tags];
-    newTags.splice(newTags.indexOf(item), 1);
-    setTags(newTags);
-  };
-
-  //Post
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newPost = {
+    const updatedPost = {
+      thumbnail: post?.thumbnail,
       title,
-      description,
-      markdown,
-      category: cate,
-      tags,
+      content,
       username: auth.username
     }
 
@@ -127,7 +117,7 @@ export default function NewPost() {
       const filename = Date.now() + file.name;
       data.append("name", filename);
       data.append("file", file);
-      newPost.thumbnail = filename;
+      updatedPost.thumbnail = filename;
 
       try {
         await axios.post("/upload", data);
@@ -137,7 +127,7 @@ export default function NewPost() {
     }
 
     try {
-      const res = await axios.post("/posts", newPost);
+      const res = await axios.put(`/posts/${post?.slug}`, updatedPost);
       navigate(`/post/${res.data.slug}`);
     } catch (err) {
       console.log(err);
@@ -151,7 +141,6 @@ export default function NewPost() {
           <Box display="flex" alignItems="center" justifyContent="space-between">
             <p className="newPostTitle">Tạo bài viết mới</p>
             <input
-              required
               type="file"
               id="fileInput"
               ref={inputFile}
@@ -164,87 +153,36 @@ export default function NewPost() {
             </Box>
           </Box>
           <Box display="flex" flexDirection="column">
-            <Grid container columnSpacing={1}>
-              <Grid item xs={12} sm={9}>
-                <CustomInput
-                  required
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  fullWidth
-                  id="title"
-                  label="Tiêu đề"
-                  // error
-                  // helperText="Không được bỏ trống"
-                  sx={{ marginBottom: '15px' }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={3}>
-                <CustomInput
-                  required
-                  label="Danh mục"
-                  select
-                  fullWidth
-                  id="category"
-                  value={cate}
-                  onChange={(e) => setCate(e.target.value)}
-                >
-                  {categories?.map((cate) => (
-                    <MenuItem key={cate.id} value={cate.type}>
-                      {cate.name}
-                    </MenuItem>
-                  ))}
-                </CustomInput>
-              </Grid>
-            </Grid>
+            <CustomInput
+              required
+              autoFocus
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              fullWidth
+              id="title"
+              label="Tiêu đề*"
+              // error
+              // helperText="Không được bỏ trống"
+              sx={{ marginBottom: '15px' }}
+            />
             <Box display="flex" justifyContent="center">
-              {file && (
-                <img className="thumbnailPreview" src={URL.createObjectURL(file)} alt="" />
-              )}
+              <img className="thumbnailPreview" src={file ? URL.createObjectURL(file) : PF + thumbnail} alt="" />
             </Box>
             <TextareaAutosize
               required
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              minRows={3}
-              id="description"
-              placeholder="Tóm tắt"
-              className="newPostContent"
-            />
-            <TextareaAutosize
-              required
-              value={markdown}
-              onChange={(e) => setMarkdown(e.target.value)}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
               minRows={8}
-              id="markdown"
+              id="content"
               placeholder="Nội dung bài viết ..."
               className="newPostContent"
             />
-            <Autocomplete
-              multiple
-              freeSolo
-              value={tags}
-              options={[]}
-              onChange={(e, value) => setTags((state) => value)}
-              renderTags={(tags, getTagProps) =>
-                tags.map((option, index) => (
-                  <Chip key={index} label={option} {...getTagProps({ index })} />
-                ))
-              }
-              renderInput={params => (
-                <CustomInput
-                  {...params}
-                  variant="outlined"
-                  label="Từ khoá"
-                  placeholder="Thêm từ khoá cho bài"
-                />
-              )}
-            />
             <Box display="flex" alignItems="center">
               <button type="button" className="submitButton" onClick={handlePreview}>
-                Xem trước <Visibility/>
+                Xem trước
               </button>
               <button className="submitButton">
-                Đăng bài <Done/>
+                Chỉnh sửa
               </button>
             </Box>
           </Box>
@@ -256,7 +194,7 @@ export default function NewPost() {
           onClose={handleClose}
         >
           <DialogContent>
-            <PostContent post={preview} previewMode={true} />
+            <PostContent post={preview} previewMode={true}/>
           </DialogContent>
           <DialogActions>
             <button className="submitButton" onClick={handleClose}>
