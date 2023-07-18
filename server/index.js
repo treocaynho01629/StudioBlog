@@ -1,27 +1,36 @@
+require("dotenv").config();
 const express = require("express");
-const dotenv = require("dotenv");
 const mongoose = require("mongoose");
-const authRoute = require("./routes/auth");
-const userRoute = require("./routes/users");
-const postRoute = require("./routes/posts");
-const cateRoute = require("./routes/categories");
 const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
 const {google} = require("googleapis");
 const { default: axios } = require("axios");
+const { logger, logEvents } = require("./middlewares/logger");
+const errorHandler = require("./middlewares/errorHandler");
+const connectDB = require("./configs/dbConn");
+const authRoute = require("./routes/auth");
+const userRoute = require("./routes/users");
+const postRoute = require("./routes/posts");
+const cateRoute = require("./routes/categories");
 const app = express();
+const PORT = process.env.PORT || 5000;
 
-dotenv.config();
+connectDB();
+
+app.use(logger);
+
 app.use(express.json());
+
 app.use(cors());
+
 app.use("/images", express.static(path.join(__dirname, "/images")));
 
-mongoose.connect(process.env.MONGO_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(console.log("Connected to MongoDB"))
-.catch(err => console.log(err));
+//Routes
+app.use("/api/auth", authRoute);
+app.use("/api/users", userRoute);
+app.use("/api/posts", postRoute);
+app.use("/api/categories", cateRoute);
 
 const apiKey = process.env.API_KEY;
 const youtube = google.youtube({
@@ -46,9 +55,7 @@ app.get("/api/videos", async (req, res, next) => {
     let amount = req.query.amount;
 
     try {
-        if (!amount){
-            amount = 5;
-        }
+        if (!amount) amount = 5;
 
         const response = await youtube.playlistItems.list({
             part: "snippet",
@@ -63,9 +70,7 @@ app.get("/api/videos", async (req, res, next) => {
                 title: item.snippet.title,
                 thumbnail: item.snippet.thumbnails.maxres.url
             } 
-        }
-        
-        );
+        });
         res.status(200).json(videos);
     } catch(err) {
         next(err);
@@ -93,11 +98,16 @@ app.get("/api/reviews", async (req, res, next) => {
     }
 })
 
-app.use("/api/auth", authRoute);
-app.use("/api/users", userRoute);
-app.use("/api/posts", postRoute);
-app.use("/api/categories", cateRoute);
+app.use(errorHandler);
 
-app.listen("5000", () => {
-    console.log("Connected");
-});
+mongoose.connection.once('open', () => {
+    console.log("Connected to MongoDB");
+    app.listen(PORT, () => {
+        console.log(`Connected port: ${PORT}`);
+    });
+})
+
+mongoose.connection.on('error', err => {
+    console.log(err);
+    logEvents(`${err.no}: ${err.code}\t${err.syscall}\t${err.hostname}`, 'mongoErrLog.log');
+})

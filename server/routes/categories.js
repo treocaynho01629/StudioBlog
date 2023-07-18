@@ -1,25 +1,11 @@
 const router = require("express").Router();
-const Category = require("../models/Category");
+const categoriesController = require("../controllers/categoriesController");
+const JWTAuthenticate = require("../middlewares/JWTAuthenticate");
 
-//Get all
-router.get("/", async (req, res) => {
-    try {
-        const categories = await Category.find();
-        res.status(200).json(categories);
-    } catch(err) {
-        res.status(500).json(err);
-    }
-});
+router.use(JWTAuthenticate);
 
-//Create cate
-router.post("/", async (req, res) => {
-    const newCate = new Category(req.body);
-    try {
-        const cate = await newCate.save();
-        res.status(200).json(cate);
-    } catch(err) {
-        res.status(500).json(err);
-    }
-})
+router.route("/")
+    .get(categoriesController.getCategories) //Get all
+    .post(categoriesController.createCategory); //Create cate
 
 module.exports = router
