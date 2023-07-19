@@ -1,7 +1,6 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
-const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
 const {google} = require("googleapis");
@@ -13,6 +12,7 @@ const authRoute = require("./routes/auth");
 const userRoute = require("./routes/users");
 const postRoute = require("./routes/posts");
 const cateRoute = require("./routes/categories");
+const imageRoute = require("./routes/images");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -31,24 +31,12 @@ app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
 app.use("/api/posts", postRoute);
 app.use("/api/categories", cateRoute);
+app.use("/api/images", imageRoute);
 
 const apiKey = process.env.API_KEY;
 const youtube = google.youtube({
     version: 'v3',
     auth: apiKey,
-})
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, "images")
-    }, filename: (req, file, cb) => {
-        cb(null, req.body.name)
-    }
-})
-
-const upload = multer({storage: storage});
-app.post("/api/upload", upload.single("file"), (req, res) => {
-    res.status(200).json("Image uploaded");
 })
 
 app.get("/api/videos", async (req, res, next) => {

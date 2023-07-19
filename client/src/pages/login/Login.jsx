@@ -125,8 +125,8 @@ export default function Login() {
             />
              <div className="persistCheck">
                 <p className="persist">
-                    <input type="checkbox" value="persist"/> 
-                    <label>Lưu đăng nhập</label>
+                    <input id="persist" type="checkbox" value="persist"/> 
+                    <label htmlFor="persist">Lưu đăng nhập</label>
                 </p>
                 <div className="forgot">Quên mật khẩu</div>
             </div>

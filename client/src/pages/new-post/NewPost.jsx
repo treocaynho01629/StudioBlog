@@ -11,6 +11,7 @@ import { useRef } from 'react';
 import { marked } from "marked";
 import PostContent from '../../components/post-content/PostContent';
 import useFetch from '../../hooks/useFetch';
+import { useCreatePostMutation } from '../../features/posts/postsApiSlice';
 
 
 const CustomInput = styled(TextField)(({ theme }) => ({
@@ -59,6 +60,13 @@ const CustomInput = styled(TextField)(({ theme }) => ({
 }));
 
 export default function NewPost() {
+  const [createPost, {
+    data: newPost,
+    isLoading,
+    isSuccess,
+    isError,
+    error
+  }] = useCreatePostMutation()
   const inputFile = useRef(null);
   const [categories, setCategories] = useState([]);
   const [title, setTitle] = useState("");
@@ -76,11 +84,23 @@ export default function NewPost() {
   const { data: dataCategories, isLoading: loadingCategories } = useFetch("/categories");
 
   useEffect(() => {
-      if (!loadingCategories && dataCategories){
-          setCategories(dataCategories);
-          setCate(dataCategories[0].type)
-      }
+    if (!loadingCategories && dataCategories) {
+      setCategories(dataCategories);
+      setCate(dataCategories[0].type)
+    }
   }, [dataCategories])
+
+  useEffect(() => {
+    if (isSuccess) {
+        setTitle('');
+        setDescription('');
+        setMarkdown('');
+        setCate('');
+        setTags([]);
+        setFile(null);
+        navigate(`/post/${newPost.slug}`)
+    }
+}, [isSuccess, navigate])
 
   const handlePreview = () => {
     const previewPost = {
@@ -103,26 +123,23 @@ export default function NewPost() {
     inputFile.current.click();
   }
 
-  const handleDelete = item => () => {
-    const newTags = [...tags];
-    newTags.splice(newTags.indexOf(item), 1);
-    setTags(newTags);
-  };
-
   //Post
+  const validPost = [title, file, description, markdown, cate].every(Boolean) && !isLoading
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newPost = {
-      title,
-      description,
-      markdown,
-      category: cate,
-      tags,
-      username: auth.username
-    }
-
-    if (file) {
+    if (validPost){
+      const newPost = {
+        title,
+        description,
+        markdown,
+        category: cate,
+        tags,
+        username: auth.username
+      }
+  
+      //Upload image
       const data = new FormData();
       const filename = Date.now() + file.name;
       data.append("name", filename);
@@ -134,13 +151,9 @@ export default function NewPost() {
       } catch (err) {
         console.log(err);
       }
-    }
 
-    try {
-      const res = await axios.post("/posts", newPost);
-      navigate(`/post/${res.data.slug}`);
-    } catch (err) {
-      console.log(err);
+      //Create post
+      await createPost(newPost);
     }
   }
 
@@ -154,6 +167,7 @@ export default function NewPost() {
               required
               type="file"
               id="fileInput"
+              accept="image/*"
               ref={inputFile}
               style={{ display: "none" }}
               onChange={(e) => setFile(e.target.files[0])}
@@ -241,10 +255,10 @@ export default function NewPost() {
             />
             <Box display="flex" alignItems="center">
               <button type="button" className="submitButton" onClick={handlePreview}>
-                Xem trước <Visibility/>
+                Xem trước <Visibility />
               </button>
               <button className="submitButton">
-                Đăng bài <Done/>
+                Đăng bài <Done />
               </button>
             </Box>
           </Box>

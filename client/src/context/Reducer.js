@@ -21,7 +21,7 @@ const Reducer = (state, action) => {
             case "LOGOUT":
             return {
                 auth: null,
-                isLoading: true,
+                isLoading: false,
                 error: false
             }
             default:

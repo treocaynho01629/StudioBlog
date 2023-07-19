@@ -4,28 +4,27 @@ import BreadCrumbs from '../../components/breadcrumbs/BreadCrumbs'
 import Comments from '../../components/comments/Comments'
 import { Container } from '@mui/material'
 import { useParams } from 'react-router-dom'
-import { useEffect } from 'react'
-import axios from 'axios'
-import { useState } from 'react'
+import { useGetPostQuery } from '../../features/posts/postsApiSlice'
 
 export default function PostDetail() {
-  const {slug} = useParams();
-  const [post, setPost] = useState([]);
+  const { slug } = useParams();
+  const { data: post, isLoading, isSuccess, isError, error } = useGetPostQuery({ slug });
 
-  useEffect(() => {
-    const getPost = async () => {
-      const res = await axios.get(`/posts/${slug}`);
-      setPost(res.data);
-    };
-    getPost();
-  }, []);
+  let content;
+  if (isLoading) {
+    content = <p>Loading...</p>
+  } else if (isSuccess) {
+    content = <PostContent post={post} />;
+  } else if (isError) {
+    content = <p>{error}</p>
+  }
 
   return (
     <div className="postDetailContainer">
       <Container fluid maxWidth="lg">
-        <BreadCrumbs/>
-        <PostContent post={post}/>
-        <Comments/>
+        <BreadCrumbs />
+        {content}
+        <Comments />
       </Container>
     </div>
   )

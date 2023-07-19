@@ -8,6 +8,7 @@ import axios from 'axios';
 
 export default function PostContent({ post, previewMode }) {
   const { auth } = useContext(Context);
+  const date = new Date(post.createdAt)
   const navigate = useNavigate();
   const PF = "http://localhost:5000/images/"
 
@@ -31,7 +32,8 @@ export default function PostContent({ post, previewMode }) {
         <Box className="leftInfo" display="flex" alignItems="center">
           <div className="info">
             <CalendarMonth sx={{ marginRight: 1 }} />
-            Đăng vào lúc: {new Date(post.createdAt).toDateString}
+            Đăng vào lúc: { date.toLocaleDateString("en-GB") + " - " + date.toLocaleTimeString()
+            }
           </div>
           <div className="info">
             <ChatIcon sx={{ marginRight: 1 }} />
@@ -64,7 +66,7 @@ export default function PostContent({ post, previewMode }) {
         <div className="postContentMarkdown" dangerouslySetInnerHTML={{ __html: post.sanitizedHtml }}/>
       </div>
       <figure className="authorInfo">
-        <figcaption>- Người viết: {post.username}</figcaption>
+        <figcaption>- Người viết: {post.author}</figcaption>
       </figure>
       <div className="tagInfo">
         <div className="tag">
