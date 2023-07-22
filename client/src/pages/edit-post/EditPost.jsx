@@ -4,8 +4,6 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useContext } from 'react';
-import { Context } from '../../context/Context';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useRef } from 'react';
 import { marked } from "marked";
@@ -67,7 +65,6 @@ export default function EditPost() {
   const [file, setFile] = useState(null);
   const [open, setOpen] = useState(false);
   const [preview, setPreview] = useState(null);
-  const { auth } = useContext(Context);
   const navigate = useNavigate();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
@@ -87,8 +84,7 @@ export default function EditPost() {
     const previewPost = {
       title,
       sanitizedHtml: marked.parse(content),
-      thumbnail: 'test.png',
-      username: auth.username
+      thumbnail: 'test.png'
     }
     setPreview(previewPost);
     setOpen(true);
@@ -108,8 +104,7 @@ export default function EditPost() {
     const updatedPost = {
       thumbnail: post?.thumbnail,
       title,
-      content,
-      username: auth.username
+      content
     }
 
     if (file) {

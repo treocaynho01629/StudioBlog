@@ -9,8 +9,10 @@ router.route("/")
     .post(JWTAuthenticate, uploadController.uploadImage, postsController.createPost); //Create post
 
 router.route("/:slug")
-    .get(postsController.getPost) //Get single post by [slug]
-    .put(JWTAuthenticate, upload.single("file"), postsController.updatePost) //Update post by [slug]
-    .delete(JWTAuthenticate, postsController.deletePost); //Delete post by [slug]
+    .get(postsController.getPost); //Get single post by [slug]
+
+router.route("/:id")
+    .put(JWTAuthenticate, upload.single("file"), postsController.updatePost) //Update post by [id]
+    .delete(JWTAuthenticate, postsController.deletePost); //Delete post by [id]
 
 module.exports = router

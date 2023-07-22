@@ -8,7 +8,7 @@ export default function YoutubeEmbed({ video }) {
         width="853"
         height="480"
         src={`https://www.youtube.com/embed/${video.videoId}`}
-        srcdoc={`
+        srcDoc={`
         <style>
           * {
             padding: 0;

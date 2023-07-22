@@ -48,8 +48,8 @@ export default function ServicePosts({ posts }) {
         <div className="servicePostsContainer">
             <Slider {...settings}>
                 {posts.map((post) => (
-                    <div className="servicePostsWrapper">
-                        <ServicePost key={post.id} post={post}/>
+                    <div key={post.id} className="servicePostsWrapper">
+                        <ServicePost post={post}/>
                     </div>
                 ))}
             </Slider>

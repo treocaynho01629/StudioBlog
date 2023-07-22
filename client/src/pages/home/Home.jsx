@@ -48,7 +48,7 @@ export default function Home() {
                     <div className="videoContainer">
                         <h1 className="mainTitle">SẢN PHẨM NỔI BẬT</h1>
                     {videos.map((video) => (
-                        <YoutubeEmbed video={video} />
+                        <YoutubeEmbed key={video.videoId} video={video} />
                     ))}
                     </div>
                 </Container>

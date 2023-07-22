@@ -1,134 +1,161 @@
 import './login.css'
 import { Container, IconButton, InputAdornment, Paper, TextField } from '@mui/material';
 import styled from '@emotion/styled';
-import { Context } from '../../context/Context';
-import { useState } from 'react';
-import { useContext } from 'react';
-import axios from 'axios';
-import { LoginSuccess } from '../../context/Action';
+import { useEffect, useRef, useState } from 'react';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
+import { setAuth } from '../../features/auth/authSlice';
+import { useLoginMutation } from '../../features/auth/authApiSlice';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import usePersist from '../../hooks/usePersist';
+
 const CustomInput = styled(TextField)(({ theme }) => ({
-    '& .MuiInputBase-root': {
-        borderRadius: 0,
-        backgroundColor: 'white',
-        color: 'black'
-    },
-    '& label.Mui-focused': {
-        color: '#b4a0a8'
-    },
-    '& .MuiInput-underline:after': {
-        borderBottomColor: '#B2BAC2',
-    },
-    '& .MuiOutlinedInput-root': {
+  '& .MuiInputBase-root': {
     borderRadius: 0,
-        '& fieldset': {
-            borderRadius: 0,
-            borderColor: '#E0E3E7',
-        },
-        '&:hover fieldset': {
-            borderRadius: 0,
-            borderColor: '#B2BAC2',
-        },
-        '&.Mui-focused fieldset': {
-            borderRadius: 0,
-            borderColor: '#6F7E8C',
-        },
+    backgroundColor: 'white',
+    color: 'black'
+  },
+  '& label.Mui-focused': {
+    color: '#b4a0a8'
+  },
+  '& .MuiInput-underline:after': {
+    borderBottomColor: '#B2BAC2',
+  },
+  '& .MuiOutlinedInput-root': {
+    borderRadius: 0,
+    '& fieldset': {
+      borderRadius: 0,
+      borderColor: '#E0E3E7',
     },
-    '& input:valid + fieldset': {
-        borderColor: 'lightgray',
-        borderRadius: 0,
-        borderWidth: 1,
+    '&:hover fieldset': {
+      borderRadius: 0,
+      borderColor: '#B2BAC2',
     },
-    '& input:invalid + fieldset': {
-        borderColor: '#f25a5a',
-        borderRadius: 0,
-        borderWidth: 1,
+    '&.Mui-focused fieldset': {
+      borderRadius: 0,
+      borderColor: '#6F7E8C',
     },
-    '& input:valid:focus + fieldset': {
-        borderColor: '#0f3e3c',
-        borderLeftWidth: 4,
-        borderRadius: 0,
-        padding: '4px !important', 
-    },
+  },
+  '& input:valid + fieldset': {
+    borderColor: 'lightgray',
+    borderRadius: 0,
+    borderWidth: 1,
+  },
+  '& input:invalid + fieldset': {
+    borderColor: '#f25a5a',
+    borderRadius: 0,
+    borderWidth: 1,
+  },
+  '& input:valid:focus + fieldset': {
+    borderColor: '#0f3e3c',
+    borderLeftWidth: 4,
+    borderRadius: 0,
+    padding: '4px !important',
+  },
 }));
 
 export default function Login() {
+  const errRef = useRef();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [persist, setPersist] = usePersist();
   const [showPassword, setShowPassword] = useState(false);
-  const { dispatch, isLoading } = useContext(Context);
+  const [errMsg, setErrMsg] = useState("");
+  const [login, { isLoading }] = useLoginMutation();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/"; //Previous route
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    setErrMsg("");
+  }, [username, password]);
 
   const handleClick = () => setShowPassword((showPassword) => !showPassword);
 
-  const handleMouseDown = (e) => {
-      e.preventDefault();
-  };
+  const handleMouseDown = (e) => { e.preventDefault() };
+
+  const handleTogglePersist = () => { setPersist(prev => !prev) };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch({type: "LOGIN_START"});
-    try{
-      const res = await axios.post("/auth/login", {
-        username: username,
-        password: password
-      })
-      dispatch(LoginSuccess(res.data))
-    } catch(err) {
-      dispatch({type: "LOGIN_FAIL"});
+    try {
+      const { accessToken } = await login({ username, password }).unwrap();
+      dispatch(setAuth({ accessToken }));
+      setUsername("");
+      setPassword("");
+      navigate(from, { replace: true });
+    } catch (err) {
+      if (!err.status) {
+        setErrMsg("Server không phản hồi!");
+      } else if (err.status === 400) {
+        setErrMsg("Vui lòng nhập đầy đủ thông tin!");
+      } else if (err.status === 401) {
+        setErrMsg("Sai tài khoản hoặc mật khẩu!");
+      } else {
+        setErrMsg(err.data?.message);
+      }
+      errRef.current.focus();
     }
   }
 
-  const endAdornment=
-  <InputAdornment position="end">
+  const endAdornment =
+    <InputAdornment position="end">
       <IconButton
-          aria-label="toggle password visibility"
-          onClick={handleClick}
-          onMouseDown={handleMouseDown}
-          edge="end"
-          sx={{
+        aria-label="toggle password visibility"
+        onClick={handleClick}
+        onMouseDown={handleMouseDown}
+        edge="end"
+        sx={{
           "&:focus": {
-              outline: 'none',
-          }}}
+            outline: 'none',
+          }
+        }}
       >
-          {showPassword ? <VisibilityOff /> : <Visibility />}
+        {showPassword ? <VisibilityOff /> : <Visibility />}
       </IconButton>
-  </InputAdornment>
+    </InputAdornment>
 
   return (
     <div className="loginContainer">
-      <Container fluid maxWidth="lg" sx={{display: 'flex', justifyContent: 'center'}}>
+      <Container fluid maxWidth="lg" sx={{ display: 'flex', justifyContent: 'center' }}>
         <form className="login" onSubmit={handleSubmit}>
           <Paper square elevation={3} className="loginBox">
             <p className="loginTitle">ĐĂNG NHẬP</p>
+            <p ref={errRef} className="errorMessage" aria-live="assertive">{errMsg}</p>
             <CustomInput
-                fullWidth
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                id="username"
-                label="Tên đăng nhập"
-                // helperText="Không được bỏ trống"
-                sx={{marginBottom: '15px', maxWidth: '400px'}}
+              fullWidth
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              id="username"
+              label="Tên đăng nhập"
+              // helperText="Không được bỏ trống"
+              autoComplete="off"
+              sx={{ marginBottom: '15px', maxWidth: '400px' }}
             />
             <CustomInput
-                fullWidth
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                label="Mật khẩu"
-                // helperText="Không được bỏ trống"
-                sx={{marginBottom: '15px', maxWidth: '400px'}}
-                InputProps={{
-                  endAdornment: endAdornment
-                }}
+              fullWidth
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              label="Mật khẩu"
+              // helperText="Không được bỏ trống"
+              sx={{ marginBottom: '15px', maxWidth: '400px' }}
+              InputProps={{
+                endAdornment: endAdornment
+              }}
             />
-             <div className="persistCheck">
-                <p className="persist">
-                    <input id="persist" type="checkbox" value="persist"/> 
-                    <label htmlFor="persist">Lưu đăng nhập</label>
-                </p>
-                <div className="forgot">Quên mật khẩu</div>
+            <div className="persistCheck">
+              <p className="persist">
+                <input id="persist" 
+                type="checkbox" 
+                checked={persist}
+                onChange={handleTogglePersist}/>
+                <label htmlFor="persist">Lưu đăng nhập</label>
+              </p>
+              <div className="forgot">Quên mật khẩu</div>
             </div>
             <button className="loginButton" disabled={isLoading}>
               Đăng nhập

@@ -2,16 +2,14 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-let refreshTokens = [];
-
 //Generate access token
 function generateAccessToken(user) {
-    return jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.SECRET_KEY, {expiresIn: '15m'});
+    return jwt.sign({ id: user._id, username: user.username, isAdmin: user.isAdmin }, process.env.SECRET_KEY, {expiresIn: '15m'});
 }
 
 //Generate refresh token
 function generateRefreshToken(user) {
-    return jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.SECRET_REFRESH_KEY);
+    return jwt.sign({ id: user._id, username: user.username, isAdmin: user.isAdmin }, process.env.SECRET_REFRESH_KEY, {expiresIn: '30d'});
 }
 
 //Register
@@ -35,23 +33,31 @@ const register = async (req, res) => {
 
 //Login
 const login = async (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) return res.status(400).json({ message: "Username and password are required!" });
+
     try {
         const user = await User.findOne({username: req.body.username}) //Find by username
-        if (!user) return res.status(400).json("Invalid Credential!");
+        if (!user) return res.status(401).json("Invalid Credential!");
 
         const passValid = await bcrypt.compare(req.body.password, user.password); //Check password
-        if (!passValid) return res.status(400).json("Invalid Credential!");
+        if (!passValid) return res.status(401).json("Invalid Credential!");
         
         const accessToken = generateAccessToken(user);
         const refreshToken = generateRefreshToken(user);
-        refreshTokens.push(refreshToken);
+
+        //Store refresh token in cookie
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "None",
+            maxAge: 30 * 25 * 60 * 60 * 1000
+        })
 
         res.status(200).json({
             username: user.username,
-            isAdmin: user.isAdmin,
-            fullName: user.fullName,
-            accessToken,
-            refreshToken
+            accessToken
         });
     } catch(err) {
         res.status(500).json(err);
@@ -60,30 +66,39 @@ const login = async (req, res) => {
 
 //Refresh access token
 const refresh = (req, res) => {
-    const refreshToken = req.body.token;
-    if(!refreshToken) return res.status(401).json("Not authenticated!")
-    if(!refreshTokens.includes(refreshToken)) return res.status(403).json("Invalid refresh token!");
-    
-    jwt.verify(refreshToken, process.env.SECRET_REFRESH_KEY, (err, user) => {
-        if (err) return res.status(403).json(err);
-        refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
+    const cookies = req.cookies;
+    if(!cookies?.refreshToken) return res.status(401).json("Unauthorized!"); //Check if exist
+
+    //Validate refresh token
+    const refreshToken = cookies.refreshToken;
+    jwt.verify(refreshToken, 
+        process.env.SECRET_REFRESH_KEY, 
+        async (err, auth) => {
+        if (err) return res.status(403).json({ message: "Forbiden!", err});
+
+        //Find token's user
+        const user = await User.findById(auth.id);
+        if (!user) return res.status(401).json({ message: "Invalid Credential!" });
 
         const newAccessToken = generateAccessToken(user);
-        const newRefreshToken = generateRefreshToken(user);
-        refreshTokens.push(newRefreshToken);
 
         res.status(200).json({
             accessToken: newAccessToken,
-            refreshToken: newRefreshToken
-        })
-    })
+        })}
+    )
 }
 
 //Lougout
 const logout = (req, res) => {
-    const refreshToken = req.body.token;
-    refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
-    res.status(200).json("Logged out");
+    const cookies = req.cookies;
+    if (!cookies?.refreshToken) return res.sendStatus(204);
+
+    res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'None'
+    })
+    res.status(200).json({ message: "Logged out" });
 }
 
 module.exports = {

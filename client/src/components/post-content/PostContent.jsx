@@ -1,26 +1,28 @@
 import './postcontent.css'
 import { Box } from '@mui/material';
 import { CalendarMonth, Chat as ChatIcon, Edit as EditIcon, Delete as DeleteIcon, Sell as SellIcon } from '@mui/icons-material';
-import { useContext } from 'react';
-import { Context } from '../../context/Context';
+import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useDeletePostMutation } from '../../features/posts/postsApiSlice';
+import useAuth from '../../hooks/useAuth';
 
 export default function PostContent({ post, previewMode }) {
-  const { auth } = useContext(Context);
+  const { id: currUser, isAdmin } = useAuth();
   const date = new Date(post.createdAt)
   const navigate = useNavigate();
-  const PF = "http://localhost:5000/images/"
 
-  const handleDelete = async () => {
-    try {
-      await axios.delete(`/posts/${post.slug}`, {
-        data: {username: auth.username}
-      });
-      navigate('/');
-    } catch(err) {
-      console.log(err);
-    }
+  const [deletePost, {
+    isSuccess,
+    isError,
+    error,
+  }] = useDeletePostMutation()
+
+  useEffect(() => {
+    if (isSuccess) navigate('/');
+  }, [isSuccess, navigate])
+
+  const onDeleteClicked = async () => {
+    await deletePost({ id: post.id })
   }
 
   return (
@@ -40,7 +42,7 @@ export default function PostContent({ post, previewMode }) {
             1 lượt đánh giá
           </div>
         </Box>
-        { (auth?.username === post.username && !previewMode) && (
+        { ((currUser == post.user || isAdmin) && !previewMode) && (
           <Box className="rightInfo" display="flex" alignItems="center">
             <Link to={`/edit-post/${post.slug}`} style={{textDecoration: 'none'}}>
               <Box className="infoButton" sx={{ color: '#0f3e3c', borderColor: '#0f3e3c' }}>
@@ -50,7 +52,7 @@ export default function PostContent({ post, previewMode }) {
             </Link>
             <Box className="infoButton" 
             sx={{ color: '#f25a5a', borderColor: '#f25a5a' }}
-            onClick={handleDelete}>
+            onClick={onDeleteClicked}>
               <DeleteIcon sx={{ marginRight: 1 }} />
               Xoá bài
             </Box>
@@ -60,13 +62,13 @@ export default function PostContent({ post, previewMode }) {
       <div className="postContent">
         <Box display="flex" justifyContent="center">
           <img className="postContentThumbnail" alt=""
-            src={PF + post.thumbnail}
+            src={post.thumbnail}
           />
         </Box>
         <div className="postContentMarkdown" dangerouslySetInnerHTML={{ __html: post.sanitizedHtml }}/>
       </div>
       <figure className="authorInfo">
-        <figcaption>- Người viết: {post.author}</figcaption>
+        <figcaption>- Người viết: {post.author ? post.auth : "Vô danh"}</figcaption>
       </figure>
       <div className="tagInfo">
         <div className="tag">

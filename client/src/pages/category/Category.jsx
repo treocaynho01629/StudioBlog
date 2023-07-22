@@ -3,9 +3,7 @@ import BreadCrumbs from '../../components/breadcrumbs/BreadCrumbs';
 import Post from '../../components/post/Post';
 import { Container } from '@mui/material';
 import { useState } from 'react';
-import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 import { useGetPostsQuery } from '../../features/posts/postsApiSlice';
 
 export default function Category() {

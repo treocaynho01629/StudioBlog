@@ -48,7 +48,9 @@ const getPosts = async (req, res) => {
 
 //Create new post
 const createPost = async (req, res) => {
-    const { title, description, markdown, category, thumbnail, tags } = req.body
+    const { title, description, markdown, category, tags, file } = req.body
+
+    const baseUrl = req.protocol + "://" + req.headers.host + "/api/images/"
 
     //Authorization
     if (!title || !description || !markdown || !category) {
@@ -65,7 +67,7 @@ const createPost = async (req, res) => {
         description,
         markdown,
         category,
-        thumbnail,
+        thumbnail: baseUrl + file.filename,
         tags,
         user: req.auth.id
     });
@@ -81,6 +83,7 @@ const createPost = async (req, res) => {
 //Update post
 const updatePost = async (req, res) => {
     const { title, description, markdown, category, thumbnail, tags } = req.body
+    const { id } = req.params;
 
     //Authorization
     if (!title || !description || !markdown || !category) {
@@ -88,7 +91,7 @@ const updatePost = async (req, res) => {
     }
 
     //Get original post
-    let post = await Post.findOne({ slug: req.params.slug }).exec();
+    let post = await Post.findById(id).exec();
     if (!post) return res.status(400).json({ message: "Post not found!"})
 
     //Check if post existed
@@ -124,13 +127,14 @@ const updatePost = async (req, res) => {
 //Delete post
 const deletePost = async (req, res) => {
     //Get original post
-    const post = await Post.findOne({ slug: req.params.slug }).exec();
+    const { id } = req.params;
+    const post = await Post.findById(id).exec();
     if (!post) return res.status(400).json({ message: "Post not found!"})
 
     try {
         if (post.user == req.auth.id || req.auth.isAdmin) {
             try{
-                await Post.findOneAndDelete({ slug: req.params.slug });
+                await Post.findByIdAndDelete(id);
                 res.status(200).json({ message: "Post deleted"});
             } catch(err) {
                 res.status(500).json(err);

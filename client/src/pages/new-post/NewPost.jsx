@@ -4,8 +4,6 @@ import { AddCircleOutline as AddCircleOutlineIcon, Visibility, Done } from '@mui
 import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useContext } from 'react';
-import { Context } from '../../context/Context';
 import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
 import { marked } from "marked";
@@ -77,7 +75,6 @@ export default function NewPost() {
   const [file, setFile] = useState(null);
   const [open, setOpen] = useState(false);
   const [preview, setPreview] = useState(null);
-  const { auth } = useContext(Context);
   const navigate = useNavigate();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
@@ -108,8 +105,7 @@ export default function NewPost() {
       description,
       sanitizedHtml: marked.parse(markdown),
       thumbnail: 'test.png',
-      tags,
-      username: auth.username
+      tags
     }
     setPreview(previewPost);
     setOpen(true);
@@ -128,32 +124,19 @@ export default function NewPost() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
+    //Create post
     if (validPost){
-      const newPost = {
-        title,
-        description,
-        markdown,
-        category: cate,
-        tags,
-        username: auth.username
-      }
+      const newPost = new FormData();
+
+      newPost.append('title', title);
+      newPost.append('description', description);
+      newPost.append('markdown', markdown);
+      newPost.append('category', cate);
+      newPost.append('tags', tags);
+      newPost.append('file', file);
   
-      //Upload image
-      const data = new FormData();
-      const filename = Date.now() + file.name;
-      data.append("name", filename);
-      data.append("file", file);
-      newPost.thumbnail = filename;
-
-      try {
-        await axios.post("/upload", data);
-      } catch (err) {
-        console.log(err);
-      }
-
-      //Create post
-      await createPost(newPost);
+      await createPost(newPost).unwrap();
     }
   }
 
@@ -202,8 +185,8 @@ export default function NewPost() {
                   value={cate}
                   onChange={(e) => setCate(e.target.value)}
                 >
-                  {categories?.map((cate) => (
-                    <MenuItem key={cate.id} value={cate.type}>
+                  {categories?.map((cate, index) => (
+                    <MenuItem key={index} value={cate.type}>
                       {cate.name}
                     </MenuItem>
                   ))}

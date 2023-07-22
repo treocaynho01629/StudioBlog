@@ -3,11 +3,13 @@ const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
 const cors = require("cors");
+const corsOptions = require("./configs/corsOption");
 const {google} = require("googleapis");
 const { default: axios } = require("axios");
 const { logger, logEvents } = require("./middlewares/logger");
 const errorHandler = require("./middlewares/errorHandler");
 const connectDB = require("./configs/dbConn");
+const cookieParser = require('cookie-parser');
 const authRoute = require("./routes/auth");
 const userRoute = require("./routes/users");
 const postRoute = require("./routes/posts");
@@ -20,9 +22,11 @@ connectDB();
 
 app.use(logger);
 
+app.use(cors(corsOptions));
+
 app.use(express.json());
 
-app.use(cors());
+app.use(cookieParser());
 
 app.use("/images", express.static(path.join(__dirname, "/images")));
 
@@ -70,7 +74,7 @@ app.get("/api/reviews", async (req, res, next) => {
         const placeId = 'ChIJs-ARcbATcTERIH6s54a3f00';
         const url = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&language=vi&key=${apiKey}`
         const response = await axios.get(url);
-        const reviews = response.data.result.reviews.map((review) => { 
+        const reviews = response.data.result?.reviews?.map((review) => { 
             return { 
                 author: review.author_name, 
                 content: review.text,

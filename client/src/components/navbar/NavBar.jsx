@@ -2,9 +2,9 @@ import './navbar.css'
 import { AppBar, Stack, Grid, Collapse, useScrollTrigger, Typography, Container, Menu, MenuItem, ListItemIcon } from '@mui/material'
 import { Phone as PhoneIcon, Mail as MailIcon, Menu as MenuIcon, Logout, AddCircleOutline, Person } from '@mui/icons-material'
 import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
-import { Context } from '../../context/Context';
-import { useContext } from 'react';
+import { useEffect, useState } from 'react';
+import { useSignoutMutation } from '../../features/auth/authApiSlice';
+import useAuth from '../../hooks/useAuth';
 
 function HideOnScroll(props) {
     const { children, window } = props;
@@ -46,14 +46,15 @@ const menuStyle = {
 }
 
 export default function NavBar(props) {
+    const { username, isAdmin } = useAuth();
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
-    const { auth, dispatch } = useContext(Context);
     const navigate = useNavigate();
+    const [signout] = useSignoutMutation();
 
-    const handleLogout = () => {
+    const handleSignout = () => {
         handleClose();
-        dispatch({type: "LOGOUT"});
+        signout();
     }
 
     const handleNewPost = () => {
@@ -62,7 +63,7 @@ export default function NavBar(props) {
     }
 
     const handleClick = (event) => {
-        auth ? setAnchorEl(event.currentTarget) : navigate('/login');
+        username ? setAnchorEl(event.currentTarget) : navigate('/login');
     };
 
     const handleClose = () => {
@@ -112,7 +113,7 @@ export default function NavBar(props) {
                                     <MenuIcon sx={{ fontSize: 26 }} />
                                 </button>
                                 <button className="signUpButton" onClick={handleClick}>
-                                    { auth ? auth.username : 'Đăng nhập' }
+                                    { username ? username : 'Đăng nhập' }
                                     <Person sx={{ fontSize: 26, marginLeft: 1 }} />
                                 </button>
                                 <Menu
@@ -133,7 +134,7 @@ export default function NavBar(props) {
                                         </ListItemIcon>
                                         Thêm bài viết
                                     </MenuItem>
-                                    <MenuItem onClick={handleLogout}>
+                                    <MenuItem onClick={handleSignout}>
                                         <ListItemIcon>
                                             <Logout fontSize="small" />
                                         </ListItemIcon>

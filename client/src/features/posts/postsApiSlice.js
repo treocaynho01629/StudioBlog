@@ -9,7 +9,7 @@ export const postsApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
         getPost: builder.query({
             query: ({ slug }) => ({
-                url: `/api/posts/${slug}`,
+                url: `/posts/${slug}`,
                 validateStatus: (response, result) => {
                     return response.status === 200 && !result.isError
                 },
@@ -22,7 +22,7 @@ export const postsApiSlice = apiSlice.injectEndpoints({
         }),
         getPosts: builder.query({
             query: () => ({
-                url: '/api/posts',
+                url: '/posts',
                 validateStatus: (response, result) => {
                     return response.status === 200 && !result.isError
                 },
@@ -44,24 +44,24 @@ export const postsApiSlice = apiSlice.injectEndpoints({
             }
         }),
         createPost: builder.mutation({
-            query: initialPost => ({
-                url: '/api/posts',
+            query: (newPost) => ({
+                url: '/posts',
                 method: 'POST',
-                body: {
-                    ...initialPost,
-                }
+                credentials: 'include',
+                body: newPost,
+                formData: true
             }),
             invalidatesTags: [
                 { type: 'Post', id: "LIST" }
             ]
         }),
         updatePost: builder.mutation({
-            query: initialPost => ({
-                url: '/api/posts',
+            query: (updatedPost) => ({
+                url: '/posts',
                 method: 'PUT',
-                body: {
-                    ...initialPost,
-                }
+                credentials: 'include',
+                body: updatedPost,
+                formData: true
             }),
             invalidatesTags: (result, error, arg) => [
                 { type: 'Post', id: arg.id }
@@ -69,7 +69,7 @@ export const postsApiSlice = apiSlice.injectEndpoints({
         }),
         deletePost: builder.mutation({
             query: ({ id }) => ({
-                url: `/api/posts/${id}`,
+                url: `/posts/${id}`,
                 method: 'DELETE'
             }),
             invalidatesTags: (result, error, arg) => [
