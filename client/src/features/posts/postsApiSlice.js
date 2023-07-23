@@ -21,12 +21,16 @@ export const postsApiSlice = apiSlice.injectEndpoints({
             providesTags: ['Post']
         }),
         getPosts: builder.query({
-            query: () => ({
-                url: '/posts',
-                validateStatus: (response, result) => {
-                    return response.status === 200 && !result.isError
-                },
-            }),
+            query: (args) => {
+                const { cate, user, tags } = args;
+                return {
+                    url: `/posts`,
+                    params: { cate, user, tags },
+                    validateStatus: (response, result) => {
+                        return response.status === 200 && !result.isError
+                    },
+                }
+            },
             transformResponse: responseData => {
                 const loadedPosts = responseData.map(post => {
                     post.id = post._id
@@ -56,8 +60,8 @@ export const postsApiSlice = apiSlice.injectEndpoints({
             ]
         }),
         updatePost: builder.mutation({
-            query: (updatedPost) => ({
-                url: '/posts',
+            query: ({ id, ...updatedPost }) => ({
+                url: `/posts/${id}`,
                 method: 'PUT',
                 credentials: 'include',
                 body: updatedPost,

@@ -11,6 +11,7 @@ import RequireAuth from "./features/auth/RequireAuth";
 import { Route, Routes } from "react-router-dom";
 import useAuth from "./hooks/useAuth";
 import Unauthorized from "./pages/unauthorized/Unauthorized";
+import Prefetch from "./features/auth/Prefetch";
 
 function App() {
   const { username } = useAuth();
@@ -23,18 +24,23 @@ function App() {
         <Route path="/unauthorized" element={<Unauthorized/>}/>
         
         <Route element={<PersistLogin/>}>
-          <Route path="/" element={<Home/>}/>
-          <Route path="/category/:cate" element={<Category/>}/>
-          <Route path="/post/:slug" element={<PostDetail/>}/>
+            <Route path="/" element={<Home/>}/>
+            <Route path="/category/:cate" element={<Category/>}/>
+            <Route path="/post/:slug" element={<PostDetail/>}/>
 
-          //EMPLOYEE
-          <Route element={<RequireAuth onlyAdmin={false}/>}>
-            <Route path="/new-post" element={<NewPost/>}/>
-          </Route>
+            //EMPLOYEE
+            <Route element={<RequireAuth onlyAdmin={false}/>}>
+              <Route path="/new-post" element={<NewPost/>}/>
+            </Route>
 
-          //ADMIN
-          <Route element={<RequireAuth onlyAdmin={true} />}>
-            <Route path="/edit-post/:slug" element={<EditPost/>}/>
+            //ADMIN
+            <Route element={<RequireAuth onlyAdmin={true} />}>
+              <Route path="/edit-post/:slug" element={<EditPost/>}/>
+            </Route>
+          
+          //PREFETCH PROTECTED
+          <Route element={<Prefetch/>}>
+            //Add later (userlist, commentlist, postlist)
           </Route>
         </Route>
       </Routes>

@@ -2,13 +2,7 @@ import './post.css';
 import { Box, Grid, Paper } from '@mui/material';
 import { Link } from 'react-router-dom';
 
-import { useSelector } from 'react-redux';
-import { selectPostById } from '../../features/posts/postsApiSlice';
-
-export default function Post({ postId }) {
-    const PF = "http://localhost:5000/images/";
-    const post = useSelector(state => selectPostById(state, postId));
-
+export default function Post({ post }) {
     if (post) {
         return (
             <div className="postContainer">
@@ -16,7 +10,7 @@ export default function Post({ postId }) {
                     <Grid container>
                         <Grid item xs={12} sm={4} sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                             <img className="postThumbnail"
-                                src={PF + post.thumbnail}
+                                src={post.thumbnail}
                                 alt="" />
                         </Grid>
                         <Grid item xs={12} sm={8} sx={{display: 'flex', alignItems: 'center'}}>

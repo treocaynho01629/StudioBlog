@@ -8,18 +8,18 @@ import useAuth from '../../hooks/useAuth';
 
 export default function PostContent({ post, previewMode }) {
   const { id: currUser, isAdmin } = useAuth();
-  const date = new Date(post.createdAt)
+  const date = new Date(post.createdAt);
   const navigate = useNavigate();
 
   const [deletePost, {
     isSuccess,
     isError,
     error,
-  }] = useDeletePostMutation()
+  }] = useDeletePostMutation();
 
   useEffect(() => {
     if (isSuccess) navigate('/');
-  }, [isSuccess, navigate])
+  }, [isSuccess, navigate]);
 
   const onDeleteClicked = async () => {
     await deletePost({ id: post.id })
@@ -75,7 +75,7 @@ export default function PostContent({ post, previewMode }) {
           <SellIcon />
           Từ khoá:
         </div>
-        {post.tags.map((tag, index) => (
+        {post?.tags?.map((tag, index) => (
             <div key={index} className="smallTag">{tag}</div>
         ))}
         

@@ -1,55 +1,26 @@
 import './home.css'
-import { useEffect, useState } from 'react'
 import { Container, Grid } from '@mui/material';
 import { Lightbulb, AttachMoney, HelpCenter, ArrowRight } from '@mui/icons-material';
 import ServicePosts from '../../components/service-posts/ServicePosts';
 import BannerSlider from '../../components/banner-slider/BannerSlider';
-import YoutubeEmbed from '../../components/youtube-embed/YoutubeEmbed';
-import useFetch from '../../hooks/useFetch';
+import YoutubeList from '../../components/youtube-list/YoutubeList';
 import Reviews from '../../components/Reviews/Reviews';
 
 export default function Home() {
-    const [posts, setPosts] = useState([]);
-    const [videos, setVideos] = useState([]);
-    const [reviews, setReviews] = useState([]);
-    const { data, isLoading } = useFetch("/posts");
-    const { data: dataVideo, isLoading: loadingVideo } = useFetch("/videos");
-    const { data: dataReview, isLoading: loadingReview } = useFetch("/reviews");
-
-    useEffect(() => {
-        if (!isLoading && data){
-            setPosts(data);
-        }
-    }, [data])
-
-    useEffect(() => {
-        if (!loadingVideo && dataVideo){
-            setVideos(dataVideo);
-        }
-    }, [dataVideo])
-
-    useEffect(() => {
-        if (!loadingReview && dataReview){
-            setReviews(dataReview);
-        }
-    }, [dataReview])
-
     return (
         <div className="homeContainer">
             <BannerSlider/>
             <Container fluid maxWidth="lg">
                 <div className="box">
                     <h1 className="mainTitle">DỊCH VỤ NỔI BẬT</h1>
-                    <ServicePosts posts={posts}/>
+                    <ServicePosts/>
                 </div>
             </Container>
             <div className="alterBox">
                 <Container fluid maxWidth="lg">
                     <div className="videoContainer">
                         <h1 className="mainTitle">SẢN PHẨM NỔI BẬT</h1>
-                    {videos.map((video) => (
-                        <YoutubeEmbed key={video.videoId} video={video} />
-                    ))}
+                        <YoutubeList/>
                     </div>
                 </Container>
             </div>
@@ -98,7 +69,7 @@ export default function Home() {
                 <Container fluid maxWidth="lg">
                     <div className="reviewContainer">
                         <h1 className="mainTitle">PHẢN HỒI KHÁCH HÀNG</h1>
-                        <Reviews reviews={reviews}/>
+                        <Reviews/>
                     </div>
                 </Container>
             </div>

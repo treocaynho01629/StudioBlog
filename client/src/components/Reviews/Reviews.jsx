@@ -1,6 +1,7 @@
 import './reviews.css';
 import Review from '../review/Review';
 import Slider from 'react-slick';
+import { useGetReviewsQuery } from '../../features/google/googleApiSlice';
 
 const settings = {
     infinite: true,
@@ -28,14 +29,30 @@ const settings = {
     ]
 };
 
-export default function Reviews({ reviews }) {
-  return (
-    <div className="reviews">
-        <Slider {...settings}>
-            {reviews.map((review) => (
-                <Review review={review} />
-            ))}
-        </Slider>
-    </div>
-  )
+export default function Reviews() {
+    const { data: reviews, isLoading, isSuccess, isError, error } = useGetReviewsQuery("reviewsList");
+
+    let content;
+
+    if (isLoading) {
+        content = <p>Loading ...</p>
+    } else if (isSuccess) {
+        const reviewsList = reviews?.length !== 0
+            ? reviews?.map((review, index) => (
+                <Review key={index} review={review} />
+            ))
+            : <p>Skeleton</p>
+
+        content = (
+            <div className="reviews">
+                <Slider {...settings}>
+                {reviewsList}
+                </Slider>
+            </div>
+        )
+    } else if (isError){
+        content = <p>{error}</p>
+    }
+
+    return content;
 }

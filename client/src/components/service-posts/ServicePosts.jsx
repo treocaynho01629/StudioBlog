@@ -3,6 +3,7 @@ import ServicePost from '../../components/service-post/ServicePost'
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { useGetPostsQuery } from '../../features/posts/postsApiSlice';
 
 const settings = {
     infinite: true,
@@ -43,16 +44,38 @@ const settings = {
     ]
 };
 
-export default function ServicePosts({ posts }) {
-    return (
+export default function ServicePosts() {
+    const { data: posts, isLoading, isSuccess, isError, error } = useGetPostsQuery(
+        { cate: 'service' }, 
+        "postsList", {
+        refetchOnMountOrArgChange: true
+    });
+
+    let content;
+
+    if (isLoading) {
+        content = <p>Loading...</p>
+    } else if (isSuccess) {
+        const { entities } = posts;
+
+        const postsList = entities?.length
+            ? entities?.map(post => (
+                <div key={post.id} className="servicePostsWrapper">
+                    <ServicePost post={post}/>
+                </div>
+            ))
+            : null
+
+        content = (
         <div className="servicePostsContainer">
             <Slider {...settings}>
-                {posts.map((post) => (
-                    <div key={post.id} className="servicePostsWrapper">
-                        <ServicePost post={post}/>
-                    </div>
-                ))}
+                {postsList}
             </Slider>
         </div>
-    )
+        )
+    } else if (isError){
+        content = <p>{error}</p>
+    }
+
+    return content;
 }

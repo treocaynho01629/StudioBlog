@@ -40,7 +40,13 @@ const getPosts = async (req, res) => {
 
         if (!posts.length) return res.status(400).json({ message: "No posts found!"});
 
-        res.status(200).json(posts);
+        //Author
+        const resultPosts = await Promise.all(posts.map(async (post) => {
+            const author = await User.findById(post.user, {fullName:1, _id:0}).lean().exec();
+            return { ...post, author: author.fullName }
+        }))
+
+        res.status(200).json(resultPosts);
     } catch(err) {
         res.status(500).json(err);
     }
