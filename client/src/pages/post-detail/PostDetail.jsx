@@ -10,14 +10,6 @@ export default function PostDetail() {
   const { slug } = useParams();
   const { data: post, isLoading, isSuccess, isError, error } = useGetPostQuery({ slug });
 
-  // const { data: post, isLoading, isSuccess, isError, error } = useGetPostsQuery("postsList", {
-  //   selectFromResult: ({ data, isLoading, isSuccess, isError, error }) => ({
-  //       data: data?.ids.filter(postId => data?.entities[postId].slug === slug)[0],
-  //       isLoading, isSuccess, isError, error 
-  //   }),
-  // })
-
-
   let content;
   if (isLoading) {
     content = <p>Loading...</p>

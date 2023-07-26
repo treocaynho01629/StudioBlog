@@ -46,24 +46,25 @@ const settings = {
 
 export default function ServicePosts() {
     const { data: posts, isLoading, isSuccess, isError, error } = useGetPostsQuery(
-        { cate: 'service' }, 
-        "postsList", {
-        refetchOnMountOrArgChange: true
-    });
+        { size: 6, cate: 'service' }, 
+        { refetchOnMountOrArgChange: true }
+    );
 
     let content;
 
     if (isLoading) {
         content = <p>Loading...</p>
     } else if (isSuccess) {
-        const { entities } = posts;
+        const { ids, entities } = posts;
 
-        const postsList = entities?.length
-            ? entities?.map(post => (
-                <div key={post.id} className="servicePostsWrapper">
+        const postsList = ids?.length
+            ? ids?.map(postId => {
+                const post = entities[postId];
+                 
+                return (<div key={post.id} className="servicePostsWrapper">
                     <ServicePost post={post}/>
                 </div>
-            ))
+            )})
             : null
 
         content = (

@@ -6,22 +6,24 @@ import { useParams } from 'react-router-dom';
 import { useGetPostsQuery } from '../../features/posts/postsApiSlice';
 
 export default function Category() {
-    const {cate} = useParams();
+    const { cate } = useParams();
     const { data: posts, isLoading, isSuccess, isError, error } = useGetPostsQuery(
         { cate }, 
-        "postsList", {
-        refetchOnMountOrArgChange: true
-    });
+        { refetchOnMountOrArgChange: true }
+    );
 
     let content;
     
     if (isLoading) {
         content = <p>Loading...</p>
     } else if (isSuccess) {
-        const { ids } = posts;
+        const { ids, entities } = posts;
 
         const postsList = ids?.length
-            ? ids.map(postId => <Post key={postId} postId={postId}/>)
+            ? ids.map(postId => {
+                const post = entities[postId];
+                return (<Post key={post.id} post={post}/>)
+            })
             : null
 
         content = (

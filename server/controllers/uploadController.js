@@ -1,10 +1,10 @@
 const { uploadFileMiddleware, uploadFilesMiddleware} = require("../middlewares/upload");
+const Post = require("../models/Post");
 
 const MongoClient = require("mongodb").MongoClient;
 const GridFSBucket = require("mongodb").GridFSBucket;
 
 const url = process.env.MONGO_URL;
-
 const mongoClient = new MongoClient(url);
 
 const uploadImage = async (req, res, next) => {
@@ -95,9 +95,42 @@ const download = async (req, res) => {
   }
 };
 
+const deleteImage = async (req, res, next) => {
+  const { name, id } = req.params;
+
+  try {
+    const database = mongoClient.db(process.env.DATABASE_NAME);
+    const bucket = new GridFSBucket(database, {
+      bucketName: 'images',
+    });
+
+    let filename;
+
+    if (id) {
+      const post = await Post.findById(id).exec();
+      if (!post) return res.status(400).json({ message: "Post not found!"});
+
+      const urlParts = post?.thumbnail.split('/');
+      filename = urlParts[urlParts.length - 1];
+    } else {
+      filename = name;
+    }
+
+    const images = await bucket.find({ filename });
+    images.forEach(image => bucket.delete(image._id));
+
+    console.log(`Deleted image file: ${filename}`);
+    next();
+  } catch (err){
+    console.log(err);
+    return res.status(500).json(err);
+  }
+}
+
 module.exports = {
   uploadImage,
   uploadImages,
   getListImages,
   download,
+  deleteImage
 };

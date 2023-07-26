@@ -16,7 +16,7 @@ export const googleApiSlice = apiSlice.injectEndpoints({
             query: () => ({
                 url: '/google/reviews',
                 validateStatus: (response, result) => {
-                    return response.status === 200 && !result.isError
+                    return response.status === 200 && !result?.isError
                 },
             }),
             providesTags: ["Review"]

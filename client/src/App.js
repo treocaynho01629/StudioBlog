@@ -31,11 +31,11 @@ function App() {
             //EMPLOYEE
             <Route element={<RequireAuth onlyAdmin={false}/>}>
               <Route path="/new-post" element={<NewPost/>}/>
+              <Route path="/edit-post/:slug" element={<EditPost/>}/>
             </Route>
 
             //ADMIN
             <Route element={<RequireAuth onlyAdmin={true} />}>
-              <Route path="/edit-post/:slug" element={<EditPost/>}/>
             </Route>
           
           //PREFETCH PROTECTED

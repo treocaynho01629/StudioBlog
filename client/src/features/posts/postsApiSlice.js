@@ -3,7 +3,14 @@ import { apiSlice } from "../../app/api/apiSlice";
 
 const postsAdapter = createEntityAdapter({});
 
-const initialState = postsAdapter.getInitialState();
+const initialState = postsAdapter.getInitialState({
+    info: {
+      currPage: 0,
+      pageSize: 0,
+      totalElements: 0,
+      numbersOfPages: 0,
+    },
+});
 
 export const postsApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
@@ -32,11 +39,12 @@ export const postsApiSlice = apiSlice.injectEndpoints({
                 }
             },
             transformResponse: responseData => {
-                const loadedPosts = responseData.map(post => {
+                const { info, data } = responseData;
+                const loadedPosts = data.map(post => {
                     post.id = post._id
                     return post
                 });
-                return postsAdapter.setAll(initialState, loadedPosts)
+                return postsAdapter.setAll({ ...initialState, info }, loadedPosts)
             },
             providesTags: (result, error, arg) => {
                 if (result?.ids) {
@@ -46,6 +54,13 @@ export const postsApiSlice = apiSlice.injectEndpoints({
                     ]
                 } else return [{ type: 'Post', id: 'LIST' }]
             }
+        }),
+        validatePost: builder.mutation({
+            query: initialPost => ({
+                url: '/posts',
+                method: 'PATCH',
+                body: { ...initialPost }
+            })
         }),
         createPost: builder.mutation({
             query: (newPost) => ({
@@ -60,7 +75,7 @@ export const postsApiSlice = apiSlice.injectEndpoints({
             ]
         }),
         updatePost: builder.mutation({
-            query: ({ id, ...updatedPost }) => ({
+            query: ({ id, updatedPost }) => ({
                 url: `/posts/${id}`,
                 method: 'PUT',
                 credentials: 'include',
@@ -86,24 +101,22 @@ export const postsApiSlice = apiSlice.injectEndpoints({
 export const {
     useGetPostQuery,
     useGetPostsQuery,
+    useValidatePostMutation,
     useCreatePostMutation,
     useUpdatePostMutation,
     useDeletePostMutation
 } = postsApiSlice
 
-// returns the query result object
 export const selectPostsResult = postsApiSlice.endpoints.getPosts.select()
 
-// creates memoized selector
 const selectPostsData = createSelector(
     selectPostsResult,
     postsResult => postsResult.data // normalized state object with ids & entities
 )
 
-//getSelectors creates these selectors and we rename them with aliases using destructuring
 export const {
     selectAll: selectAllPosts,
     selectById: selectPostById,
-    selectIds: selectPostIds
-    // Pass in a selector that returns the Posts slice of state
+    selectIds: selectPostIds,
+    selectEntities: selectPostEntities
 } = postsAdapter.getSelectors(state => selectPostsData(state) ?? initialState)

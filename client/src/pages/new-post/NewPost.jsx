@@ -3,14 +3,12 @@ import { Autocomplete, Box, Chip, Container, Dialog, DialogActions, DialogConten
 import { AddCircleOutline as AddCircleOutlineIcon, Visibility, Done } from '@mui/icons-material';
 import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
 import { marked } from "marked";
 import PostContent from '../../components/post-content/PostContent';
 import useFetch from '../../hooks/useFetch';
-import { useCreatePostMutation } from '../../features/posts/postsApiSlice';
-
+import { useCreatePostMutation, useValidatePostMutation } from '../../features/posts/postsApiSlice';
 
 const CustomInput = styled(TextField)(({ theme }) => ({
   '& .MuiInputBase-root': {
@@ -58,13 +56,8 @@ const CustomInput = styled(TextField)(({ theme }) => ({
 }));
 
 export default function NewPost() {
-  const [createPost, {
-    data: newPost,
-    isLoading,
-    isSuccess,
-    isError,
-    error
-  }] = useCreatePostMutation()
+  const [createPost, {data: newPost, isSuccess, isLoading}] = useCreatePostMutation();
+  const [validatePost] = useValidatePostMutation();
   const inputFile = useRef(null);
   const [categories, setCategories] = useState([]);
   const [title, setTitle] = useState("");
@@ -89,15 +82,15 @@ export default function NewPost() {
 
   useEffect(() => {
     if (isSuccess) {
-        setTitle('');
-        setDescription('');
-        setMarkdown('');
-        setCate('');
-        setTags([]);
-        setFile(null);
-        navigate(`/post/${newPost.slug}`)
+      setTitle('');
+      setDescription('');
+      setMarkdown('');
+      setCate('');
+      setTags([]);
+      setFile(null);
+      navigate(`/post/${newPost.slug}`)
     }
-}, [isSuccess, navigate])
+  }, [isSuccess, navigate])
 
   const handlePreview = () => {
     const previewPost = {
@@ -124,19 +117,41 @@ export default function NewPost() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    //Create post
-    if (validPost){
-      const newPost = new FormData();
 
-      newPost.append('title', title);
-      newPost.append('description', description);
-      newPost.append('markdown', markdown);
-      newPost.append('category', cate);
-      newPost.append('tags', tags);
-      newPost.append('file', file);
-  
-      await createPost(newPost).unwrap();
+    if (validPost) {
+      try {
+        //Validate
+        const newPost = {
+          title,
+          description,
+          markdown,
+          category: cate,
+          tags
+        }
+        const isValidPost = await validatePost(newPost).unwrap();
+       
+        if (isValidPost?.isValid) {
+
+          //Create post
+          try {
+            const form = new FormData();
+
+            form.append('title', title);
+            form.append('description', description);
+            form.append('markdown', markdown);
+            form.append('category', cate);
+            form.append('tags', tags);
+            form.append('file', file);
+      
+            await createPost(form).unwrap();
+          } catch (err){
+            console.log(err);
+          }
+        }
+      } catch (err){
+        //Error handler ...
+        console.log(err);
+      }
     }
   }
 
@@ -155,7 +170,11 @@ export default function NewPost() {
               style={{ display: "none" }}
               onChange={(e) => setFile(e.target.files[0])}
             />
-            <Box className="fileButton" onClick={handleOpenFile} sx={{ color: '#0f3e3c', borderColor: '#0f3e3c' }}>
+            <Box className="fileButton" onClick={handleOpenFile} 
+              sx={{ 
+                color: (!validPost && !file) ? '#f25a5a' : '#0f3e3c', 
+                borderColor: (!validPost && !file) ? '#f25a5a' : '#0f3e3c'
+              }}>
               <AddCircleOutlineIcon sx={{ marginRight: 1 }} />
               Ảnh đại diện
             </Box>
@@ -170,7 +189,7 @@ export default function NewPost() {
                   fullWidth
                   id="title"
                   label="Tiêu đề"
-                  // error
+                  error={!validPost && !title}
                   // helperText="Không được bỏ trống"
                   sx={{ marginBottom: '15px' }}
                 />
@@ -182,6 +201,7 @@ export default function NewPost() {
                   select
                   fullWidth
                   id="category"
+                  error={!validPost && !cate}
                   value={cate}
                   onChange={(e) => setCate(e.target.value)}
                 >
@@ -194,9 +214,7 @@ export default function NewPost() {
               </Grid>
             </Grid>
             <Box display="flex" justifyContent="center">
-              {file && (
-                <img className="thumbnailPreview" src={URL.createObjectURL(file)} alt="" />
-              )}
+              <img className="thumbnailPreview" src={file ? URL.createObjectURL(file) : null} alt="" />
             </Box>
             <TextareaAutosize
               required
@@ -206,6 +224,7 @@ export default function NewPost() {
               id="description"
               placeholder="Tóm tắt"
               className="newPostContent"
+              style={{borderColor: (!validPost && !description) ? '#f25a5a' : '#E0E3E7'}}
             />
             <TextareaAutosize
               required
@@ -215,6 +234,7 @@ export default function NewPost() {
               id="markdown"
               placeholder="Nội dung bài viết ..."
               className="newPostContent"
+              style={{borderColor: (!validPost && !markdown) ? '#f25a5a' : '#E0E3E7'}}
             />
             <Autocomplete
               multiple
@@ -240,7 +260,7 @@ export default function NewPost() {
               <button type="button" className="submitButton" onClick={handlePreview}>
                 Xem trước <Visibility />
               </button>
-              <button className="submitButton">
+              <button className="submitButton" disabled={!validPost}>
                 Đăng bài <Done />
               </button>
             </Box>

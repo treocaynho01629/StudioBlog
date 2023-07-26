@@ -22,6 +22,16 @@
     border-radius: 40px;
     border: dashed 1px;
     cursor: pointer;
+    background-color: white;
+    color: #0f3e3c;
+    border-color: #0f3e3c;
+}
+
+.fileButton:hover {
+    color: #387e5d;
+    border-color: #387e5d;
+    border-style: solid;
+    background-color: whitesmoke;
 }
 
 .newPostContent {
@@ -50,6 +60,15 @@
 
 .submitButton:hover {
     background-color: #387e5d;
+}
+
+.submitButton:hover {
+    background-color: #387e5d;
+}
+
+.submitButton:disabled {
+    background-color: #3d4944;
+    color: gray;
 }
 
 .thumbnailPreview {

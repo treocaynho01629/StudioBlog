@@ -42,6 +42,7 @@ var upload = multer({
     checkFileType(file, cb);
   },
 });
+
 var uploadFileMiddleware = util.promisify(upload.single("file"));
 var uploadFilesMiddleware = util.promisify(upload.array("file", 10));
 module.exports = {

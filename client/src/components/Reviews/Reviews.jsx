@@ -30,14 +30,14 @@ const settings = {
 };
 
 export default function Reviews() {
-    const { data: reviews, isLoading, isSuccess, isError, error } = useGetReviewsQuery("reviewsList");
+    const { data: reviews, isLoading, isSuccess, isError, error } = useGetReviewsQuery();
 
     let content;
 
     if (isLoading) {
         content = <p>Loading ...</p>
     } else if (isSuccess) {
-        const reviewsList = reviews?.length !== 0
+        const reviewsList = (reviews && reviews?.length !== 0)
             ? reviews?.map((review, index) => (
                 <Review key={index} review={review} />
             ))

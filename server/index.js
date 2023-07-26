@@ -14,6 +14,7 @@ const postRoute = require("./routes/posts");
 const cateRoute = require("./routes/categories");
 const imageRoute = require("./routes/images");
 const googleRoute = require("./routes/google");
+const bodyParser = require("body-parser");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -24,6 +25,8 @@ app.use(logger);
 app.use(cors(corsOptions));
 
 app.use(express.json());
+
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(cookieParser());
 

@@ -4,7 +4,7 @@ import { Lightbulb, AttachMoney, HelpCenter, ArrowRight } from '@mui/icons-mater
 import ServicePosts from '../../components/service-posts/ServicePosts';
 import BannerSlider from '../../components/banner-slider/BannerSlider';
 import YoutubeList from '../../components/youtube-list/YoutubeList';
-import Reviews from '../../components/Reviews/Reviews';
+import Reviews from '../../components/reviews/Reviews';
 
 export default function Home() {
     return (
