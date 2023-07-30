@@ -70,7 +70,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-image: url(http://khangnguyenweddinghouse.com/wp-content/uploads/2022/09/Rectangle-39.png?id=181) !important;
+    background-image: url('../../assets/Rectangle-39.png') !important;
     background-size: cover;
 }
 
@@ -78,6 +78,9 @@
     color: white;
     font-size: 32px;
     font-weight: 450;
+    text-align: center;
+    margin-left: 20px;
+    margin-right: 20px;
 }
 
 .contactButton {

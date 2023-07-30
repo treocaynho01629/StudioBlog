@@ -1,10 +1,11 @@
 import './navbar.css'
 import { AppBar, Stack, Grid, Collapse, useScrollTrigger, Typography, Container, Menu, MenuItem, ListItemIcon } from '@mui/material'
 import { Phone as PhoneIcon, Mail as MailIcon, Menu as MenuIcon, Logout, AddCircleOutline, Person } from '@mui/icons-material'
-import { Link, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { useSignoutMutation } from '../../features/auth/authApiSlice';
 import useAuth from '../../hooks/useAuth';
+import { useGetCategoriesQuery } from '../../features/categories/categoriesApiSlice';
 
 function HideOnScroll(props) {
     const { children, window } = props;
@@ -48,9 +49,10 @@ const menuStyle = {
 export default function NavBar(props) {
     const { username, isAdmin } = useAuth();
     const [anchorEl, setAnchorEl] = useState(null);
+    const [signout] = useSignoutMutation();
+    const { data: categories, isLoading, isSuccess } = useGetCategoriesQuery();
     const open = Boolean(anchorEl);
     const navigate = useNavigate();
-    const [signout] = useSignoutMutation();
 
     const handleSignout = () => {
         handleClose();
@@ -69,6 +71,25 @@ export default function NavBar(props) {
     const handleClose = () => {
         setAnchorEl(null);
     };
+
+    let catesList;
+
+    if (isLoading) {
+        catesList = <p>Loading...</p>
+    } else if (isSuccess) {
+        const { ids, entities } = categories;
+
+        catesList = ids?.length
+            ? ids?.map(cateId => {
+                const cate = entities[cateId];
+
+                return (
+                <li className="tab" key={cateId}>
+                    <NavLink className="link" to={`/category/${cate.type}`}>{cate.name}</NavLink>
+                </li>
+            )})
+            : null
+    } 
 
     return (
         <div className="navContainer">
@@ -96,16 +117,17 @@ export default function NavBar(props) {
                         </HideOnScroll>
                         <div className="bottom">
                             <div className="bottomLeft">
-                                <img className="logoImage" alt="logo" src="https://tamproduction.com/wp-content/uploads/2023/06/Untitled-1-copy.png" />
+                                <Link to="/">
+                                    <img className="logoImage" alt="logo" src={require(`../../assets/logo.png`)} />
+                                </Link>
                             </div>
                             <div className="bottomCenter">
                                 <ul className="tabList">
-                                    <li className="tab"><Link className="link" to="/">TRANG CHỦ</Link></li>
-                                    <li className="tab"><Link className="link" to="/">GIỚI THIỆU</Link></li>
-                                    <li className="tab"><Link className="link" to="/category/service">DỊCH VỤ</Link></li>
-                                    <li className="tab"><Link className="link" to="/">VIDEO</Link></li>
-                                    <li className="tab"><Link className="link" to="/category/news">TIN TỨC</Link></li>
-                                    <li className="tab"><Link className="link" to="/login">LIÊN HỆ</Link></li>
+                                    <li className="tab"><NavLink className="link" to="/">TRANG CHỦ</NavLink></li>
+                                    <li className="tab"><NavLink className="link" to="/about">GIỚI THIỆU</NavLink></li>
+                                    <li className="tab"><NavLink className="link" to="/videos">VIDEO</NavLink></li>
+                                    {catesList}
+                                    <li className="tab"><NavLink className="link" to="/contact">LIÊN HỆ</NavLink></li>
                                 </ul>
                             </div>
                             <div className="bottomRight">

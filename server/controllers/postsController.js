@@ -116,7 +116,7 @@ const updatePost = async (req, res) => {
         post.markdown = markdown;
         post.category = category;
 
-        if (thumbnail) {
+        if (thumbnail && !req.file) {
             post.thumbnail = thumbnail;
         } else {
             post.thumbnail = baseUrl + req.file.filename;
@@ -137,6 +137,7 @@ const updatePost = async (req, res) => {
             res.status(401).json({ message: "Wrong user!"});
         }
     } catch(err) {
+        console.log(err);
         res.status(500).send(err);
     }
 }

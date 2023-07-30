@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import './footer.css'
 import { Container, Grid } from '@mui/material'
 
@@ -9,12 +10,19 @@ export default function Footer() {
                 LIÊN HỆ CHÚNG TÔI TẠI
             </p>
             <Grid container>
-                <Grid item xs={12} sm={7} md={6}>
+                <Grid item xs={12} sm={8} md={6}>
                     <div className="footerLeft">
-                        <div className="fullLogo">
-                            <img className="fullLogoImage" alt="logo" src="https://tamproduction.com/wp-content/uploads/2023/06/Untitled-1-copy.png"/>
-                            &nbsp;TAM PRODUCTION
-                        </div>
+                        <Link to="/">
+                            <div className="fullLogo">
+                                <img className="fullLogoImage" alt="logo" src={require(`../../assets/logo.png`)}/>
+                                <div className="logoText">AM 
+                                    <div className="logoTextAlt">
+                                        <span className="logoTextSmall">PRODUCTION</span>
+                                        <span className="logoInfo">WEEDING-EVENT-TVC-LIVESTREAM</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </Link>
                         
                         <ul className="footerInfoList">
                             <li className="footerInfo"><b>Địa chỉ:</b> 217/24/12 Ngô Quyền, Phường 6, Tp Đà Lạt</li>
@@ -25,7 +33,7 @@ export default function Footer() {
                     </div>
                     
                 </Grid>
-                <Grid item xs={12} sm={5} md={6} sx={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-end'}}>
+                <Grid item xs={12} sm={4} md={6} sx={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-end'}}>
                     <div className="footerMap">
                         <iframe title="map"
                             className="mapFrame"

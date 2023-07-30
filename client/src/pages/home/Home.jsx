@@ -5,8 +5,11 @@ import ServicePosts from '../../components/service-posts/ServicePosts';
 import BannerSlider from '../../components/banner-slider/BannerSlider';
 import YoutubeList from '../../components/youtube-list/YoutubeList';
 import Reviews from '../../components/reviews/Reviews';
+import useTitle from '../../hooks/useTitle';
 
 export default function Home() {
+    useTitle("TAM PRODUCTION");
+
     return (
         <div className="homeContainer">
             <BannerSlider/>
@@ -18,7 +21,7 @@ export default function Home() {
             </Container>
             <div className="alterBox">
                 <Container fluid maxWidth="lg">
-                    <div className="videoContainer">
+                    <div className="vidContainer">
                         <h1 className="mainTitle">SẢN PHẨM NỔI BẬT</h1>
                         <YoutubeList/>
                     </div>
@@ -30,7 +33,8 @@ export default function Home() {
                         <Grid item xs={12} md={6}>
                             <img className="aboutImage"
                             loading="lazy"
-                            src="https://tamproduction.com/wp-content/uploads/2023/06/Untitled-3-copy.png"/>
+                            src={require(`../../assets/Untitled-3-copy.png`)}
+                            />
                         </Grid>
                         <Grid item xs={12} md={6} sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
                             <h1 className="aboutMainTitle">VỀ TAM PRODUCTION</h1>

@@ -65,3 +65,16 @@
     width: 150px;
     font-size: 16px;
 }
+
+.background:hover {
+    background-color: #387e5d;
+}
+
+.background:disabled {
+    background-color: #3d4944;
+    color: gray;
+}
+
+.postComments {
+    margin-bottom: 50px;
+}

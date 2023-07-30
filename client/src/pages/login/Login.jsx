@@ -1,9 +1,8 @@
 import './login.css'
-import { Container, IconButton, InputAdornment, Paper, TextField } from '@mui/material';
+import { CircularProgress, Container, IconButton, InputAdornment, Paper, TextField } from '@mui/material';
 import styled from '@emotion/styled';
 import { useEffect, useRef, useState } from 'react';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-
 import { setAuth } from '../../features/auth/authSlice';
 import { useLoginMutation } from '../../features/auth/authApiSlice';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -78,24 +77,32 @@ export default function Login() {
 
   const handleTogglePersist = () => { setPersist(prev => !prev) };
 
+  const validLogin = [username, password].every(Boolean) && !isLoading
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const { accessToken } = await login({ username, password }).unwrap();
-      dispatch(setAuth({ accessToken }));
-      setUsername("");
-      setPassword("");
-      navigate(from, { replace: true });
-    } catch (err) {
-      if (!err.status) {
-        setErrMsg("Server không phản hồi!");
-      } else if (err.status === 400) {
-        setErrMsg("Vui lòng nhập đầy đủ thông tin!");
-      } else if (err.status === 401) {
-        setErrMsg("Sai tài khoản hoặc mật khẩu!");
-      } else {
-        setErrMsg(err.data?.message);
+
+    if (validLogin){
+      try {
+        const { accessToken } = await login({ username, password }).unwrap();
+        dispatch(setAuth({ accessToken }));
+        setUsername("");
+        setPassword("");
+        navigate(from, { replace: true });
+      } catch (err) {
+        if (!err.status) {
+          setErrMsg("Server không phản hồi!");
+        } else if (err.status === 400) {
+          setErrMsg("Vui lòng nhập đầy đủ thông tin!");
+        } else if (err.status === 401) {
+          setErrMsg("Sai tài khoản hoặc mật khẩu!");
+        } else {
+          setErrMsg(err.data?.message);
+        }
+        errRef.current.focus();
       }
+    } else {
+      setErrMsg("Vui lòng nhập đầy đủ thông tin!");
       errRef.current.focus();
     }
   }
@@ -123,14 +130,13 @@ export default function Login() {
         <form className="login" onSubmit={handleSubmit}>
           <Paper square elevation={3} className="loginBox">
             <p className="loginTitle">ĐĂNG NHẬP</p>
-            <p ref={errRef} className="errorMessage" aria-live="assertive">{errMsg}</p>
+            <p ref={errRef} className="errorMsg" aria-live="assertive">{errMsg}</p>
             <CustomInput
               fullWidth
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               id="username"
               label="Tên đăng nhập"
-              // helperText="Không được bỏ trống"
               autoComplete="off"
               sx={{ marginBottom: '15px', maxWidth: '400px' }}
             />
@@ -141,7 +147,6 @@ export default function Login() {
               id="password"
               type={showPassword ? 'text' : 'password'}
               label="Mật khẩu"
-              // helperText="Không được bỏ trống"
               sx={{ marginBottom: '15px', maxWidth: '400px' }}
               InputProps={{
                 endAdornment: endAdornment
@@ -155,10 +160,22 @@ export default function Login() {
                 onChange={handleTogglePersist}/>
                 <label htmlFor="persist">Lưu đăng nhập</label>
               </p>
-              <div className="forgot">Quên mật khẩu</div>
+              <div className="forgot">Quên mật khẩu?</div>
             </div>
             <button className="loginButton" disabled={isLoading}>
               Đăng nhập
+              {isLoading && (
+                <CircularProgress
+                  size={24}
+                  sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    marginTop: '-12px',
+                    marginLeft: '-12px',
+                  }}
+                />
+              )}
             </button>
           </Paper>
         </form>

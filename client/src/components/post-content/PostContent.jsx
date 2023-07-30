@@ -39,7 +39,7 @@ export default function PostContent({ post, previewMode }) {
           </div>
           <div className="info">
             <ChatIcon sx={{ marginRight: 1 }} />
-            1 lượt đánh giá
+            1 lượt bình luận
           </div>
         </Box>
         { ((currUser == post.user || isAdmin) && !previewMode) && (
@@ -65,10 +65,13 @@ export default function PostContent({ post, previewMode }) {
             src={post.thumbnail}
           />
         </Box>
+        <div className="postContentDescription">
+          {post.description}
+        </div>
         <div className="postContentMarkdown" dangerouslySetInnerHTML={{ __html: post.sanitizedHtml }}/>
       </div>
       <figure className="authorInfo">
-        <figcaption>- Người viết: {post.author ? post.auth : "Vô danh"}</figcaption>
+        <figcaption>- Người viết: {post.author ?? "Vô danh"}</figcaption>
       </figure>
       <div className="tagInfo">
         <div className="tag">
@@ -78,7 +81,6 @@ export default function PostContent({ post, previewMode }) {
         {post?.tags?.map((tag, index) => (
             <div key={index} className="smallTag">{tag}</div>
         ))}
-        
       </div>
     </div>
   )

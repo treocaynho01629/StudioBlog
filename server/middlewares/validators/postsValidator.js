@@ -18,8 +18,8 @@ exports.validatePost = [
         .not()
         .isEmpty()
         .withMessage("Không được bỏ trống nội dung!")
-        .isLength({ min: 100, max: 1000 })
-        .withMessage("Nội dung phải từ 100-1000 kí tự"),
+        .isLength({ min: 100})
+        .withMessage("Nội dung phải từ 100 kí tự trở lên"),
     check('category')
         .not()
         .isEmpty()

@@ -12,8 +12,8 @@ const settings = {
 
 export default function BannerSlider() {
     const banners = [
-        {image: 'https://tamproduction.com/wp-content/uploads/2023/07/Banner-2.jpg'},
-        {image: 'https://tamproduction.com/wp-content/uploads/2023/07/Banner-2.jpg'},
+        {image: require('../../assets/Banner-2.jpg')},
+        {image: require('../../assets/Banner-2.jpg')},
     ]
 
     return (

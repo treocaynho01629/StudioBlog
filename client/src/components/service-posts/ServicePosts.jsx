@@ -46,8 +46,7 @@ const settings = {
 
 export default function ServicePosts() {
     const { data: posts, isLoading, isSuccess, isError, error } = useGetPostsQuery(
-        { size: 6, cate: 'service' }, 
-        { refetchOnMountOrArgChange: true }
+        { size: 6, cate: 'service' }
     );
 
     let content;
@@ -61,7 +60,8 @@ export default function ServicePosts() {
             ? ids?.map(postId => {
                 const post = entities[postId];
                  
-                return (<div key={post.id} className="servicePostsWrapper">
+                return (
+                <div key={post.id} className="servicePostsWrapper">
                     <ServicePost post={post}/>
                 </div>
             )})

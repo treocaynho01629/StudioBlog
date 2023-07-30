@@ -2,6 +2,7 @@
     background-color: whitesmoke;
     padding: 10px 0;
     width: 100%;
+    padding-bottom: 50px;
 }
 
 .footerTop {
@@ -22,11 +23,49 @@
 }
 
 .fullLogo {
+    position: relative;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    transition: ease-in-out all 0.25s;
+    cursor: pointer;
+}
+
+.fullLogo:hover {
+    filter: drop-shadow(1px 1px 10px #0d3c3985);
+    margin-left: 10px;
+}
+
+.logoText {
+    letter-spacing: 4px;
+    color: #FF6600;
+    font-size: 46px;
+    font-weight: 450;
+    position: absolute;
+    top: 27px;
+    left: 76px;
+    filter: drop-shadow(1px 1px 10px #0d3c3985);
     display: flex;
     align-items: center;
-    font-size: 25px;
-    font-weight: bold;
-    color: orange;
+}
+
+.logoTextAlt{
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    margin-left: 5px;
+}
+
+.logoTextSmall {
+    font-size: 27px;
+}
+
+.logoInfo {
+    font-size: 9px;
+    color: white;
+    background-color: #0f3e3c;
+    padding: 2px 1px 1px 2px;
+    letter-spacing: 2px;
 }
 
 .footerInfoList {

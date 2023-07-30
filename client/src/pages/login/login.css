@@ -1,5 +1,11 @@
 .loginContainer {
-    margin: 250px auto 150px auto;
+    background-image: url('../../assets/wallpaper.jpg');
+    background-size: cover;
+    background-position: center;
+    margin: 100px auto 0 auto;
+    height: 90vh;
+    display: flex;
+    align-items: center;
 }
 
 .login {
@@ -35,6 +41,7 @@
     width: 250px;
     font-size: 16px;
     cursor: pointer;
+    position: relative;
 }
 
 .loginButton:hover {
@@ -63,4 +70,9 @@
     color: #387e5d;
     text-decoration: underline;
     cursor: pointer;
+}
+
+.errorMsg {
+    color: #f25a5a;
+    margin-top: 0;
 }

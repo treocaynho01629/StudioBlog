@@ -24,6 +24,34 @@
     cursor: pointer;
 }
 
+.fileButton:hover {
+    color: #387e5d;
+    border-color: #387e5d;
+    border-style: solid;
+    background-color: whitesmoke;
+}
+
+.removeButton {
+    color: #f25a5a;
+    border-color: #f25a5a;
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    margin-top: 15px;
+    height: 35px;
+    border-radius: 40px;
+    border: dashed 1px;
+    cursor: pointer;
+    position: absolute
+}
+
+.removeButton:hover {
+    color: red;
+    border-color: red;
+    border-style: solid;
+    background-color: whitesmoke;
+}
+
 .editPostContent {
     background-color: white;
     outline: none;
@@ -46,10 +74,20 @@
     align-items: center;
     justify-content: space-around;
     cursor: pointer;
+    position: relative;
 }
 
 .submitButton:hover {
     background-color: #387e5d;
+}
+
+.submitButton:hover {
+    background-color: #387e5d;
+}
+
+.submitButton:disabled {
+    background-color: #3d4944;
+    color: gray;
 }
 
 .thumbnailPreview {
@@ -59,4 +97,9 @@
     border: 1px solid lightsteelblue;
     padding: 10px;
     margin-bottom: 15px;
+}
+
+.errorMsg {
+    color: #f25a5a;
+    margin-top: 0;
 }

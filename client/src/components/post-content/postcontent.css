@@ -49,11 +49,19 @@
     object-fit: cover;
     border: 1px solid lightsteelblue;
     padding: 10px;
+    margin-bottom: 20px;
+}
+
+.postContentDescription {
+    text-align: justify;
+    font-weight: bold;
+    font-style: italic;
+    line-height: 26px;
 }
 
 .postContentMarkdown {
-    /* font-size: 18px; */
-    /* line-height: 25px; */
+    text-align: justify;
+    line-height: 26px;
 }
 
 .authorInfo {

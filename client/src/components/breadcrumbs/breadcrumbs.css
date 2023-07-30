@@ -1,20 +1,54 @@
 .breadCrumbsContainer {
     border: 0.05px solid lightgray;
-    padding: 10px 5px;
+    padding: 0px 5px;
     margin-bottom: 10px;
 }
 
 .crumb {
     text-overflow: ellipsis;
-	overflow: hidden;
-	white-space: nowrap;
-	
-	@supports (-webkit-line-clamp: 1) {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: initial;
-      display: -webkit-box;
-      -webkit-line-clamp: 1;
-      -webkit-box-orient: vertical;
+    text-transform: uppercase;
+    text-decoration: none;
+    overflow: hidden;
+    white-space: nowrap;
+    color: #0f3e3c;
+
+    @supports (-webkit-line-clamp: 1) {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: initial;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
     }
+}
+
+.home-crumb {
+    display: flex;
+    align-items: center;
+    color: #0f3e3c;
+}
+
+.crumb:hover {
+    color: #387e5d;
+    text-decoration: underline;
+}
+
+.breadcrumbs li {
+    position: relative;
+    padding: 10px 3px;
+}
+
+.breadcrumbs li:first-child {
+    margin-left: 10px;
+}
+
+.crumb-seperator::before {
+    content: '';
+    height: 100%;
+    width: 1px;
+    background: lightgray;
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: rotate(20deg);
 }

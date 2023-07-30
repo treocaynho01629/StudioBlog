@@ -84,34 +84,34 @@ export default function Comments() {
                 <label>Lưu tên và email của tôi trong trình duyệt này cho lần bình luận kế tiếp.</label>
             </p>
             <Box display="flex" flexDirection="column">
-            <CustomInput
-                error
-                fullWidth
-                id="fullName"
-                label="Họ và Tên*"
-                defaultValue="Nguyễn Văn A"
-                helperText="Không được bỏ trống"
-                sx={{marginBottom: '15px'}}
-            />
-            <CustomInput
-                error
-                fullWidth
-                type="email"
-                id="email"
-                label="Email*"
-                defaultValue="haductrong01629@gmail.com"
-                helperText="Sai định dạng email"
-                sx={{marginBottom: '15px'}}
-            />
-            <TextareaAutosize
-                minRows={4}
-                value="Blah blah"
-                placeholder="Ý kiến của bạn ..."
-                className="commentTextarea"
-            />
-            <button className="commentButton">
-                Gửi ý kiến
-            </button>
+                <CustomInput
+                    error
+                    fullWidth
+                    id="fullName"
+                    label="Họ và Tên*"
+                    defaultValue="Nguyễn Văn A"
+                    helperText="Không được bỏ trống"
+                    sx={{marginBottom: '15px'}}
+                />
+                <CustomInput
+                    error
+                    fullWidth
+                    type="email"
+                    id="email"
+                    label="Email*"
+                    defaultValue="haductrong01629@gmail.com"
+                    helperText="Sai định dạng email"
+                    sx={{marginBottom: '15px'}}
+                />
+                <TextareaAutosize
+                    minRows={4}
+                    value="Blah blah"
+                    placeholder="Ý kiến của bạn ..."
+                    className="commentTextarea"
+                />
+                <button className="commentButton">
+                    Gửi ý kiến
+                </button>
             </Box>
         </form>
     </div>

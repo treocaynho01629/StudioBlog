@@ -1,0 +1,46 @@
+.contactContainer {
+    margin-top: 150px;
+    margin-bottom: 150px;
+}
+
+.contactButton {
+    background-color: #0f3e3c;
+    color: white;
+    border: none;
+    padding: 10px;
+    margin: 20px 0;
+    width: 150px;
+    font-size: 16px;
+}
+
+.contactButton:hover {
+    background-color: #387e5d;
+}
+
+.alternativeTitle {
+    font-size: 24px;
+    font-weight: 450;
+    color: #0f3e3c;
+    margin-bottom: 30px;
+}
+
+.contactInfoList {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.contactInfo {
+    color: black;
+    font-size: 18px;
+    font-weight: 350;
+    margin: 10px 0;
+}
+
+.contactLogo {
+    display: flex;
+    align-items: center;
+    font-size: 25px;
+    font-weight: bold;
+    color: #0f3e3c;
+}
