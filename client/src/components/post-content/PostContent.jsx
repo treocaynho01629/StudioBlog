@@ -6,7 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDeletePostMutation } from '../../features/posts/postsApiSlice';
 import useAuth from '../../hooks/useAuth';
 
-export default function PostContent({ post, previewMode }) {
+export default function PostContent({ post, commentsCount, previewMode }) {
   const { id: currUser, isAdmin } = useAuth();
   const date = new Date(post.createdAt);
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ export default function PostContent({ post, previewMode }) {
   }, [isSuccess, navigate]);
 
   const onDeleteClicked = async () => {
-    await deletePost({ id: post.id })
+    await deletePost({ id: post?.id })
   }
 
   return (
@@ -34,12 +34,11 @@ export default function PostContent({ post, previewMode }) {
         <Box className="leftInfo" display="flex" alignItems="center">
           <div className="info">
             <CalendarMonth sx={{ marginRight: 1 }} />
-            Đăng vào lúc: { date.toLocaleDateString("en-GB") + " - " + date.toLocaleTimeString()
-            }
+            Đăng vào lúc: { date.toLocaleDateString("en-GB") + " - " + date.toLocaleTimeString() }
           </div>
           <div className="info">
             <ChatIcon sx={{ marginRight: 1 }} />
-            1 lượt bình luận
+            {commentsCount} lượt bình luận
           </div>
         </Box>
         { ((currUser == post.user || isAdmin) && !previewMode) && (

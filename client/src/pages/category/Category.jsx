@@ -38,7 +38,7 @@ export default function Category() {
             </div>
         )
     } else if (isError){
-        <p>{error}</p>
+        content = <p>{error}</p>
     }
 
     return content;

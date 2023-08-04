@@ -1,9 +1,10 @@
 import './comments.css'
-import { Box, TextField, TextareaAutosize } from '@mui/material';
-import { Chat as ChatIcon } from '@mui/icons-material';
+import { Box, CircularProgress, TextField, TextareaAutosize } from '@mui/material';
+import { Chat as ChatIcon, Done } from '@mui/icons-material';
 import styled from '@emotion/styled';
 import Comment from '../comment/Comment';
 import { useState } from 'react';
+import { useCreateCommentMutation, useGetCommentsQuery } from '../../features/comments/commentsApiSlice';
 
 const CustomInput = styled(TextField)(({ theme }) => ({
     '& .MuiInputBase-root': {
@@ -50,32 +51,102 @@ const CustomInput = styled(TextField)(({ theme }) => ({
     },
 }));
 
-export default function Comments() {
-    const [remember, setRemember] = useState(false);
-    const [fullName, setFullName] = useState("");
-    const [email, setEmail] = useState("");
+export default function Comments({ postId, setCommentsCount }) {
+    const [createComment, {isLoading: commenting}] = useCreateCommentMutation();
+    const { data: comments, isLoading, isSuccess, isError, error } = useGetCommentsQuery({ postId });
+    const [remember, setRemember] = useState(JSON.parse(localStorage.getItem("info")) ? true : false);
+    const [fullName, setFullName] = useState(JSON.parse(localStorage.getItem("info"))?.fullName || "");
+    const [email, setEmail] = useState(JSON.parse(localStorage.getItem("info"))?.email || "");
     const [content, setContent] = useState("");
+    const [errMsg, setErrMsg] = useState("");
 
-    let commentsList = (
-        <div>
-            <Comment/>
-        </div>
-    )
+    const handleToggleRemember = () => { 
+        setRemember(prev => !prev);
+        if (!remember) {
+            localStorage.setItem("info", JSON.stringify({ fullName, email }));
+        } else {
+            localStorage.removeItem("info");
+        }
+    };
+
+    let commentsContainer;
+
+    if (isLoading) {
+        commentsContainer = <p>Loading...</p>
+    } else if (isSuccess) {
+        const { ids, entities } = comments;
+        setCommentsCount(comments?.info?.totalElements);
+
+        const commentsList = ids?.length
+            ? ids.map(commentId => {
+                const comment = entities[commentId];
+                return (<Comment key={commentId} comment={comment}/>)
+            })
+            : null
+
+        commentsContainer = (
+            <div className="commentsContainer">
+                {commentsList}
+            </div>
+        )
+    } else if (isError){
+        commentsContainer = null;
+    }
 
     const validComment = [fullName, email, content].every(Boolean);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+    
+        if (validComment){
+          try {
+            const newComment = {
+                fullName,
+                email,
+                content
+            }
+            const createdComment = await createComment({ postId, newComment}).unwrap();
+            setErrMsg("");
+            setContent("");
+            if (!remember) {
+                setFullName("");
+                setEmail("");
+            } else {
+                localStorage.setItem("info", JSON.stringify({ fullName, email }));
+            }
+          } catch (err) {
+            if (!err.status) {
+              setErrMsg("Server không phản hồi!");
+            } else if (err.status === 400) {
+              setErrMsg("Vui lòng nhập đầy đủ thông tin!");
+            } else if (err.status === 409) {
+              setErrMsg("Ý kiến với email này đã tồn tại!");
+            } else {
+              setErrMsg("Gửi ý kiến thất bại!");
+            }
+          }
+        } else {
+          setErrMsg("Vui lòng nhập đầy đủ thông tin!");
+        }
+    }
 
     return (
         <div className="postComments">
             <p className="commentTitle">
-                <ChatIcon sx={{ marginRight: 1 }} />Ý kiến bạn đọc (9 bình luận)
+                <ChatIcon sx={{ marginRight: 1 }} />Ý kiến bạn đọc ({comments?.info ? comments?.info?.totalElements : 0} bình luận)
             </p>
-            {commentsList}
-            <form className="leaveComment">
+            {commentsContainer}
+            <form className="leaveComment" onSubmit={handleSubmit}>
                 <p className="leaveTitle">Để lại ý kiến</p>
                 <p className="rememberComment">
-                    <input id="remember" type="checkbox" value="remember" />
+                    <input id="remember" 
+                        type="checkbox" 
+                        checked={remember}
+                        onChange={handleToggleRemember}
+                    />
                     <label htmlFor="remember" >Lưu tên và email của tôi trong trình duyệt này cho lần bình luận kế tiếp.</label>
                 </p>
+                { errMsg && <p className="errorMsg">{errMsg}</p> }
                 <Box display="flex" flexDirection="column">
                     <CustomInput
                         fullWidth
@@ -111,8 +182,20 @@ export default function Comments() {
                         onChange={(e) => setContent(e.target.value)}
                         label="Ý kiến của bạn*"
                     />
-                    <button className="commentButton">
-                        Gửi ý kiến
+                    <button className="commentButton" disabled={commenting}>
+                        Gửi ý kiến <Done />
+                        {commenting && (
+                        <CircularProgress
+                            size={24}
+                            sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            marginTop: '-12px',
+                            marginLeft: '-12px',
+                            }}
+                        />
+                        )}
                     </button>
                 </Box>
             </form>

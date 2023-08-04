@@ -46,9 +46,23 @@
     color: white;
     border: none;
     padding: 10px;
-    margin: 20px 0;
+    margin: 20px 10px 20px 0;
     width: 150px;
     font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    cursor: pointer;
+    position: relative;
+}
+
+.commentButton:hover {
+    background-color: #387e5d;
+}
+
+.commentButton:disabled {
+    background-color: #3d4944;
+    color: gray;
 }
 
 .background:hover {
@@ -62,4 +76,35 @@
 
 .postComments {
     margin-bottom: 50px;
+}
+
+.deleteButton {
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    margin-left: 15px;
+    height: 35px;
+    border-radius: 40px;
+    border: dashed 1px #f25a5a;
+    color: #f25a5a;
+    background-color: white;
+    cursor: pointer;
+    position: relative;
+}
+
+.deleteButton:hover {
+    border-color: lightblue;
+    border-style: solid;
+    background-color: whitesmoke;
+}
+
+.deleteButton:disabled {
+    border-color: gray;
+    background-color: lightgray;
+    color: gray;
+}
+
+.errorMsg {
+    color: #f25a5a;
+    margin-top: 0;
 }

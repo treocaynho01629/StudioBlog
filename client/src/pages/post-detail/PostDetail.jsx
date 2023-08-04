@@ -6,17 +6,19 @@ import { Container } from '@mui/material'
 import { useParams } from 'react-router-dom'
 import { useGetPostQuery } from '../../features/posts/postsApiSlice'
 import useTitle from '../../hooks/useTitle'
+import { useState } from 'react'
 
 export default function PostDetail() {
   const { slug } = useParams();
   const { data: post, isLoading, isSuccess, isError, error } = useGetPostQuery({ slug });
+  const [commentsCount, setCommentsCount] = useState(0);
   useTitle(`${post?.title} - TAM PRODUCTION`);
 
   let content;
   if (isLoading) {
     content = <p>Loading...</p>
   } else if (isSuccess) {
-    content = <PostContent post={post} />;
+    content = <PostContent post={post} commentsCount={commentsCount} />;
   } else if (isError) {
     content = <p>{error}</p>
   }
@@ -26,7 +28,7 @@ export default function PostDetail() {
       <Container fluid maxWidth="lg">
         <BreadCrumbs post={post}/>
         {content}
-        <Comments />
+        <Comments postId={post?.id} setCommentsCount={setCommentsCount} />
       </Container>
     </div>
   )

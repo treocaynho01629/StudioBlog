@@ -32,16 +32,8 @@ const getPosts = async (req, res) => {
         if (category) condition = { ...condition, category };
         if (tags && tags.length !== 0) condition = { ...condition, tags: { "$in": tags } }
         
-        const total = await Post.countDocuments({});
+        const total = await Post.countDocuments(condition);
         const posts = await Post.find(condition).sort({ _id: -1 }).limit(size).skip(startIndex).lean();
-
-        if (!posts.length) return res.status(400).json({ message: "No posts found!"});
-
-        //Author
-        // const resultPosts = await Promise.all(posts.map(async (post) => {
-        //     const author = await User.findById(post.user, {fullName:1, _id:0}).lean().exec();
-        //     return { ...post, author: author.fullName }
-        // }))
 
         res.status(200).json({ 
             data: posts, 
