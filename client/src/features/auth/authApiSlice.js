@@ -35,10 +35,10 @@ export const authApiSlice = apiSlice.injectEndpoints({
                     const { data } = await queryFulfilled
                     console.log(data)
                     dispatch(logOut())
-                    localStorage.removeItem("persist")
-                    // setTimeout(() => {
-                    //     dispatch(apiSlice.util.resetApiState()) //Unmount api state
-                    // }, 1000)
+                    localStorage.setItem("persist", JSON.stringify(false));
+                    setTimeout(() => {
+                        dispatch(apiSlice.util.resetApiState()) //Unmount api state
+                    }, 1000)
                 } catch (err) {
                     console.log(err)
                 }

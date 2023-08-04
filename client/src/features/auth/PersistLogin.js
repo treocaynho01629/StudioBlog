@@ -60,7 +60,8 @@ export default function PersistLogin() {
         console.log("Xác thực hoàn tất!");
         content = <Outlet />
     } else if (token && isUninitialized) {
-        console.log(isUninitialized);
+        content = <Outlet />
+    } else {
         content = <Outlet />
     }
 

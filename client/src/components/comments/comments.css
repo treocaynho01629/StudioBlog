@@ -10,21 +10,6 @@
     border-bottom: 0.5px solid lightgray;
 }
 
-.commentInfo {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    padding: 5px 0px;
-    border-bottom: dashed 0.5px lightgray;
-}
-
-.commentContent {
-    font-size: 16px;
-    margin: 20px 0;
-    padding-bottom: 20px;
-    border-bottom: dashed 0.5px lightgray;
-}
-
 .leaveComment {
     width: 90%;
     background-color: whitesmoke;
