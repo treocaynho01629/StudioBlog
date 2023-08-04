@@ -145,6 +145,8 @@
 .signUpButton {
     display: none;
     align-items: center;
+    font-size: 16px;
+    font-family: 'Roboto', sans-serif;
     height: 40px;
     padding: 10px 20px;
     background-color: white;

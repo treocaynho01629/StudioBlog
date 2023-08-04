@@ -1,5 +1,5 @@
 import './postcontent.css'
-import { Box } from '@mui/material';
+import { Box, CircularProgress } from '@mui/material';
 import { CalendarMonth, Chat as ChatIcon, Edit as EditIcon, Delete as DeleteIcon, Sell as SellIcon } from '@mui/icons-material';
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -9,13 +9,8 @@ import useAuth from '../../hooks/useAuth';
 export default function PostContent({ post, commentsCount, previewMode }) {
   const { id: currUser, isAdmin } = useAuth();
   const date = new Date(post.createdAt);
+  const [deletePost, { isLoading, isSuccess, isError, error }] = useDeletePostMutation();
   const navigate = useNavigate();
-
-  const [deletePost, {
-    isSuccess,
-    isError,
-    error,
-  }] = useDeletePostMutation();
 
   useEffect(() => {
     if (isSuccess) navigate('/');
@@ -49,12 +44,25 @@ export default function PostContent({ post, commentsCount, previewMode }) {
                 Chỉnh sửa
               </Box>
             </Link>
-            <Box className="infoButton" 
-            sx={{ color: '#f25a5a', borderColor: '#f25a5a' }}
+            <button className="infoButton" 
+            style={{ color: '#f25a5a', borderColor: '#f25a5a' }}
+            disabled={isLoading}
             onClick={onDeleteClicked}>
               <DeleteIcon sx={{ marginRight: 1 }} />
               Xoá bài
-            </Box>
+              {isLoading && (
+              <CircularProgress
+                  size={22}
+                  sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  marginTop: '-12px',
+                  marginLeft: '-12px',
+                  }}
+              />
+              )}
+            </button>
           </Box>
         )}
       </div>
@@ -70,7 +78,9 @@ export default function PostContent({ post, commentsCount, previewMode }) {
         <div className="postContentMarkdown" dangerouslySetInnerHTML={{ __html: post.sanitizedHtml }}/>
       </div>
       <figure className="authorInfo">
-        <figcaption>- Người viết: {post.author ?? "Vô danh"}</figcaption>
+        <Link to={`/search?user=${post?.author}`}>
+          <figcaption>- Người viết: {post.author ?? "Vô danh"}</figcaption>
+        </Link>
       </figure>
       <div className="tagInfo">
         <div className="tag">
@@ -78,7 +88,7 @@ export default function PostContent({ post, commentsCount, previewMode }) {
           Từ khoá:
         </div>
         {post?.tags?.map((tag, index) => (
-            <div key={index} className="smallTag">{tag}</div>
+            <Link to={`/search?tags=${tag}`} key={index} className="smallTag">{tag}</Link>
         ))}
       </div>
     </div>

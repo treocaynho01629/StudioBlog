@@ -52,15 +52,16 @@ const CustomInput = styled(TextField)(({ theme }) => ({
 }));
 
 export default function Comments({ postId, setCommentsCount }) {
-    const [createComment, {isLoading: commenting}] = useCreateCommentMutation();
+    const [createComment, { isLoading: commenting }] = useCreateCommentMutation();
     const { data: comments, isLoading, isSuccess, isError, error } = useGetCommentsQuery({ postId });
     const [remember, setRemember] = useState(JSON.parse(localStorage.getItem("info")) ? true : false);
     const [fullName, setFullName] = useState(JSON.parse(localStorage.getItem("info"))?.fullName || "");
     const [email, setEmail] = useState(JSON.parse(localStorage.getItem("info"))?.email || "");
     const [content, setContent] = useState("");
+    const [err, setErr] = useState("");
     const [errMsg, setErrMsg] = useState("");
 
-    const handleToggleRemember = () => { 
+    const handleToggleRemember = () => {
         setRemember(prev => !prev);
         if (!remember) {
             localStorage.setItem("info", JSON.stringify({ fullName, email }));
@@ -80,7 +81,7 @@ export default function Comments({ postId, setCommentsCount }) {
         const commentsList = ids?.length
             ? ids.map(commentId => {
                 const comment = entities[commentId];
-                return (<Comment key={commentId} comment={comment}/>)
+                return (<Comment key={commentId} comment={comment} />)
             })
             : null
 
@@ -89,7 +90,7 @@ export default function Comments({ postId, setCommentsCount }) {
                 {commentsList}
             </div>
         )
-    } else if (isError){
+    } else if (isError) {
         commentsContainer = null;
     }
 
@@ -97,56 +98,60 @@ export default function Comments({ postId, setCommentsCount }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
-        if (validComment){
-          try {
-            const newComment = {
-                fullName,
-                email,
-                content
+
+        if (validComment) {
+            try {
+                const newComment = {
+                    fullName,
+                    email,
+                    content
+                }
+                const createdComment = await createComment({ postId, newComment }).unwrap();
+                setErrMsg("");
+                setErr("");
+                setContent("");
+                if (!remember) {
+                    setFullName("");
+                    setEmail("");
+                } else {
+                    localStorage.setItem("info", JSON.stringify({ fullName, email }));
+                }
+            } catch (error) {
+                if (!error.status) {
+                    setErrMsg("Server không phản hồi!");
+                } else if (error.status === 400) {
+                    setErrMsg("Vui lòng nhập đầy đủ thông tin!");
+                } else if (error.status === 409) {
+                    setErrMsg("Ý kiến với email này đã tồn tại!");
+                } else if (error.status === 422) {
+                    setErrMsg('Sai định dạng thông tin!');
+                    setErr({ ...error, data: new Map(error.data.errors.map(obj => [obj.path, obj.msg])) })
+                } else {
+                    setErrMsg("Gửi ý kiến thất bại!");
+                }
             }
-            const createdComment = await createComment({ postId, newComment}).unwrap();
-            setErrMsg("");
-            setContent("");
-            if (!remember) {
-                setFullName("");
-                setEmail("");
-            } else {
-                localStorage.setItem("info", JSON.stringify({ fullName, email }));
-            }
-          } catch (err) {
-            if (!err.status) {
-              setErrMsg("Server không phản hồi!");
-            } else if (err.status === 400) {
-              setErrMsg("Vui lòng nhập đầy đủ thông tin!");
-            } else if (err.status === 409) {
-              setErrMsg("Ý kiến với email này đã tồn tại!");
-            } else {
-              setErrMsg("Gửi ý kiến thất bại!");
-            }
-          }
         } else {
-          setErrMsg("Vui lòng nhập đầy đủ thông tin!");
+            setErrMsg("Vui lòng nhập đầy đủ thông tin!");
         }
     }
 
     return (
         <div className="postComments">
             <p className="commentTitle">
-                <ChatIcon sx={{ marginRight: 1 }} />Ý kiến bạn đọc ({comments?.info ? comments?.info?.totalElements : 0} bình luận)
+                <ChatIcon sx={{ marginRight: 1 }} />Ý kiến bạn đọc ({comments?.info?.totalElements || 0} bình luận)
             </p>
             {commentsContainer}
             <form className="leaveComment" onSubmit={handleSubmit}>
                 <p className="leaveTitle">Để lại ý kiến</p>
                 <p className="rememberComment">
-                    <input id="remember" 
-                        type="checkbox" 
+                    <input id="remember"
+                        type="checkbox"
                         checked={remember}
                         onChange={handleToggleRemember}
                     />
                     <label htmlFor="remember" >Lưu tên và email của tôi trong trình duyệt này cho lần bình luận kế tiếp.</label>
                 </p>
-                { errMsg && <p className="errorMsg">{errMsg}</p> }
+                {errMsg && <p className="errorMsg">{errMsg}</p>}
                 <Box display="flex" flexDirection="column">
                     <CustomInput
                         fullWidth
@@ -154,6 +159,8 @@ export default function Comments({ postId, setCommentsCount }) {
                         label="Họ và Tên*"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
+                        error={err?.data?.has('fullName')}
+                        helperText={err?.data?.has('fullName') && err?.data?.get('fullName')}
                         sx={{ marginBottom: '15px' }}
                     />
                     <CustomInput
@@ -163,6 +170,8 @@ export default function Comments({ postId, setCommentsCount }) {
                         label="Email*"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        error={err?.data?.has('email')}
+                        helperText={err?.data?.has('email') && err?.data?.get('email')}
                         sx={{ marginBottom: '15px' }}
                     />
                     <CustomInput
@@ -180,21 +189,23 @@ export default function Comments({ postId, setCommentsCount }) {
                         id="content"
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
+                        error={ err?.data?.has('content')}
+                        helperText={err?.data?.has('content') && err?.data?.get('content')}
                         label="Ý kiến của bạn*"
                     />
                     <button className="commentButton" disabled={commenting}>
                         Gửi ý kiến <Done />
                         {commenting && (
-                        <CircularProgress
-                            size={24}
-                            sx={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            marginTop: '-12px',
-                            marginLeft: '-12px',
-                            }}
-                        />
+                            <CircularProgress
+                                size={24}
+                                sx={{
+                                    position: 'absolute',
+                                    top: '50%',
+                                    left: '50%',
+                                    marginTop: '-12px',
+                                    marginLeft: '-12px',
+                                }}
+                            />
                         )}
                     </button>
                 </Box>

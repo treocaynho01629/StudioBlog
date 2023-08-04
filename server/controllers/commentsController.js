@@ -57,10 +57,6 @@ const createComment = async (req, res) => {
         return res.status(400).json({ message: "Please fill in all required!" });
     }
 
-    //Check if comment by this user existed
-    const comment = await Comment.findOne({ email }).collation({ locale: 'en', strength: 2 }).lean().exec();
-    if (comment) return res.status(409).json({ message: "Comment with this Email already existed!"});
-
     //Create new Comment
     const newComment = new Comment({
         fullName,

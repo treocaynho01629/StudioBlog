@@ -29,10 +29,10 @@ export const postsApiSlice = apiSlice.injectEndpoints({
         }),
         getPosts: builder.query({
             query: (args) => {
-                const { cate, user, tags } = args;
+                const { cate, user, tags, page, size } = args;
                 return {
                     url: `/posts`,
-                    params: { cate, user, tags },
+                    params: { cate, user, tags, page, size },
                     validateStatus: (response, result) => {
                         return response.status === 200 && !result.isError
                     },

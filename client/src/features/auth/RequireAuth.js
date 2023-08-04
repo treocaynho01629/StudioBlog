@@ -6,7 +6,7 @@ const RequireAuth = ({ onlyAdmin }) => {
     const { username, isAdmin } = useAuth();
 
     const content = ( 
-        (username && onlyAdmin == isAdmin)
+        (username && ( !onlyAdmin || isAdmin))
         ? <Outlet/> 
         : username
             ? <Navigate to="/unauthorized" state={{ from: location }} replace/>

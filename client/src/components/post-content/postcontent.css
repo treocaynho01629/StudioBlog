@@ -1,3 +1,8 @@
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
 .postContentTitle {
     width: 100%;
     text-align: left;
@@ -24,10 +29,13 @@
 .infoButton {
     display: flex;
     align-items: center;
+    font-size: 16px;
+    font-family: 'Roboto', sans-serif;
     padding: 0 15px;
     margin-left: 15px;
     height: 35px;
     border-radius: 40px;
+    background-color: white;
     border: dashed 1px;
     cursor: pointer;
 }
@@ -70,6 +78,12 @@
     justify-content: flex-end;
     color: gray;
     font-style: italic;
+    transition: all ease-in-out 0.1s;
+}
+
+.authorInfo figcaption:hover {
+    color: lightblue;
+    text-decoration: underline;
 }
 
 .tagInfo {
@@ -90,6 +104,12 @@
     padding: 5px 10px;
     border-radius: 15px;
     margin-right: 10px;
+    transition: all ease-in-out 0.1s;
+    cursor: pointer;
 }
 
+.smallTag:hover {
+    background-color: lightblue;
+    color: darkslategray;
+}
 

@@ -58,9 +58,9 @@ const CustomInput = styled(TextField)(({ theme }) => ({
 export default function EditPost() {
   const { slug } = useParams();
   const { data: post, isLoading: loadingPost, isSuccess: postDone } = useGetPostQuery({ slug });
+  const { data: categories, isLoading: loadingCates, isSuccess: catesDone } = useGetCategoriesQuery();
   const [updatePost, {isLoading}] = useUpdatePostMutation();
   const [validatePost, {isLoading: validating}] = useValidatePostMutation();
-  const { data: categories } = useGetCategoriesQuery();
   const inputFile = useRef(null);
   const errRef = useRef();
   const [title, setTitle] = useState("");
@@ -187,6 +187,26 @@ export default function EditPost() {
     }
   }
 
+  let catesList;
+
+  if (loadingCates) {
+    catesList = <p>Loading...</p>
+  } else if (catesDone) {
+    const { ids, entities } = categories;
+
+    catesList = ids?.length
+      ? ids?.map(cateId => {
+        const cate = entities[cateId];
+
+        return (
+          <MenuItem key={cateId} value={cateId}>
+            {cate.name}
+          </MenuItem>
+        )
+      })
+      : null
+  }
+
   return (
     <div className="editPostContainer">
        <Container fluid maxWidth="lg">
@@ -238,11 +258,7 @@ export default function EditPost() {
                   value={cate}
                   onChange={(e) => setCate(e.target.value)}
                 >
-                  {categories?.map((cate, index) => (
-                    <MenuItem key={index} value={cate.type}>
-                      {cate.name}
-                    </MenuItem>
-                  ))}
+                  {catesList}
                 </CustomInput>
               </Grid>
             </Grid>
@@ -266,6 +282,7 @@ export default function EditPost() {
               InputProps={{
                 inputComponent: TextareaAutosize,
                 inputProps: {
+                  minRows: 3,
                   style: {
                     resize: "auto"
                   }
@@ -286,6 +303,7 @@ export default function EditPost() {
               InputProps={{
                 inputComponent: TextareaAutosize,
                 inputProps: {
+                  minRows: 8,
                   style: {
                     resize: "auto"
                   }

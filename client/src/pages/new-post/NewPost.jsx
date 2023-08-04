@@ -2,7 +2,7 @@ import './newpost.css';
 import { Autocomplete, Box, Chip, CircularProgress, Container, Dialog, DialogActions, DialogContent, Grid, MenuItem, TextField, TextareaAutosize, useMediaQuery, useTheme } from '@mui/material';
 import { AddCircleOutline as AddCircleOutlineIcon, Visibility, Done } from '@mui/icons-material';
 import styled from '@emotion/styled';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
 import { marked } from "marked";
@@ -56,8 +56,8 @@ const CustomInput = styled(TextField)(({ theme }) => ({
 }));
 
 export default function NewPost() {
-  const [createPost, {isLoading}] = useCreatePostMutation();
-  const [validatePost, {isLoading: validating}] = useValidatePostMutation();
+  const [createPost, { isLoading }] = useCreatePostMutation();
+  const [validatePost, { isLoading: validating }] = useValidatePostMutation();
   const { data: categories, isLoading: loadingCates, isSuccess: catesDone } = useGetCategoriesQuery();
   const inputFile = useRef(null);
   const errRef = useRef();
@@ -76,11 +76,7 @@ export default function NewPost() {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
-  useEffect(() => {
-    if (catesDone && categories && !loadingCates) {
-      setCate(categories[0].type)
-    }
-  }, [catesDone])
+
 
   const handlePreview = () => {
     const previewPost = {
@@ -124,7 +120,7 @@ export default function NewPost() {
           tags
         }
         const isValidPost = await validatePost(newPost).unwrap();
-       
+
         if (isValidPost?.isValid) {
 
           //Create post
@@ -137,7 +133,7 @@ export default function NewPost() {
             form.append('category', cate);
             form.append('tags', tags);
             form.append('file', file);
-      
+
             const createdPost = await createPost(form).unwrap();
             setTitle('');
             setDescription('');
@@ -146,27 +142,47 @@ export default function NewPost() {
             setTags([]);
             setFile(null);
             navigate(`/post/${createdPost.slug}`);
-          } catch (err){
+          } catch (err) {
             console.log(err);
           }
         }
-      } catch (error){
+      } catch (error) {
         //Error handler ...
         if (!error?.status) {
-            setErrMsg('Server không phản hồi');
+          setErrMsg('Server không phản hồi');
         } else if (error?.status === 400) {
-            setErrMsg(error?.data?.msg);
+          setErrMsg(error?.data?.msg);
         } else if (error?.status === 409) {
-            setErrMsg('Bài viết với tiêu đề trên đã tồn tại!');
+          setErrMsg('Bài viết với tiêu đề trên đã tồn tại!');
         } else if (error?.status === 422) {
-            setErrMsg('Sai định dạng thông tin!');  
-            setErr({ ...error, data: new Map(error.data.errors.map(obj => [obj.path, obj.msg]))})
+          setErrMsg('Sai định dạng thông tin!');
+          setErr({ ...error, data: new Map(error.data.errors.map(obj => [obj.path, obj.msg])) })
         } else {
-            setErrMsg('Gửi bài viết thất bại!')
+          setErrMsg('Gửi bài viết thất bại!')
         }
         errRef.current.focus();
       }
     }
+  }
+
+  let catesList;
+
+  if (loadingCates) {
+    catesList = <p>Loading...</p>
+  } else if (catesDone) {
+    const { ids, entities } = categories;
+
+    catesList = ids?.length
+      ? ids?.map(cateId => {
+        const cate = entities[cateId];
+
+        return (
+          <MenuItem key={cateId} value={cateId}>
+            {cate.name}
+          </MenuItem>
+        )
+      })
+      : null
   }
 
   return (
@@ -184,16 +200,16 @@ export default function NewPost() {
               style={{ display: "none" }}
               onChange={handleChangeThumbnail}
             />
-            <Box className="fileButton" onClick={handleOpenFile} 
-              sx={{ 
-                color: (!validPost && !file) ? '#f25a5a' : '#0f3e3c', 
+            <Box className="fileButton" onClick={handleOpenFile}
+              sx={{
+                color: (!validPost && !file) ? '#f25a5a' : '#0f3e3c',
                 borderColor: (!validPost && !file) ? '#f25a5a' : '#0f3e3c'
               }}>
               <AddCircleOutlineIcon sx={{ marginRight: 1 }} />
               Ảnh đại diện
             </Box>
           </Box>
-          { errMsg && <p ref={errRef} className="errorMsg">{errMsg}</p> }
+          {errMsg && <p ref={errRef} className="errorMsg">{errMsg}</p>}
           <Box display="flex" flexDirection="column">
             <Grid container columnSpacing={1}>
               <Grid item xs={12} sm={9}>
@@ -221,15 +237,11 @@ export default function NewPost() {
                   value={cate}
                   onChange={(e) => setCate(e.target.value)}
                 >
-                  {categories?.map((cate, index) => (
-                    <MenuItem key={index} value={cate.type}>
-                      {cate.name}
-                    </MenuItem>
-                  ))}
+                  {catesList}
                 </CustomInput>
               </Grid>
             </Grid>
-            { thumbnail &&
+            {thumbnail &&
               <Box display="flex" justifyContent="center">
                 <img className="thumbnailPreview" src={thumbnail} alt="" />
               </Box>
@@ -243,6 +255,7 @@ export default function NewPost() {
               InputProps={{
                 inputComponent: TextareaAutosize,
                 inputProps: {
+                  minRows: 3,
                   style: {
                     resize: "auto"
                   }
@@ -263,6 +276,7 @@ export default function NewPost() {
               InputProps={{
                 inputComponent: TextareaAutosize,
                 inputProps: {
+                  minRows: 8,
                   style: {
                     resize: "auto"
                   }
@@ -295,10 +309,10 @@ export default function NewPost() {
               )}
             />
             <Box display="flex" alignItems="center">
-              <button type="button" 
-              className="submitButton" 
-              disabled={validating || isLoading}
-              onClick={handlePreview}>
+              <button type="button"
+                className="submitButton"
+                disabled={validating || isLoading}
+                onClick={handlePreview}>
                 Xem trước <Visibility />
               </button>
               <button className="submitButton" disabled={!validPost || validating || isLoading}>
