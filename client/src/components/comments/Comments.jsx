@@ -3,7 +3,7 @@ import { Box, CircularProgress, TextField, TextareaAutosize } from '@mui/materia
 import { Chat as ChatIcon, Done } from '@mui/icons-material';
 import styled from '@emotion/styled';
 import Comment from '../comment/Comment';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useCreateCommentMutation, useGetCommentsQuery } from '../../features/comments/commentsApiSlice';
 
 const CustomInput = styled(TextField)(({ theme }) => ({
@@ -53,13 +53,53 @@ const CustomInput = styled(TextField)(({ theme }) => ({
 
 export default function Comments({ postId, setCommentsCount }) {
     const [createComment, { isLoading: commenting }] = useCreateCommentMutation();
-    const { data: comments, isLoading, isSuccess, isError, error } = useGetCommentsQuery({ postId });
+    const [pagination, setPagination] = useState({
+        currPage: 1,
+        pageSize: 2,
+        numberOfPages: 0,
+    });
+    const [fullComments, setFullComments] = useState([]);
+    const { data: comments, isLoading, isSuccess, isError, error } = useGetCommentsQuery({ 
+        post: postId,
+        page: pagination.currPage,
+        size: pagination.pageSize,
+    });
     const [remember, setRemember] = useState(JSON.parse(localStorage.getItem("info")) ? true : false);
     const [fullName, setFullName] = useState(JSON.parse(localStorage.getItem("info"))?.fullName || "");
     const [email, setEmail] = useState(JSON.parse(localStorage.getItem("info"))?.email || "");
     const [content, setContent] = useState("");
     const [err, setErr] = useState("");
     const [errMsg, setErrMsg] = useState("");
+
+    useEffect(() => {
+        if (!isLoading && isSuccess && comments){
+            const { ids, entities } = comments;
+            setPagination({ ...pagination, numberOfPages: comments?.info?.numberOfPages});
+            setCommentsCount(comments?.info?.totalElements);
+
+            if (ids?.length){
+                ids.map(commentId => {
+                    const comment = entities[commentId];
+                    if (!fullComments.includes(comment)) {
+                        setFullComments(current => [...current, comment]);
+                    }
+                    
+                })
+            }
+            console.log(pagination);
+        }
+    }, [comments])
+
+    const handleReset = () => {
+        setPagination({ ...pagination, currPage: 1});       
+        setFullComments([]);
+    }
+
+    const handleLoadMore = () => {
+        if (pagination.currPage < pagination.numberOfPages){
+            setPagination({ ...pagination, currPage: pagination.currPage + 1});
+        }
+    }
 
     const handleToggleRemember = () => {
         setRemember(prev => !prev);
@@ -69,30 +109,6 @@ export default function Comments({ postId, setCommentsCount }) {
             localStorage.removeItem("info");
         }
     };
-
-    let commentsContainer;
-
-    if (isLoading) {
-        commentsContainer = <p>Loading...</p>
-    } else if (isSuccess) {
-        const { ids, entities } = comments;
-        setCommentsCount(comments?.info?.totalElements);
-
-        const commentsList = ids?.length
-            ? ids.map(commentId => {
-                const comment = entities[commentId];
-                return (<Comment key={commentId} comment={comment} />)
-            })
-            : null
-
-        commentsContainer = (
-            <div className="commentsContainer">
-                {commentsList}
-            </div>
-        )
-    } else if (isError) {
-        commentsContainer = null;
-    }
 
     const validComment = [fullName, email, content].every(Boolean);
 
@@ -107,15 +123,19 @@ export default function Comments({ postId, setCommentsCount }) {
                     content
                 }
                 const createdComment = await createComment({ postId, newComment }).unwrap();
+
                 setErrMsg("");
                 setErr("");
                 setContent("");
+
                 if (!remember) {
                     setFullName("");
                     setEmail("");
                 } else {
                     localStorage.setItem("info", JSON.stringify({ fullName, email }));
                 }
+
+                handleReset();
             } catch (error) {
                 if (!error.status) {
                     setErrMsg("Server không phản hồi!");
@@ -135,12 +155,45 @@ export default function Comments({ postId, setCommentsCount }) {
         }
     }
 
+    let commentsContainer;
+
+    if (isLoading) {
+        commentsContainer = <p>Loading...</p>
+    } else if (isSuccess) {
+        commentsContainer = (
+            <div className="commentsContainer">
+                {fullComments?.map((comment) => {
+                    return (<Comment key={comment.id} comment={comment}/>)
+                })}
+            </div>
+        )
+    } else if (isError) {
+        commentsContainer = null;
+    }
+
     return (
         <div className="postComments">
             <p className="commentTitle">
                 <ChatIcon sx={{ marginRight: 1 }} />Ý kiến bạn đọc ({comments?.info?.totalElements || 0} bình luận)
             </p>
             {commentsContainer}
+            { ((pagination.currPage < pagination.numberOfPages) && pagination.numberOfPages > 1) &&
+                <button className="showMore" onClick={handleLoadMore} disabled={isLoading}>
+                    Xem các ý kiến cũ
+                    {isLoading && (
+                    <CircularProgress
+                        size={24}
+                        sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            marginTop: '-12px',
+                            marginLeft: '-12px',
+                        }}
+                    />
+                    )}
+                </button>
+            }
             <form className="leaveComment" onSubmit={handleSubmit}>
                 <p className="leaveTitle">Để lại ý kiến</p>
                 <p className="rememberComment">

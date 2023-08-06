@@ -29,10 +29,10 @@ export const commentsApiSlice = apiSlice.injectEndpoints({
         }),
         getComments: builder.query({
             query: (args) => {
-                const { postId } = args;
+                const { post, page, size } = args;
                 return {
                     url: `/comments`,
-                    params: { postId },
+                    params: { post, page, size },
                     validateStatus: (response, result) => {
                         return response.status === 200 && !result.isError
                     },

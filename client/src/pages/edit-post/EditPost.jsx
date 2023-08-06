@@ -62,7 +62,6 @@ export default function EditPost() {
   const [updatePost, {isLoading}] = useUpdatePostMutation();
   const [validatePost, {isLoading: validating}] = useValidatePostMutation();
   const inputFile = useRef(null);
-  const errRef = useRef();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [markdown, setMarkdown] = useState("");
@@ -182,7 +181,6 @@ export default function EditPost() {
         } else {
             setErrMsg('Gửi bài viết thất bại!')
         }
-        errRef.current.focus();
       }
     }
   }
@@ -230,7 +228,7 @@ export default function EditPost() {
               Ảnh đại diện
             </Box>
           </Box>
-          { errMsg && <p ref={errRef} className="errorMsg">{errMsg}</p> }
+          { errMsg && <p className="errorMsg">{errMsg}</p> }
           <Box display="flex" flexDirection="column">
             <Grid container columnSpacing={1}>
               <Grid item xs={12} sm={9}>

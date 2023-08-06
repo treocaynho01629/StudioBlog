@@ -15,7 +15,7 @@ export default function Category() {
     const[searchParams, setSearchParams] = useSearchParams();
     const[pagination, setPagination] = useState({
         currPage: searchParams.get("page") || 1,
-        pageSize: searchParams.get("size") || 1,
+        pageSize: searchParams.get("size") || 8,
         numberOfPages: 0,
     })
     const { data: posts, isLoading, isSuccess, isError, error } = useGetPostsQuery({ 

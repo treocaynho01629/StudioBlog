@@ -108,3 +108,29 @@
     color: #f25a5a;
     margin-top: 0;
 }
+
+.showMore {
+    color: #0f3e3c;
+    text-align: center;
+    width: 100%;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    border-bottom: dashed 0.5px lightgray;
+    padding-bottom: 16px;
+    margin-top: 0;
+    margin-bottom: 16px;
+    background-color: transparent;
+    transition: all ease-in-out 0.1s;
+    position: relative;
+}
+
+.showMore:hover {
+    color: #387e5d;
+    border-color: #387e5d;
+    text-decoration: underline;
+}
+
+.showMore:disabled {
+    color: gray;
+}

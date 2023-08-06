@@ -60,7 +60,6 @@ export default function NewPost() {
   const [validatePost, { isLoading: validating }] = useValidatePostMutation();
   const { data: categories, isLoading: loadingCates, isSuccess: catesDone } = useGetCategoriesQuery();
   const inputFile = useRef(null);
-  const errRef = useRef();
   const [title, setTitle] = useState("");
   const [thumbnail, setThumbnail] = useState("");
   const [description, setDescription] = useState("");
@@ -160,7 +159,6 @@ export default function NewPost() {
         } else {
           setErrMsg('Gửi bài viết thất bại!')
         }
-        errRef.current.focus();
       }
     }
   }
@@ -209,7 +207,7 @@ export default function NewPost() {
               Ảnh đại diện
             </Box>
           </Box>
-          {errMsg && <p ref={errRef} className="errorMsg">{errMsg}</p>}
+          {errMsg && <p className="errorMsg">{errMsg}</p>}
           <Box display="flex" flexDirection="column">
             <Grid container columnSpacing={1}>
               <Grid item xs={12} sm={9}>

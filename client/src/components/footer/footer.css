@@ -32,8 +32,7 @@
 }
 
 .fullLogo:hover {
-    filter: drop-shadow(1px 1px 10px #0d3c3985);
-    margin-left: 10px;
+    filter: drop-shadow(1px 1px 20px #0d3c3985);
 }
 
 .logoText {

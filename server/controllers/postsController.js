@@ -1,4 +1,5 @@
 const Post = require("../models/Post");
+const Comment = require("../models/Comment");
 const User = require("../models/User");
 
 //Get single post
@@ -144,6 +145,8 @@ const deletePost = async (req, res) => {
     try {
         if (post.user == req.auth.id || req.auth.isAdmin) {
             try{
+                //Delete post's comment
+                await Comment.deleteMany({ post: post._id }).exec();
                 //Delete post
                 await Post.findByIdAndDelete(id);
                 res.status(200).json({ message: "Post deleted"});

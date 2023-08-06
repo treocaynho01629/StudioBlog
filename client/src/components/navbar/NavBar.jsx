@@ -57,6 +57,7 @@ export default function NavBar(props) {
     const handleSignout = () => {
         handleClose();
         signout();
+        navigate("/");
     }
 
     const handleNewPost = () => {

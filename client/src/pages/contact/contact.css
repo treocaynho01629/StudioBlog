@@ -3,6 +3,11 @@
     margin-bottom: 150px;
 }
 
+.contactForm {
+    display: flex;
+    flex-direction: column;
+}
+
 .contactButton {
     background-color: #0f3e3c;
     color: white;
@@ -11,10 +16,16 @@
     margin: 20px 0;
     width: 150px;
     font-size: 16px;
+    position: relative;
 }
 
 .contactButton:hover {
     background-color: #387e5d;
+}
+
+.contactButton:disabled {
+    background-color: #3d4944;
+    color: gray;
 }
 
 .alternativeTitle {
