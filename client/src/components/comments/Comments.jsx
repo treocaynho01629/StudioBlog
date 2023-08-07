@@ -51,18 +51,20 @@ const CustomInput = styled(TextField)(({ theme }) => ({
     },
 }));
 
+const defaultSize = 4;
 export default function Comments({ postId, setCommentsCount }) {
     const [createComment, { isLoading: commenting }] = useCreateCommentMutation();
     const [pagination, setPagination] = useState({
         currPage: 1,
-        pageSize: 2,
+        pageSize: defaultSize,
         numberOfPages: 0,
     });
-    const [fullComments, setFullComments] = useState([]);
     const { data: comments, isLoading, isSuccess, isError, error } = useGetCommentsQuery({ 
         post: postId,
         page: pagination.currPage,
         size: pagination.pageSize,
+    }, {
+        skip: postId === undefined
     });
     const [remember, setRemember] = useState(JSON.parse(localStorage.getItem("info")) ? true : false);
     const [fullName, setFullName] = useState(JSON.parse(localStorage.getItem("info"))?.fullName || "");
@@ -73,32 +75,19 @@ export default function Comments({ postId, setCommentsCount }) {
 
     useEffect(() => {
         if (!isLoading && isSuccess && comments){
-            const { ids, entities } = comments;
             setPagination({ ...pagination, numberOfPages: comments?.info?.numberOfPages});
             setCommentsCount(comments?.info?.totalElements);
-
-            if (ids?.length){
-                ids.map(commentId => {
-                    const comment = entities[commentId];
-                    if (!fullComments.includes(comment)) {
-                        setFullComments(current => [...current, comment]);
-                    }
-                    
-                })
-            }
-            console.log(pagination);
         }
     }, [comments])
-
-    const handleReset = () => {
-        setPagination({ ...pagination, currPage: 1});       
-        setFullComments([]);
-    }
 
     const handleLoadMore = () => {
         if (pagination.currPage < pagination.numberOfPages){
             setPagination({ ...pagination, currPage: pagination.currPage + 1});
         }
+    }
+
+    const reloadComments = () => {
+        setPagination({ ...pagination, currPage: 1 });
     }
 
     const handleToggleRemember = () => {
@@ -116,13 +105,15 @@ export default function Comments({ postId, setCommentsCount }) {
         e.preventDefault();
 
         if (validComment) {
+            reloadComments();
+
             try {
                 const newComment = {
                     fullName,
                     email,
                     content
                 }
-                const createdComment = await createComment({ postId, newComment }).unwrap();
+                await createComment({ postId, newComment }).unwrap();
 
                 setErrMsg("");
                 setErr("");
@@ -134,8 +125,6 @@ export default function Comments({ postId, setCommentsCount }) {
                 } else {
                     localStorage.setItem("info", JSON.stringify({ fullName, email }));
                 }
-
-                handleReset();
             } catch (error) {
                 if (!error.status) {
                     setErrMsg("Server không phản hồi!");
@@ -160,11 +149,18 @@ export default function Comments({ postId, setCommentsCount }) {
     if (isLoading) {
         commentsContainer = <p>Loading...</p>
     } else if (isSuccess) {
+        const { ids, entities } = comments;
+
+        const commentsList = ids?.length
+            ? ids.map(commendId => {
+                const comment = entities[commendId];
+                return (<Comment key={comment.id} comment={comment} reloadComments={reloadComments}/>)
+            })
+            : null
+
         commentsContainer = (
             <div className="commentsContainer">
-                {fullComments?.map((comment) => {
-                    return (<Comment key={comment.id} comment={comment}/>)
-                })}
+                {commentsList}
             </div>
         )
     } else if (isError) {

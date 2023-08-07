@@ -14,8 +14,9 @@ import Unauthorized from "./pages/unauthorized/Unauthorized";
 import Prefetch from "./features/auth/Prefetch";
 import Video from "./pages/video/Video";
 import useTitle from "./hooks/useTitle";
-import Contact from "./pages/contact/Contact";
-import About from "./pages/About/About";
+import Contact from "./pages/contact/Contact";  
+import About from "./pages/about/About";
+import Search from "./pages/search/Search";
 
 function App() {
   useTitle("TAM PRODUCTION");
@@ -34,6 +35,7 @@ function App() {
             <Route path="/contact" element={<Contact/>}/>
             <Route path="/about" element={<About/>}/>
             <Route path="/category/:cate" element={<Category/>}/>
+            <Route path="/search" element={<Search/>}/>
             <Route path="/post/:slug" element={<PostDetail/>}/>
 
             //EMPLOYEE

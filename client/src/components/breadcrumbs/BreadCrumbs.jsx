@@ -10,6 +10,7 @@ export default function BreadCrumbs({ route, post }) {
 
   const breadcrumbs = [
     <Link
+      key={'home'}
       className="home-crumb"
       to="/"
     >
@@ -20,6 +21,7 @@ export default function BreadCrumbs({ route, post }) {
   if (route) {
     breadcrumbs.push(
       <Typography
+        key={'prim'}
         className="crumb"
         sx={{ display: 'flex', alignItems: 'center' }}
         color="text.primary"
@@ -30,6 +32,7 @@ export default function BreadCrumbs({ route, post }) {
   } else if (post) {
     breadcrumbs.push(
       <Link
+        key={'cate'}
         className="crumb"
         to={`/category/${category?.type}`}
       >
@@ -37,6 +40,7 @@ export default function BreadCrumbs({ route, post }) {
       </Link>
       ,
       <Typography
+        key={'prim'}
         className="crumb"
         sx={{ display: 'flex', alignItems: 'center' }}
         color="text.primary"

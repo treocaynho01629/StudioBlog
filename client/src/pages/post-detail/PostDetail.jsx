@@ -12,7 +12,7 @@ export default function PostDetail() {
   const { slug } = useParams();
   const { data: post, isLoading, isSuccess, isError, error } = useGetPostQuery({ slug });
   const [commentsCount, setCommentsCount] = useState(0);
-  useTitle(`${post?.title} - TAM PRODUCTION`);
+  useTitle(`${post?.title || 'Bài viết'} - TAM PRODUCTION`);
 
   let content;
   if (isLoading) {

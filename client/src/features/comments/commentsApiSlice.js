@@ -46,6 +46,22 @@ export const commentsApiSlice = apiSlice.injectEndpoints({
                 });
                 return commentsAdapater.setAll({ ...initialState, info }, loadedComments)
             },
+            serializeQueryArgs: ({ endpointName }) => {
+                return endpointName;
+            },
+            merge: (currentCache, newItems, { arg }) => {
+                if (arg.page > 1) { //Only merge on load more
+                    currentCache.ids.filter(e => !newItems.ids.includes(e));
+                    currentCache.ids.push(...newItems.ids);
+                    currentCache.entities = {...currentCache.entities, ...newItems.entities};
+                    currentCache.info = newItems.info;
+                    return currentCache;
+                }
+                return newItems;
+            },
+            forceRefetch({ currentArg, previousArg }) {
+                return ((currentArg !== previousArg))
+            },
             providesTags: (result, error, arg) => {
                 if (result?.ids) {
                     return [

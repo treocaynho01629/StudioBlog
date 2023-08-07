@@ -4,7 +4,7 @@ import { CalendarMonth, Delete as DeleteIcon, Person as PersonIcon } from '@mui/
 import { useDeleteCommentMutation } from '../../features/comments/commentsApiSlice';
 import useAuth from '../../hooks/useAuth';
 
-export default function Comment({ comment }) {
+export default function Comment({ comment, reloadComments }) {
     const { isAdmin } = useAuth();
     const [deleteComment, {
         isLoading,
@@ -14,6 +14,7 @@ export default function Comment({ comment }) {
     }] = useDeleteCommentMutation();
 
     const onDeleteClicked = async () => {
+        reloadComments();
         await deleteComment({ id: comment?.id });
     }
 

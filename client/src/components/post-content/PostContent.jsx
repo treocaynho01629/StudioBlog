@@ -78,7 +78,7 @@ export default function PostContent({ post, commentsCount, previewMode }) {
         <div className="postContentMarkdown" dangerouslySetInnerHTML={{ __html: post.sanitizedHtml }}/>
       </div>
       <figure className="authorInfo">
-        <Link to={`/search?user=${post?.author}`}>
+        <Link to={`/search?author=${post?.author}`}>
           <figcaption>- Người viết: {post.author ?? "Vô danh"}</figcaption>
         </Link>
       </figure>

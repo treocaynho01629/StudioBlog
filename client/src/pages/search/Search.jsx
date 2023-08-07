@@ -1,31 +1,34 @@
-import './category.css';
+import './search.css';
 import BreadCrumbs from '../../components/breadcrumbs/BreadCrumbs';
 import Post from '../../components/post/Post';
 import { Container } from '@mui/material';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useGetPostsQuery } from '../../features/posts/postsApiSlice';
-import { selectCategoryById } from '../../features/categories/categoriesApiSlice';
-import { useSelector } from 'react-redux';
 import useTitle from '../../hooks/useTitle';
 import CustomPagination from '../../components/custom-pagination/CustomPagination';
 import { useEffect, useState } from 'react';
 
 const defaultSize = 8;
-export default function Category() {
-    const { cate } = useParams();
-    const[searchParams, setSearchParams] = useSearchParams();
-    const[pagination, setPagination] = useState({
+export default function Search() {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [pagination, setPagination] = useState({
         currPage: searchParams.get("page") || 1,
         pageSize: searchParams.get("size") || defaultSize,
         numberOfPages: 0,
+    });
+    const[filters, setFilters] = useState({
+        tags: searchParams.get("tags") ? searchParams.get("tags").split(',') : [],
+        author: searchParams.get("author") || "",
+        cate: searchParams.get("cate") || "",
     })
     const { data: posts, isLoading, isSuccess, isError, error } = useGetPostsQuery({ 
-        cate, 
+        tags: filters.tags,
+        author: filters.author,
+        cate: filters.cate,
         page: pagination.currPage, 
         size: pagination.pageSize 
     });
-    const category = useSelector(state => selectCategoryById(state, cate));
-    useTitle(`${category?.name.toUpperCase() || 'Danh mục'} - TAM PRODUCTION`);
+    useTitle(`Tìm kiếm - TAM PRODUCTION`);
 
     useEffect(() => {
         if (!isLoading && isSuccess && posts){
@@ -56,6 +59,42 @@ export default function Category() {
         setPagination({...pagination, pageSize: newValue});
     }
 
+    const handleChangeTags = (newValue) => {
+        handlePageChange(1);
+        if (newValue.length === 0){
+            searchParams.delete("tags");
+            setSearchParams(searchParams);
+        } else {
+            searchParams.set("tags", newValue);
+            setSearchParams(searchParams);
+        }
+        setFilters({...filters, tags: newValue});
+    }
+
+    const handleChangeAuthor= (newValue) => {
+        handlePageChange(1);
+        if (newValue === ""){
+            searchParams.delete("author");
+            setSearchParams(searchParams);
+        } else {
+            searchParams.set("author", newValue);
+            setSearchParams(searchParams);
+        }
+        setFilters({...filters, author: newValue});
+    }
+
+    const handleChangeCate = (newValue) => {
+        handlePageChange(1);
+        if (newValue === ""){
+            searchParams.delete("cate");
+            setSearchParams(searchParams);
+        } else {
+            searchParams.set("cate", newValue);
+            setSearchParams(searchParams);
+        }
+        setFilters({...filters, cate: newValue});
+    }
+
     let content;
     
     if (isLoading) {
@@ -76,8 +115,8 @@ export default function Category() {
     return (
         <div className="cateContainer">
             <Container fluid maxWidth="lg">
-                <BreadCrumbs route={category?.name}/>
-                <h1 className="alternativeTitle">DANH MỤC: {category?.name.toUpperCase()}</h1>
+                <BreadCrumbs route={'Tìm kiếm'}/>
+                <h1 className="alternativeTitle">TÌM KIẾM BÀI VIẾT</h1>
                 {content}
                 <CustomPagination pagination={pagination}
                 onPageChange={handlePageChange}

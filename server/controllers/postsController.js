@@ -20,21 +20,38 @@ const getPost = async (req, res) => {
 
 //Get multiple posts
 const getPosts = async (req, res) => {
-    const { user, cate: category, tags } = req.query;
+    const { author, cate: category, tags } = req.query;
 
     try {
         const page = req.query.page ? (Number(req.query.page) - 1) : 0;
-        const size = req.query.size ? req.query.size : 8;
+        const size = req.query.size ? Number(req.query.size) : 8;
         const startIndex = page * size;
         let condition = {};
+        let total;
+        let posts;
         
         //Apply condition
-        if (user) condition = { ...condition, user };
+        if (author) condition = { ...condition, 'author.fullName': author };
         if (category) condition = { ...condition, category };
         if (tags && tags.length !== 0) condition = { ...condition, tags: { "$in": tags } }
         
-        const total = await Post.countDocuments(condition);
-        const posts = await Post.find(condition).sort({ _id: -1 }).limit(size).skip(startIndex).lean();
+        if (author) {
+            const agg = await Post.aggregate().lookup({ from: 'users', localField: 'user', foreignField: '_id', as: 'author' })
+            .unwind({ path: '$author', preserveNullAndEmptyArrays: true })
+            .match(condition)
+            .facet({
+                data: [{ $skip: startIndex }, { $limit: size }, { $sort: { _id: -1 }}],
+                info: [{ $count: 'totalElements'}]
+            })
+            .project({ author: 0 })
+            .exec();
+
+            posts = agg[0].data;
+            total = agg[0].info[0].totalElements;
+        } else {
+            posts = await Post.find(condition).sort({ _id: -1 }).limit(size).skip(startIndex).lean();
+            total = await Post.countDocuments(condition);
+        }
 
         res.status(200).json({ 
             data: posts, 
