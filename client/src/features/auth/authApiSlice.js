@@ -32,13 +32,11 @@ export const authApiSlice = apiSlice.injectEndpoints({
             }),
             async onQueryStarted(arg, { dispatch, queryFulfilled }) {
                 try {
-                    const { data } = await queryFulfilled
-                    console.log(data)
-                    dispatch(logOut())
-                    localStorage.setItem("persist", JSON.stringify(false));
+                    await queryFulfilled
+                    dispatch(logOut());
                     setTimeout(() => {
                         dispatch(apiSlice.util.resetApiState()) //Unmount api state
-                    }, 1000)
+                    }, 1000);
                 } catch (err) {
                     console.log(err)
                 }

@@ -4,6 +4,9 @@ const JWTAuthenticate = require("../middlewares/JWTAuthenticate");
 
 router.use(JWTAuthenticate);
 
+router.route("")
+    .get(usersController.getUsers); //Get all users
+
 router.route("/:id")
     .get(usersController.getUser) //Get user by [id]
     .put(usersController.updateUser) //Update user by [id]

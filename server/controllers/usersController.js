@@ -15,6 +15,31 @@ const getUser = async (req, res) => {
     }
 }
 
+//Get multiple users
+const getUsers = async (req, res) => {
+    try {
+        const page = req.query.page ? (Number(req.query.page) - 1) : 0;
+        const size = req.query.size ? Number(req.query.size) : 8;
+        const startIndex = page * size;
+        
+        const users = await User.find().select('-password').sort({ _id: -1 }).limit(size).skip(startIndex).lean();
+        const total = await User.countDocuments() || 0;
+
+        res.status(200).json({ 
+            data: users, 
+            info: {
+                currPage: page, 
+                pageSize: size,
+                totalElements: total,
+                numberOfPages: Math.ceil(total / size)
+            }
+        });
+    } catch(err) {
+        console.log(err);
+        res.status(500).send(err);
+    }
+}
+
 //Update user
 const updateUser = async (req, res) => {
     const { username, email, password, fullName, isAdmin } = req.body;
@@ -74,6 +99,7 @@ const deleteUser = async (req, res) => {
 
 module.exports = {
     getUser,
+    getUsers,
     updateUser,
     deleteUser
 }

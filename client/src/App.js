@@ -17,6 +17,7 @@ import useTitle from "./hooks/useTitle";
 import Contact from "./pages/contact/Contact";  
 import About from "./pages/about/About";
 import Search from "./pages/search/Search";
+import Users from "./pages/users/Users";
 
 function App() {
   useTitle("TAM PRODUCTION");
@@ -46,11 +47,13 @@ function App() {
 
             //ADMIN
             <Route element={<RequireAuth onlyAdmin={true} />}>
+              <Route path="/users-list" element={<Users/>}/>
             </Route>
+            
           
           //PREFETCH PROTECTED
           <Route element={<Prefetch/>}>
-            //Add later (userlist, commentlist, postlist)
+            //Add later (commentlist, imagesList)
           </Route>
         </Route>
       </Routes>

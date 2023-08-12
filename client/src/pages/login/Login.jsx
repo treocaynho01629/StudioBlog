@@ -3,7 +3,7 @@ import { CircularProgress, Container, IconButton, InputAdornment, Paper, TextFie
 import styled from '@emotion/styled';
 import { useEffect, useRef, useState } from 'react';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { setAuth } from '../../features/auth/authSlice';
+import { setAuth, setPersist } from '../../features/auth/authSlice';
 import { useLoginMutation } from '../../features/auth/authApiSlice';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -58,7 +58,8 @@ export default function Login() {
   const errRef = useRef();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [persist, setPersist] = usePersist();
+  // const [persist, setPersist] = usePersist();
+  const persist = usePersist();
   const [showPassword, setShowPassword] = useState(false);
   const [errMsg, setErrMsg] = useState("");
   const [login, { isLoading }] = useLoginMutation();
@@ -75,7 +76,7 @@ export default function Login() {
 
   const handleMouseDown = (e) => { e.preventDefault() };
 
-  const handleTogglePersist = () => { setPersist(prev => !prev) };
+  const handleTogglePersist = () => { dispatch(setPersist({ persist: !persist })); };
 
   const validLogin = [username, password].every(Boolean) && !isLoading
 

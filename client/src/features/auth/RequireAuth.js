@@ -13,6 +13,8 @@ const RequireAuth = ({ onlyAdmin }) => {
             : <Navigate to="/login" state={{ from: location }} replace/>
     )
 
+    console.log(username && ( !onlyAdmin || isAdmin));
+
     return content
 }
 export default RequireAuth

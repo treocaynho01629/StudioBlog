@@ -3,23 +3,49 @@ import { apiSlice } from "../../app/api/apiSlice";
 
 const usersAdapter = createEntityAdapter({});
 
-const initialState = usersAdapter.getInitialState();
+const initialState = usersAdapter.getInitialState({
+    info: {
+      currPage: 0,
+      pageSize: 0,
+      totalElements: 0,
+      numbersOfPages: 0,
+    },
+});
 
 export const usersApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
-        getUsers: builder.query({
-            query: () => ({
-                url: '/api/users',
+        getUser: builder.query({
+            query: ({ id }) => ({
+                url: `/users/${id}`,
                 validateStatus: (response, result) => {
                     return response.status === 200 && !result.isError
                 },
             }),
             transformResponse: responseData => {
-                const loadedUsers = responseData.map(user => {
+                const user = { ...responseData, id: responseData._id};
+                return user;
+            },
+            providesTags: ['User']
+        }),
+        getUsers: builder.query({
+            query: (args) => {
+                const { page, size } = args;
+
+                return {
+                    url: '/users',
+                    params: { page, size },
+                    validateStatus: (response, result) => {
+                        return response.status === 200 && !result.isError
+                    },
+                }
+            },
+            transformResponse: responseData => {
+                const { info, data } = responseData;
+                const loadedUsers = data.map(user => {
                     user.id = user._id
                     return user
                 });
-                return usersAdapter.setAll(initialState, loadedUsers)
+                return usersAdapter.setAll({ ...initialState, info }, loadedUsers);
             },
             providesTags: (result, error, arg) => {
                 if (result?.ids) {
@@ -32,7 +58,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         }),
         createUser: builder.mutation({
             query: initialUser => ({
-                url: '/api/users',
+                url: '/users',
                 method: 'POST',
                 body: {
                     ...initialUser,
@@ -44,7 +70,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         }),
         updateUser: builder.mutation({
             query: initialUser => ({
-                url: '/api/users',
+                url: '/users',
                 method: 'PUT',
                 body: {
                     ...initialUser,
@@ -56,7 +82,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         }),
         deleteUser: builder.mutation({
             query: ({ id }) => ({
-                url: `/api/users/${id}`,
+                url: `/users/${id}`,
                 method: 'DELETE'
             }),
             invalidatesTags: (result, error, arg) => [
@@ -67,25 +93,23 @@ export const usersApiSlice = apiSlice.injectEndpoints({
 })
 
 export const {
-    getUsers,
-    createUser,
-    updateUser,
-    deleteUser
+    useGetUserQuery,
+    useGetUsersQuery,
+    useCreateUserMutation,
+    useUpdateUserMutation,
+    useDeleteUserMutation
 } = usersApiSlice
 
-// returns the query result object
 export const selectUsersResult = usersApiSlice.endpoints.getUsers.select()
 
-// creates memoized selector
 const selectUsersData = createSelector(
     selectUsersResult,
-    usersResult => usersResult.data // normalized state object with ids & entities
+    usersResult => usersResult.data
 )
 
-//getSelectors creates these selectors and we rename them with aliases using destructuring
 export const {
     selectAll: selectAllUsers,
     selectById: selectUserById,
-    selectIds: selectUserIds
-    // Pass in a selector that returns the users slice of state
+    selectIds: selectUserIds,
+    selectEntities: selectUserEntities
 } = usersAdapter.getSelectors(state => selectUsersData(state) ?? initialState)

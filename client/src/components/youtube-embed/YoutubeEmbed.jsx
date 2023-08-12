@@ -1,9 +1,9 @@
 import './youtubeembed.css';
 
-export default function YoutubeEmbed({ video }) {
+export default function YoutubeEmbed({ key, video }) {
   if (video) {
     return (
-      <div className="video-responsive">
+      <div key={key} className="video-responsive">
         <iframe
           loading="lazy"
           width="853"

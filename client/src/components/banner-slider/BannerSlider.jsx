@@ -19,8 +19,8 @@ export default function BannerSlider() {
     return (
         <div className="bannerSliderContainer">
             <Slider {...settings}>
-                {banners.map((banner) => (
-                    <div className="bannerSliderWrapper">
+                {banners.map((banner, index) => (
+                    <div key={index} className="bannerSliderWrapper">
                         <img className="bannerImage"
                             src={banner.image}
                             alt="" />

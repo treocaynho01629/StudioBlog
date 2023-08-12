@@ -30,9 +30,21 @@ export const postsApiSlice = apiSlice.injectEndpoints({
         getPosts: builder.query({
             query: (args) => {
                 const { cate, author, tags, page, size } = args;
+
+                //Params
+                const params = new URLSearchParams();
+                if (cate) params.append('cate', cate);
+                if (author) params.append('author', author);
+                if (page) params.append('page', page);
+                if (size) params.append('size', size);
+                if (tags) {
+                    for (const tag of tags) {
+                      params.append('tags', tag);
+                    }
+                }
+
                 return {
-                    url: `/posts`,
-                    params: { cate, author, tags, page, size },
+                    url: `/posts?${params.toString()}`,
                     validateStatus: (response, result) => {
                         return response.status === 200 && !result.isError
                     },

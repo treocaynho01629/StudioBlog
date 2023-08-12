@@ -6,7 +6,7 @@ import { selectCurrentToken } from './authSlice';
 import usePersist from '../../hooks/usePersist';
 
 export default function PersistLogin() {
-    const [persist] = usePersist();
+    const persist = usePersist();
     const token = useSelector(selectCurrentToken);
     const effectRan = useRef(false);
 
@@ -21,7 +21,6 @@ export default function PersistLogin() {
     const [trueSuccess, setTrueSuccess] = useState(false);
 
     useEffect(() => {
-        console.log(persist);
         if (effectRan.current === true || process.env.NODE_ENV !== 'development') { // React 18 Strict Mode
 
             const verifyRefreshToken = async () => {
@@ -62,7 +61,14 @@ export default function PersistLogin() {
     } else if (token && isUninitialized) {
         content = <Outlet />
     } else {
-        content = <Outlet />
+        console.log('persist' + persist);
+        console.log('isLoading' + isLoading);
+        console.log('isError' + isError);
+        console.log('error' + error);
+        console.log('isSuccess' + isSuccess);
+        console.log('trueSuccess' + trueSuccess);
+        console.log('token' + token);
+        console.log('isUninitialized' + isUninitialized);
     }
 
     return content

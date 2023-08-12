@@ -75,8 +75,6 @@ export default function NewPost() {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
-
-
   const handlePreview = () => {
     const previewPost = {
       title,

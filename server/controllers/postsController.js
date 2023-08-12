@@ -31,9 +31,12 @@ const getPosts = async (req, res) => {
         let posts;
         
         //Apply condition
-        if (author) condition = { ...condition, 'author.fullName': author };
+        if (author) condition = { ...condition, 'author.fullName': {'$regex': author, '$options': 'i'}};
         if (category) condition = { ...condition, category };
-        if (tags && tags.length !== 0) condition = { ...condition, tags: { "$in": tags } }
+        if (tags) {
+            const tagsArr = [].concat(tags);
+            condition = { ...condition, tags: { "$in": tagsArr } }
+        }
         
         if (author) {
             const agg = await Post.aggregate().lookup({ from: 'users', localField: 'user', foreignField: '_id', as: 'author' })
@@ -47,10 +50,10 @@ const getPosts = async (req, res) => {
             .exec();
 
             posts = agg[0].data;
-            total = agg[0].info[0].totalElements;
+            total = agg[0]?.info[0]?.totalElements || 0;
         } else {
             posts = await Post.find(condition).sort({ _id: -1 }).limit(size).skip(startIndex).lean();
-            total = await Post.countDocuments(condition);
+            total = await Post.countDocuments(condition) || 0;
         }
 
         res.status(200).json({ 

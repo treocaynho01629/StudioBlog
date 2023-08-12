@@ -2,10 +2,13 @@ import './navbar.css'
 import { AppBar, Stack, Grid, Collapse, useScrollTrigger, Typography, Container, Menu, MenuItem, ListItemIcon } from '@mui/material'
 import { Phone as PhoneIcon, Mail as MailIcon, Menu as MenuIcon, Logout, AddCircleOutline, Person } from '@mui/icons-material'
 import { NavLink, Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSignoutMutation } from '../../features/auth/authApiSlice';
 import useAuth from '../../hooks/useAuth';
 import { useGetCategoriesQuery } from '../../features/categories/categoriesApiSlice';
+import usePersist from '../../hooks/usePersist';
+import { setPersist } from '../../features/auth/authSlice';
+import { useDispatch } from 'react-redux';
 
 function HideOnScroll(props) {
     const { children, window } = props;
@@ -49,19 +52,26 @@ const menuStyle = {
 export default function NavBar(props) {
     const { username, isAdmin } = useAuth();
     const [anchorEl, setAnchorEl] = useState(null);
-    const [signout] = useSignoutMutation();
+    const persist = usePersist();
+    const [signout, { isSuccess: loggedOut }] = useSignoutMutation();
     const { data: categories, isLoading, isSuccess } = useGetCategoriesQuery();
     const open = Boolean(anchorEl);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (loggedOut) {
+            navigate('/')
+        }
+    }, [loggedOut, navigate])
 
     const handleSignout = () => {
-        handleClose();
+        console.log('da');
+        dispatch(setPersist(false));
         signout();
-        navigate("/");
     }
 
     const handleNewPost = () => {
-        handleClose();
         navigate('/new-post');
     }
 
