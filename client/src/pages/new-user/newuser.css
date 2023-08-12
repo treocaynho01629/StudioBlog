@@ -1,0 +1,42 @@
+.newUserContainer {
+    margin-top: 150px;
+}
+
+.newUserTitle {
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase;
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 10px 0;
+}
+
+.submitButton {
+    background-color: #0f3e3c;
+    color: white;
+    border: none;
+    margin: 20px 10px 20px 0;
+    width: 100px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    cursor: pointer;
+    position: relative;
+}
+
+.submitButton:hover {
+    background-color: #387e5d;
+}
+
+.submitButton:disabled {
+    background-color: #3d4944;
+    color: gray;
+}
+
+.errorMsg {
+    color: #f25a5a;
+    margin-top: 0;
+}

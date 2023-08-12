@@ -8,3 +8,26 @@
     color: #0f3e3c;
     margin-bottom: 30px;
 }
+
+.addButton {
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    margin-left: 15px;
+    height: 35px;
+    border-radius: 40px;
+    border: dashed 1px;
+    cursor: pointer;
+    background-color: white;
+    color: #0f3e3c;
+    border-color: #0f3e3c;
+    font-size: 16px;
+    font-family: 'Roboto', sans-serif;
+}
+
+.addButton:hover {
+    color: #387e5d;
+    border-color: #387e5d;
+    border-style: solid;
+    background-color: whitesmoke;
+}

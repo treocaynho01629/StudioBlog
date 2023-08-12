@@ -40,12 +40,43 @@ const getUsers = async (req, res) => {
     }
 }
 
+//Create user
+const createUser = async (req, res) => {
+    const { username, email, password, fullName, isAdmin } = req.body;
+
+    //Authorization
+    if (!username || !email || !password || !fullName) {
+        return res.status(400).json({message: "All field is required!"});
+    }
+
+    if (req.auth.isAdmin) {
+        try {
+            const salt = await bcrypt.genSalt(10);
+            const encryptPass = await bcrypt.hash(password, salt);
+            const newUser = new User({
+                username,
+                email,
+                password: encryptPass,
+                fullName,
+                isAdmin
+            });
+    
+            const user = await newUser.save();
+            res.status(200).json(user);
+        } catch(err) {
+            res.status(500).json(err);
+        }
+    } else {
+        res.status(404).json({message: "Wrong user!"});
+    }
+}
+
 //Update user
 const updateUser = async (req, res) => {
     const { username, email, password, fullName, isAdmin } = req.body;
 
     //Authorization
-    if (!usernamae || !email || !password || !fullName) {
+    if (!email || !fullName) {
         return res.status(400).json({message: "All field is required!"});
     }
 
@@ -54,21 +85,23 @@ const updateUser = async (req, res) => {
     if (!user) return res.status(400).json({ message: "User not found!" });
 
     if (req.auth.id == user._id || req.auth.isAdmin){
-        if (password) {
-            const salt = await bcrypt.genSalt(10);
-            password = await bcrypt.hash(password, salt);
-        }
-        try {
-            user.username = username;
-            user.password = password;
-            user.email = email;
-            user.fullName = fullName;
-            if (isAdmin != null && req.auth.isAdmin) user.isAdmin = isAdmin;
-
-            const updatedUser = await user.save();
-            res.status(200).json(updatedUser);
-        } catch(err) {
-            res.status(500).json(err);
+        if (!user.isAdmin || (user.isAdmin && req.auth.id == user._id)) { //If role admin >> update themself
+            if (password) {
+                const salt = await bcrypt.genSalt(10);
+                const newPassword = await bcrypt.hash(password, salt);
+                user.password = newPassword;
+            }
+            try {
+                user.email = email;
+                user.fullName = fullName;
+                if (username != null && req.auth.isAdmin) user.username = username;
+                if (isAdmin != null && req.auth.isAdmin) user.isAdmin = isAdmin;
+    
+                const updatedUser = await user.save();
+                res.status(200).json(updatedUser);
+            } catch(err) {
+                res.status(500).json(err);
+            }
         }
     } else {
         res.status(404).json({message: "Wrong user!"});
@@ -81,16 +114,18 @@ const deleteUser = async (req, res) => {
     if (!user) return res.status(400).json({ message: "User not found!" });
 
     if (req.auth.id == user._id || req.auth.isAdmin){
-        try {
+        if (!user.isAdmin || (user.isAdmin && req.auth.id == user._id)) { //If role admin >> delete themself
             try {
-                await Post.deleteMany({ user: user._id }).exec();
-                await User.findByIdAndDelete(user._id).exec();
-                res.status(200).json({ message: `User ${user.username} has been deleted!`});
+                try {
+                    await Post.updateMany({ user: user._id }, {"$set": {"user": null}}).exec();
+                    await User.findByIdAndDelete(user._id).exec();
+                    res.status(200).json({ message: `User ${user.username} has been deleted!`});
+                } catch(err) {
+                    res.status(500).json(err);
+                }
             } catch(err) {
-                res.status(500).json(err);
+                res.status(404).json({ message: "User not found!" });
             }
-        } catch(err) {
-            res.status(404).json({ message: "User not found!" });
         }
     } else {
         res.status(404).json({ message: "Wrong user!" });
@@ -100,6 +135,7 @@ const deleteUser = async (req, res) => {
 module.exports = {
     getUser,
     getUsers,
+    createUser,
     updateUser,
     deleteUser
 }

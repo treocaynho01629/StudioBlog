@@ -1,0 +1,48 @@
+.userContainer {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    padding: 0px 5px;
+}
+
+.userInfo {
+    padding: 5px;
+}
+
+.usernameInfo {
+    display: flex;
+    align-items: center;
+}
+
+.userAction {
+    display: flex;
+    padding: 10px 5px;
+}
+
+.userInfoButton {
+    font-size: 16px;
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 35px;
+    width: 35px;
+    border-radius: 50%;
+    background-color: white;
+    border: dashed 1px;
+    cursor: pointer;
+    position: relative;
+}
+
+.userInfoButton:hover {
+    border-color: lightblue;
+    border-style: solid;
+    background-color: whitesmoke;
+}
+
+.userInfoButton:disabled {
+    border-color: gray!important;
+    color: gray!important;
+    border-style: dotted;
+    background-color: whitesmoke;
+}

@@ -35,5 +35,5 @@ async (req, res) => {
 }]
 
 exports = [
-    
+    validateRegister
 ];

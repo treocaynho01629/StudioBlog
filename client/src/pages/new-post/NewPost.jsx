@@ -9,6 +9,7 @@ import { marked } from "marked";
 import PostContent from '../../components/post-content/PostContent';
 import { useCreatePostMutation, useValidatePostMutation } from '../../features/posts/postsApiSlice';
 import { useGetCategoriesQuery } from '../../features/categories/categoriesApiSlice';
+import useTitle from '../../hooks/useTitle';
 
 const CustomInput = styled(TextField)(({ theme }) => ({
   '& .MuiInputBase-root': {
@@ -74,6 +75,7 @@ export default function NewPost() {
   const navigate = useNavigate();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  useTitle(`Bài viết mới - TAM PRODUCTION`);
 
   const handlePreview = () => {
     const previewPost = {
@@ -232,6 +234,7 @@ export default function NewPost() {
                   helperText={err?.data?.has('category') && err?.data?.get('category')}
                   value={cate}
                   onChange={(e) => setCate(e.target.value)}
+                  sx={{ marginBottom: '15px' }}
                 >
                   {catesList}
                 </CustomInput>

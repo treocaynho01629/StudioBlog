@@ -9,6 +9,7 @@ import { marked } from "marked";
 import PostContent from '../../components/post-content/PostContent';
 import { useGetPostQuery, useUpdatePostMutation, useValidatePostMutation } from '../../features/posts/postsApiSlice';
 import { useGetCategoriesQuery } from '../../features/categories/categoriesApiSlice';
+import useTitle from '../../hooks/useTitle';
 
 const CustomInput = styled(TextField)(({ theme }) => ({
   '& .MuiInputBase-root': {
@@ -76,6 +77,7 @@ export default function EditPost() {
   const navigate = useNavigate();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  useTitle(`Chỉnh sửa ${post?.title || 'bài viết'} - TAM PRODUCTION`);
 
   useEffect(() => {
     if (postDone && post && !loadingPost) {

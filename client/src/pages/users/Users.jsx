@@ -1,11 +1,12 @@
 import './user.css';
-import { Container } from '@mui/material';
+import { Box, Container } from '@mui/material';
+import { AddCircleOutline as AddCircleOutlineIcon } from '@mui/icons-material';
 import BreadCrumbs from '../../components/breadcrumbs/BreadCrumbs';
 import CustomPagination from '../../components/custom-pagination/CustomPagination';
 import { useEffect, useState } from 'react';
 import useTitle from '../../hooks/useTitle';
 import { useGetUsersQuery } from '../../features/users/usersApiSlice';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import User from '../../components/user/User';
 
 const defaultSize = 8;
@@ -72,7 +73,13 @@ export default function Users() {
         <div className="usersContainer">
             <Container fluid maxWidth="lg">
                 <BreadCrumbs route={"Quản lý người dùng"} />
-                <h1 className="alternativeTitle">QUẢN LÝ NGƯỜI DÙNG</h1>
+                <Box display="flex" alignItems="center" justifyContent="space-between">
+                    <h1 className="alternativeTitle"> QUẢN LÝ NGƯỜI DÙNG</h1>
+                    <Link to="/new-user" className="addButton">
+                        <AddCircleOutlineIcon sx={{ marginRight: 1 }} />
+                        Thêm người dùng
+                    </Link>
+                </Box>
                 {content}
                 <CustomPagination pagination={pagination}
                     onPageChange={handlePageChange}

@@ -60,15 +60,6 @@ export default function PersistLogin() {
         content = <Outlet />
     } else if (token && isUninitialized) {
         content = <Outlet />
-    } else {
-        console.log('persist' + persist);
-        console.log('isLoading' + isLoading);
-        console.log('isError' + isError);
-        console.log('error' + error);
-        console.log('isSuccess' + isSuccess);
-        console.log('trueSuccess' + trueSuccess);
-        console.log('token' + token);
-        console.log('isUninitialized' + isUninitialized);
     }
 
     return content

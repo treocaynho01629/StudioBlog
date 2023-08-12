@@ -8,6 +8,7 @@ import { useLoginMutation } from '../../features/auth/authApiSlice';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import usePersist from '../../hooks/usePersist';
+import useTitle from '../../hooks/useTitle';
 
 const CustomInput = styled(TextField)(({ theme }) => ({
   '& .MuiInputBase-root': {
@@ -58,7 +59,6 @@ export default function Login() {
   const errRef = useRef();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  // const [persist, setPersist] = usePersist();
   const persist = usePersist();
   const [showPassword, setShowPassword] = useState(false);
   const [errMsg, setErrMsg] = useState("");
@@ -67,6 +67,7 @@ export default function Login() {
   const location = useLocation();
   const from = location.state?.from?.pathname || "/"; //Previous route
   const dispatch = useDispatch();
+  useTitle(`Đăng nhập - TAM PRODUCTION`);
 
   useEffect(() => {
     setErrMsg("");

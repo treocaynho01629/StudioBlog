@@ -38,11 +38,19 @@ a {
     background-color: white;
     border: dashed 1px;
     cursor: pointer;
+    position: relative;
 }
 
 .infoButton:hover {
     border-color: lightblue;
     border-style: solid;
+    background-color: whitesmoke;
+}
+
+.infoButton:disabled {
+    border-color: gray!important;
+    color: gray!important;
+    border-style: dotted;
     background-color: whitesmoke;
 }
 

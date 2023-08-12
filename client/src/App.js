@@ -18,6 +18,8 @@ import Contact from "./pages/contact/Contact";
 import About from "./pages/about/About";
 import Search from "./pages/search/Search";
 import Users from "./pages/users/Users";
+import NewUser from "./pages/new-user/NewUser";
+import EditUser from "./pages/edit-user/EditUser";
 
 function App() {
   useTitle("TAM PRODUCTION");
@@ -48,6 +50,8 @@ function App() {
             //ADMIN
             <Route element={<RequireAuth onlyAdmin={true} />}>
               <Route path="/users-list" element={<Users/>}/>
+              <Route path="/new-user" element={<NewUser/>}/>
+              <Route path="/edit-user/:id" element={<EditUser/>}/>
             </Route>
             
           
