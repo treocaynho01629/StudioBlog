@@ -34,9 +34,9 @@ export default function BreadCrumbs({ route, post }) {
       <Link
         key={'cate'}
         className="crumb"
-        to={`/category/${category?.type}`}
+        to={category ? `/category/${category?.type}` : ''}
       >
-        {category?.name}
+        {category ? category?.name : 'Danh mục'}
       </Link>
       ,
       <Typography
@@ -45,7 +45,7 @@ export default function BreadCrumbs({ route, post }) {
         sx={{ display: 'flex', alignItems: 'center' }}
         color="text.primary"
       >
-        {post?.title}
+        {post ? post?.title : 'Bài viết'}
       </Typography>
     )
   }

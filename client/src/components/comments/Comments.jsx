@@ -59,7 +59,7 @@ export default function Comments({ postId, setCommentsCount }) {
         pageSize: defaultSize,
         numberOfPages: 0,
     });
-    const { data: comments, isLoading, isSuccess, isError, error } = useGetCommentsQuery({ 
+    const { data: comments, isLoading, isSuccess, isError } = useGetCommentsQuery({ 
         post: postId,
         page: pagination.currPage,
         size: pagination.pageSize,

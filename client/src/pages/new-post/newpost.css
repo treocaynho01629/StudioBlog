@@ -50,7 +50,6 @@
     border: none;
     padding: 10px;
     margin: 20px 10px 20px 0;
-    width: 150px;
     font-size: 16px;
     display: flex;
     align-items: center;
@@ -80,4 +79,25 @@
 .errorMsg {
     color: #f25a5a;
     margin-top: 0;
+}
+
+.removeButton {
+    color: #f25a5a;
+    border-color: #f25a5a;
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    margin-top: 15px;
+    height: 35px;
+    border-radius: 40px;
+    border: dashed 1px;
+    cursor: pointer;
+    position: absolute
+}
+
+.removeButton:hover {
+    color: #f16d6d;
+    border-color: #f16d6d;
+    border-style: solid;
+    background-color: rgb(243, 198, 198, 0.3);
 }

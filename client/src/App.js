@@ -11,15 +11,18 @@ import RequireAuth from "./features/auth/RequireAuth";
 import { Route, Routes } from "react-router-dom";
 import useAuth from "./hooks/useAuth";
 import Unauthorized from "./pages/unauthorized/Unauthorized";
+import Error from "./pages/error/Error";
 import Prefetch from "./features/auth/Prefetch";
 import Video from "./pages/video/Video";
 import useTitle from "./hooks/useTitle";
 import Contact from "./pages/contact/Contact";  
 import About from "./pages/about/About";
 import Search from "./pages/search/Search";
+import Posts from "./pages/posts/Posts";
 import Users from "./pages/users/Users";
 import NewUser from "./pages/new-user/NewUser";
 import EditUser from "./pages/edit-user/EditUser";
+import Images from "./pages/images/Images";
 
 function App() {
   useTitle("TAM PRODUCTION");
@@ -31,6 +34,7 @@ function App() {
       <Routes>
         <Route path="/login" element={username ? <Home/> : <Login/>}/>
         <Route path="/unauthorized" element={<Unauthorized/>}/>
+        <Route path="/error" element={<Error/>}/>
         
         <Route element={<PersistLogin/>}>
             <Route path="/" element={<Home/>}/>
@@ -43,6 +47,7 @@ function App() {
 
             //EMPLOYEE
             <Route element={<RequireAuth onlyAdmin={false}/>}>
+              <Route path="/posts-list" element={<Posts/>}/>
               <Route path="/new-post" element={<NewPost/>}/>
               <Route path="/edit-post/:slug" element={<EditPost/>}/>
             </Route>
@@ -52,6 +57,7 @@ function App() {
               <Route path="/users-list" element={<Users/>}/>
               <Route path="/new-user" element={<NewUser/>}/>
               <Route path="/edit-user/:id" element={<EditUser/>}/>
+              <Route path="/images-list" element={<Images/>}/>
             </Route>
             
           

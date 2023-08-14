@@ -55,7 +55,9 @@ const CustomInput = styled(TextField)(({ theme }) => ({
 export default function EditPost() {
   const { id } = useParams();
   const [updateUser, { isLoading }] = useUpdateUserMutation();
-  const { data: user, isLoading: loadingUser, isSuccess: userDone } = useGetUserQuery({ id });
+  const { data: user, isLoading: loadingUser, isSuccess: userDone } = useGetUserQuery({ id }, {
+    refetchOnMountOrArgChange: true
+  });
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [rePassword, setRePassword] = useState("");

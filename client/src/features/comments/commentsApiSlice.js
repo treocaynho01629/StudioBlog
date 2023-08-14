@@ -25,7 +25,14 @@ export const commentsApiSlice = apiSlice.injectEndpoints({
                 const comment = { ...responseData, id: responseData._id};
                 return comment;
             },
-            providesTags: ['Comment']
+            providesTags: (result, error, arg) => {
+                if (result?.id) {
+                    return [
+                        { type: 'Comment', id: 'LIST' },
+                        { type: 'Comment', id: result?.id }
+                    ]
+                } else return [{ type: 'Comment', id: 'LIST' }]
+            }
         }),
         getComments: builder.query({
             query: (args) => {

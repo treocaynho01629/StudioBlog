@@ -1,12 +1,12 @@
 import './user.css';
 import { Box, Container } from '@mui/material';
 import { AddCircleOutline as AddCircleOutlineIcon } from '@mui/icons-material';
-import BreadCrumbs from '../../components/breadcrumbs/BreadCrumbs';
-import CustomPagination from '../../components/custom-pagination/CustomPagination';
 import { useEffect, useState } from 'react';
-import useTitle from '../../hooks/useTitle';
 import { useGetUsersQuery } from '../../features/users/usersApiSlice';
 import { Link, useSearchParams } from 'react-router-dom';
+import BreadCrumbs from '../../components/breadcrumbs/BreadCrumbs';
+import CustomPagination from '../../components/custom-pagination/CustomPagination';
+import useTitle from '../../hooks/useTitle';
 import User from '../../components/user/User';
 
 const defaultSize = 8;
@@ -17,9 +17,13 @@ export default function Users() {
         pageSize: searchParams.get("size") || defaultSize,
         numberOfPages: 0,
     })
-    const { data: users, isLoading, isSuccess, isError, error } = useGetUsersQuery({ 
+    const { data: users, isLoading, isSuccess, isError } = useGetUsersQuery({ 
         page: pagination.currPage, 
         size: pagination.pageSize 
+    }, {
+        pollingInterval: 15000,
+        refetchOnFocus: true,
+        refetchOnMountOrArgChange: true
     });
     useTitle(`Quản lý người dùng - TAM PRODUCTION`);
 
@@ -66,7 +70,7 @@ export default function Users() {
             })
             : null
     } else if (isError){
-        content = <p>{error}</p>
+        content = <p>Đã có lỗi xảy ra</p>
     }
 
     return (

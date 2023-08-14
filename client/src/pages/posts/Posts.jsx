@@ -1,14 +1,16 @@
-import './search.css';
+import './posts.css';
 import BreadCrumbs from '../../components/breadcrumbs/BreadCrumbs';
-import Post from '../../components/post/Post';
-import { Autocomplete, Chip, Container, TextField, Grid, MenuItem } from '@mui/material';
-import { useSearchParams } from 'react-router-dom';
+import { Autocomplete, Chip, Container, TextField, Grid, MenuItem, Box } from '@mui/material';
+import { AddCircleOutline as AddCircleOutlineIcon } from '@mui/icons-material';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useGetPostsQuery } from '../../features/posts/postsApiSlice';
+import { useEffect, useRef, useState } from 'react';
+import { useGetCategoriesQuery } from '../../features/categories/categoriesApiSlice';
 import useTitle from '../../hooks/useTitle';
 import CustomPagination from '../../components/custom-pagination/CustomPagination';
-import { useEffect, useRef, useState } from 'react';
 import styled from '@emotion/styled';
-import { useGetCategoriesQuery } from '../../features/categories/categoriesApiSlice';
+import PostTab from '../../components/post-tab/PostTab';
+import useAuth from '../../hooks/useAuth';
 
 const CustomInput = styled(TextField)(({ theme }) => ({
     '& .MuiInputBase-root': {
@@ -57,6 +59,7 @@ const CustomInput = styled(TextField)(({ theme }) => ({
 
 const defaultSize = 8;
 export default function Search() {
+    const { id, isAdmin } = useAuth();
     const [searchParams, setSearchParams] = useSearchParams();
     const { data: categories, isLoading: loadingCates, isSuccess: catesDone } = useGetCategoriesQuery();
     const [pagination, setPagination] = useState({
@@ -67,7 +70,7 @@ export default function Search() {
     const [filters, setFilters] = useState({
         tags: searchParams.get("tags") ? searchParams.get("tags").split(',') : [],
         author: searchParams.get("author") || "",
-        cate: searchParams.get("cate") || "",
+        cate: searchParams.get("cate") || undefined,
     })
     const { data: posts, isLoading, isSuccess, isError } = useGetPostsQuery({
         tags: filters.tags.length !== 0 ? filters.tags : undefined,
@@ -75,9 +78,13 @@ export default function Search() {
         cate: filters.cate,
         page: pagination.currPage,
         size: pagination.pageSize
+    }, {
+        pollingInterval: 15000,
+        refetchOnFocus: true,
+        refetchOnMountOrArgChange: true
     });
     const authorRef = useRef(null);
-    useTitle(`Tìm kiếm - TAM PRODUCTION`);
+    useTitle(`Quản lý bài viết - TAM PRODUCTION`);
 
     useEffect(() => {
         if (!isLoading && isSuccess && posts) {
@@ -181,10 +188,14 @@ export default function Search() {
     } else if (isSuccess) {
         const { ids, entities } = posts;
 
-        content = ids?.length
-            ? ids?.map(postId => {
-                const post = entities[postId];
-                return (<Post key={post.id} post={post} />)
+        let filteredPosts = ids?.map(postId => {
+            const post = entities[postId];
+            if (isAdmin || post?.user === id) return post;
+        });
+
+        content = filteredPosts?.length
+            ? filteredPosts?.map(post => {
+                return (<PostTab key={post?.id} post={post} />)
             })
             : <p>Không có bài viết nào</p>
     } else if (isError) {
@@ -192,10 +203,16 @@ export default function Search() {
     }
 
     return (
-        <div className="searchContainer">
+        <div className="postsContainer">
             <Container fluid maxWidth="lg">
-                <BreadCrumbs route={'Tìm kiếm'} />
-                <h1 className="alternativeTitle">TÌM KIẾM BÀI VIẾT</h1>
+                <BreadCrumbs route={'Quản lý bài viết'} />
+                <Box display="flex" alignItems="center" justifyContent="space-between">
+                    <h1 className="alternativeTitle">QUẢN LÝ BÀI VIẾT</h1>
+                    <Link to="/new-post" className="addButton">
+                        <AddCircleOutlineIcon sx={{ marginRight: 1 }} />
+                        Thêm bài viết
+                    </Link>
+                </Box>
                 <Grid container spacing={1}>
                     <Grid item xs={12} lg={6}>
                         <Autocomplete

@@ -3,6 +3,17 @@ a {
     color: inherit;
 }
 
+.postContentContainer p {
+    display: flex;
+    justify-content: center;
+}
+
+.postContentContainer img {
+    width: 80%;
+    height: auto;
+    object-fit: cover;
+}
+
 .postContentTitle {
     width: 100%;
     text-align: left;
@@ -60,7 +71,7 @@ a {
 }
 
 .postContentThumbnail {
-    width: 95%;
+    width: 90%!important;
     height: auto;
     object-fit: cover;
     border: 1px solid lightsteelblue;
@@ -99,21 +110,33 @@ a {
     align-items: center;
 }
 
+.tagsList {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.tagsList li {
+    float: left;
+    padding: 8px;
+}
+
 .tag {
     display: flex;
     align-items: center;
     font-weight: bold;
     color: #333333;
     margin-right: 10px;
+    white-space: nowrap;
 }
 
 .smallTag {
     background-color: lightgray;
     padding: 5px 10px;
     border-radius: 15px;
-    margin-right: 10px;
     transition: all ease-in-out 0.1s;
     cursor: pointer;
+    white-space: nowrap;
 }
 
 .smallTag:hover {

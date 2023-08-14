@@ -1,6 +1,6 @@
 import './newpost.css';
 import { Autocomplete, Box, Chip, CircularProgress, Container, Dialog, DialogActions, DialogContent, Grid, MenuItem, TextField, TextareaAutosize, useMediaQuery, useTheme } from '@mui/material';
-import { AddCircleOutline as AddCircleOutlineIcon, Visibility, Done } from '@mui/icons-material';
+import { AddCircleOutline as AddCircleOutlineIcon, Visibility, Done, HighlightOff } from '@mui/icons-material';
 import styled from '@emotion/styled';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -56,6 +56,9 @@ const CustomInput = styled(TextField)(({ theme }) => ({
   },
 }));
 
+const allowedExtensions = ['jpeg', 'jpg', 'png', 'gif', 'svg'],
+  sizeLimit = 5_242_880; //5MB
+
 export default function NewPost() {
   const [createPost, { isLoading }] = useCreatePostMutation();
   const [validatePost, { isLoading: validating }] = useValidatePostMutation();
@@ -82,7 +85,7 @@ export default function NewPost() {
       title,
       description,
       sanitizedHtml: marked.parse(markdown),
-      thumbnail: 'test.png',
+      thumbnail,
       tags
     }
     setPreview(previewPost);
@@ -90,8 +93,22 @@ export default function NewPost() {
   };
 
   const handleChangeThumbnail = (e) => {
-    setThumbnail(URL.createObjectURL(e.target.files[0]));
-    setFile(e.target.files[0]);
+    const { name: fileName, size: fileSize } = e.target.files[0];
+    const fileExtension = fileName.split(".").pop();
+
+    if (!allowedExtensions.includes(fileExtension)) {
+        setErrMsg(`${fileName} sai định dạng ảnh!`);
+    } else if (fileSize > sizeLimit) {
+        setErrMsg(`${fileName} kích thước quá lớn!`);
+    } else {
+        setThumbnail(URL.createObjectURL(e.target.files[0]));
+        setFile(e.target.files[0]);
+    }
+  }
+
+  const handleRemoveThumbnail = () => {
+    setFile(null);
+    setThumbnail("");
   }
 
   const handleClose = () => {
@@ -242,6 +259,12 @@ export default function NewPost() {
             </Grid>
             {thumbnail &&
               <Box display="flex" justifyContent="center">
+                {file &&
+                  <Box className="removeButton" onClick={handleRemoveThumbnail}>
+                    <HighlightOff sx={{ marginRight: 1 }} />
+                    Gỡ ảnh
+                  </Box>
+                }
                 <img className="thumbnailPreview" src={thumbnail} alt="" />
               </Box>
             }
@@ -312,10 +335,10 @@ export default function NewPost() {
                 className="submitButton"
                 disabled={validating || isLoading}
                 onClick={handlePreview}>
-                Xem trước <Visibility />
+                Xem trước <Visibility sx={{ marginLeft: 1 }} />
               </button>
               <button className="submitButton" disabled={!validPost || validating || isLoading}>
-                Đăng bài <Done />
+                Đăng bài <Done sx={{ marginLeft: 1 }} />
                 {(validating || isLoading) && (
                   <CircularProgress
                     size={24}

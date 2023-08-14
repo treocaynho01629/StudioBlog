@@ -56,9 +56,14 @@ const CustomInput = styled(TextField)(({ theme }) => ({
   },
 }));
 
+const allowedExtensions = ['jpeg', 'jpg', 'png', 'gif', 'svg'],
+  sizeLimit = 5_242_880; //5MB
+
 export default function EditPost() {
   const { slug } = useParams();
-  const { data: post, isLoading: loadingPost, isSuccess: postDone } = useGetPostQuery({ slug });
+  const { data: post, isLoading: loadingPost, isSuccess: postDone } = useGetPostQuery({ slug }, {
+    refetchOnMountOrArgChange: true
+  });
   const { data: categories, isLoading: loadingCates, isSuccess: catesDone } = useGetCategoriesQuery();
   const [updatePost, {isLoading}] = useUpdatePostMutation();
   const [validatePost, {isLoading: validating}] = useValidatePostMutation();
@@ -95,7 +100,7 @@ export default function EditPost() {
       title,
       description,
       sanitizedHtml: marked.parse(markdown),
-      thumbnail: 'test.png',
+      thumbnail,
       tags
     }
     setPreview(previewPost);
@@ -103,8 +108,17 @@ export default function EditPost() {
   };
 
   const handleChangeThumbnail = (e) => {
-    setThumbnail(URL.createObjectURL(e.target.files[0]));
-    setFile(e.target.files[0]);
+    const { name: fileName, size: fileSize } = e.target.files[0];
+    const fileExtension = fileName.split(".").pop();
+
+    if (!allowedExtensions.includes(fileExtension)) {
+        setErrMsg(`${fileName} sai định dạng ảnh!`);
+    } else if (fileSize > sizeLimit) {
+        setErrMsg(`${fileName} kích thước quá lớn!`);
+    } else {
+        setThumbnail(URL.createObjectURL(e.target.files[0]));
+        setFile(e.target.files[0]);
+    }
   }
 
   const handleRemoveThumbnail = () => {
@@ -340,10 +354,10 @@ export default function EditPost() {
               className="submitButton" 
               disabled={validating || isLoading}
               onClick={handlePreview}>
-                Xem trước <Visibility />
+                Xem trước <Visibility sx={{marginLeft: 1}}/>
               </button>
               <button className="submitButton" disabled={!validPost || validating || isLoading}>
-                Cập nhât <Done />
+                Cập nhât <Done sx={{marginLeft: 1}}/>
                 {(validating || isLoading) && (
                   <CircularProgress
                     size={24}

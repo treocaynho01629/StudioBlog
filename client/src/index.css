@@ -5,3 +5,49 @@
 body {
     margin: 0px;
 }
+
+.mainButton {
+    background-color: #0f3e3c;
+    color: white;
+    border: none;
+    padding: 10px;
+    margin: 10px 0px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    cursor: pointer;
+    position: relative;
+}
+
+.mainButton:hover {
+    background-color: #387e5d;
+}
+
+.mainButton:disabled {
+    background-color: #3d4944;
+    color: gray;
+}
+
+.dangerButton {
+    background-color: #f25a5a;
+    color: white;
+    border: none;
+    padding: 10px;
+    margin: 10px 0px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    cursor: pointer;
+    position: relative;
+}
+
+.dangerButton:hover {
+    background-color: #f16d6d;
+}
+
+.dangerButton:disabled {
+    background-color: #3d4944;
+    color: gray;
+}

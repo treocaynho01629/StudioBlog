@@ -19,7 +19,7 @@ export default function Category() {
         pageSize: searchParams.get("size") || defaultSize,
         numberOfPages: 0,
     })
-    const { data: posts, isLoading, isSuccess, isError, error } = useGetPostsQuery({ 
+    const { data: posts, isLoading, isSuccess, isError } = useGetPostsQuery({ 
         cate, 
         page: pagination.currPage, 
         size: pagination.pageSize 
@@ -68,9 +68,9 @@ export default function Category() {
                 const post = entities[postId];
                 return (<Post key={post.id} post={post}/>)
             })
-            : null
+            : <p>Không có bài viết nào</p>
     } else if (isError){
-        content = <p>{error}</p>
+        content = <p>Đã có lỗi xảy ra</p>
     }
 
     return (

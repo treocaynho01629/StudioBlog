@@ -1,24 +1,18 @@
-.userContainer {
-    margin-bottom: 15px;
-    padding: 0px 5px;
+.postContainer {
+    margin: 20px 0;
 }
 
-.userInfo {
+.postInfo {
     padding: 5px;
     padding-bottom: 0px;
 }
 
-.usernameInfo {
-    display: flex;
-    align-items: center;
-}
-
-.userAction {
+.postAction {
     display: flex;
     padding: 10px 5px;
 }
 
-.userInfoButton {
+.postInfoButton {
     font-size: 16px;
     margin-left: 10px;
     display: flex;
@@ -33,13 +27,13 @@
     position: relative;
 }
 
-.userInfoButton:hover {
+.postInfoButton:hover {
     border-color: lightblue;
     border-style: solid;
     background-color: whitesmoke;
 }
 
-.userInfoButton:disabled {
+.postInfoButton:disabled {
     border-color: gray!important;
     color: gray!important;
     border-style: dotted;

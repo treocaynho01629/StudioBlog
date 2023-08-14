@@ -3,22 +3,27 @@ import { Box, CircularProgress } from '@mui/material';
 import { CalendarMonth, Delete as DeleteIcon, Person as PersonIcon } from '@mui/icons-material';
 import { useDeleteCommentMutation } from '../../features/comments/commentsApiSlice';
 import useAuth from '../../hooks/useAuth';
+import useConfirm from '../../hooks/useConfirm';
 
 export default function Comment({ comment, reloadComments }) {
     const { isAdmin } = useAuth();
-    const [deleteComment, {
-        isLoading,
-        isSuccess,
-        isError,
-        error,
-    }] = useDeleteCommentMutation();
+    const [deleteComment, { isLoading }] = useDeleteCommentMutation();
+    const [ConfirmationDialog, confirmDelete] = useConfirm(
+        'Xoá ý kiến?',
+        'Bạn có muốn xoá ý kiến này?',
+    )
 
     const onDeleteClicked = async () => {
-        reloadComments();
-        await deleteComment({ id: comment?.id });
+        const confirmation = await confirmDelete();
+        if (confirmation) {
+            reloadComments();
+            await deleteComment({ id: comment?.id });
+        } else {
+            console.log('cancel delete');
+        }
     }
 
-    if (comment){
+    if (comment) {
         const date = new Date(comment.createdAt);
 
         return (
@@ -31,26 +36,26 @@ export default function Comment({ comment, reloadComments }) {
                         </div>
                         <div className="info">
                             <CalendarMonth sx={{ marginRight: 1 }} />
-                            Đăng vào lúc: { date.toLocaleDateString("en-GB") + " - " + date.toLocaleTimeString()}
+                            Đăng vào lúc: {date.toLocaleDateString("en-GB") + " - " + date.toLocaleTimeString()}
                         </div>
                     </Box>
-                    { isAdmin &&
+                    {isAdmin &&
                         <Box className="rightInfo" display="flex" alignItems="center">
-                            <button className="deleteButton" 
-                            disabled={isLoading}
-                            onClick={onDeleteClicked}>
+                            <button className="deleteButton"
+                                disabled={isLoading}
+                                onClick={onDeleteClicked}>
                                 <DeleteIcon sx={{ marginRight: 1 }} />Xoá
                                 {isLoading && (
-                                <CircularProgress
-                                    size={22}
-                                    sx={{
-                                    position: 'absolute',
-                                    top: '50%',
-                                    left: '50%',
-                                    marginTop: '-12px',
-                                    marginLeft: '-12px',
-                                    }}
-                                />
+                                    <CircularProgress
+                                        size={22}
+                                        sx={{
+                                            position: 'absolute',
+                                            top: '50%',
+                                            left: '50%',
+                                            marginTop: '-12px',
+                                            marginLeft: '-12px',
+                                        }}
+                                    />
                                 )}
                             </button>
                         </Box>
@@ -59,6 +64,7 @@ export default function Comment({ comment, reloadComments }) {
                 <p className="commentContent">
                     {comment.content}
                 </p>
+                <ConfirmationDialog/>
             </div>
         )
     }

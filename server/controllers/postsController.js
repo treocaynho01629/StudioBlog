@@ -92,7 +92,7 @@ const createPost = async (req, res) => {
         markdown,
         category,
         thumbnail: baseUrl + req.file.filename,
-        tags,
+        tags: tags.split(","),
         user: req.auth.id
     });
 
@@ -128,15 +128,12 @@ const updatePost = async (req, res) => {
         post.description = description;
         post.markdown = markdown;
         post.category = category;
+        post.tags = tags.split(",");
 
         if (thumbnail && !req.file) {
             post.thumbnail = thumbnail;
         } else {
             post.thumbnail = baseUrl + req.file.filename;
-        }
-
-        if (tags.length) {
-            post.tags = tags;
         }
 
         if (post.user == req.auth.id || req.auth.isAdmin) {

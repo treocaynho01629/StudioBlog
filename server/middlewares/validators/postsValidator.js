@@ -12,8 +12,8 @@ exports.validatePost = [
         .not()
         .isEmpty()
         .withMessage("Không được bỏ trống mô tả!")
-        .isLength({ min: 30, max: 500 })
-        .withMessage("Mô tả phải từ 30-500 kí tự"),
+        .isLength({ min: 30, max: 700 })
+        .withMessage("Mô tả phải từ 30-700 kí tự"),
     check('markdown')
         .not()
         .isEmpty()

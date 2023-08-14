@@ -34,6 +34,6 @@ const baseQueryWithRefresh= async (args, api, extraOptions) => {
 
 export const apiSlice = createApi({
     baseQuery: baseQueryWithRefresh,
-    tagTypes: ['Post', 'User', 'Category', 'Comment', 'Video', 'Review'],
+    tagTypes: ['Post', 'User', 'Category', 'Comment', 'Video', 'Review', 'Image'],
     endpoints: builder => ({})
 })

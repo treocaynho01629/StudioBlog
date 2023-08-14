@@ -25,7 +25,14 @@ export const postsApiSlice = apiSlice.injectEndpoints({
                 const post = { ...responseData, id: responseData._id};
                 return post;
             },
-            providesTags: ['Post']
+            providesTags: (result, error, arg) => {
+                if (result?.id) {
+                    return [
+                        { type: 'Post', id: 'LIST' },
+                        { type: 'Post', id: result?.id }
+                    ]
+                } else return [{ type: 'Post', id: 'LIST' }]
+            }
         }),
         getPosts: builder.query({
             query: (args) => {

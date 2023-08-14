@@ -25,7 +25,14 @@ export const usersApiSlice = apiSlice.injectEndpoints({
                 const user = { ...responseData, id: responseData._id};
                 return user;
             },
-            providesTags: ['User']
+            providesTags: (result, error, arg) => {
+                if (result?.id) {
+                    return [
+                        { type: 'User', id: 'LIST' },
+                        { type: 'User', id: result?.id }
+                    ]
+                } else return [{ type: 'User', id: 'LIST' }]
+            }
         }),
         getUsers: builder.query({
             query: (args) => {
