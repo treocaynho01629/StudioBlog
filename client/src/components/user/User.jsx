@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import useConfirm from '../../hooks/useConfirm';
 
 export default function User({ user }) {
-  const [deleteUser, { isLoading, isSuccess, isError, error }] = useDeleteUserMutation();
+  const [deleteUser, { isLoading }] = useDeleteUserMutation();
   const [ConfirmationDialog, confirmDelete] = useConfirm(
     'Xoá người dùng?',
     'Bạn có muốn xoá người dùng này?',

@@ -10,11 +10,11 @@ const getPost = async (req, res) => {
 
         //Map author
         const author = await User.findById(post.user, {fullName:1, _id:0}).lean().exec();
-        const resultPost = { ...post, author: author.fullName };
+        const resultPost = { ...post, author: author ? author.fullName : undefined };
 
         res.status(200).json(resultPost);
     } catch(err) {
-        res.status(500).send(err);
+        res.status(500).json({ err });
     }
 }
 

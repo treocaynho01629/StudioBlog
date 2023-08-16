@@ -78,32 +78,6 @@
     margin-bottom: 50px;
 }
 
-.deleteButton {
-    display: flex;
-    align-items: center;
-    padding: 0 15px;
-    margin-left: 15px;
-    height: 35px;
-    border-radius: 40px;
-    border: dashed 1px #f25a5a;
-    color: #f25a5a;
-    background-color: white;
-    cursor: pointer;
-    position: relative;
-}
-
-.deleteButton:hover {
-    border-color: lightblue;
-    border-style: solid;
-    background-color: whitesmoke;
-}
-
-.deleteButton:disabled {
-    border-color: gray;
-    background-color: lightgray;
-    color: gray;
-}
-
 .errorMsg {
     color: #f25a5a;
     margin-top: 0;

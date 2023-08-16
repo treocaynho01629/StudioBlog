@@ -1,5 +1,5 @@
 import './comment.css';
-import { Box, CircularProgress } from '@mui/material';
+import { CircularProgress, Grid } from '@mui/material';
 import { CalendarMonth, Delete as DeleteIcon, Person as PersonIcon } from '@mui/icons-material';
 import { useDeleteCommentMutation } from '../../features/comments/commentsApiSlice';
 import useAuth from '../../hooks/useAuth';
@@ -28,8 +28,8 @@ export default function Comment({ comment, reloadComments }) {
 
         return (
             <div className="commentContainer">
-                <div className="commentInfo">
-                    <Box className="leftInfo" display="flex" alignItems="center">
+                <Grid container className="commentInfo">
+                    <Grid item className="leftInfo" display="flex" alignItems="center">
                         <div className="info">
                             <PersonIcon sx={{ marginRight: 1 }} />
                             {comment.fullName}
@@ -38,9 +38,9 @@ export default function Comment({ comment, reloadComments }) {
                             <CalendarMonth sx={{ marginRight: 1 }} />
                             Đăng vào lúc: {date.toLocaleDateString("en-GB") + " - " + date.toLocaleTimeString()}
                         </div>
-                    </Box>
+                    </Grid>
                     {isAdmin &&
-                        <Box className="rightInfo" display="flex" alignItems="center">
+                        <Grid item className="rightInfo" display="flex" alignItems="center">
                             <button className="deleteButton"
                                 disabled={isLoading}
                                 onClick={onDeleteClicked}>
@@ -58,9 +58,9 @@ export default function Comment({ comment, reloadComments }) {
                                     />
                                 )}
                             </button>
-                        </Box>
+                        </Grid>
                     }
-                </div>
+                </Grid>
                 <p className="commentContent">
                     {comment.content}
                 </p>

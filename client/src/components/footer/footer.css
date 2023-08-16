@@ -29,6 +29,11 @@
     align-items: center;
     transition: ease-in-out all 0.25s;
     cursor: pointer;
+    justify-content: center;
+
+    @media (min-width: 420px) {
+        justify-content: flex-start;
+    }
 }
 
 .fullLogo:hover {
@@ -44,8 +49,12 @@
     top: 27px;
     left: 76px;
     filter: drop-shadow(1px 1px 10px #0d3c3985);
-    display: flex;
+    display: none;
     align-items: center;
+
+    @media (min-width: 420px) {
+        display: flex;
+    }
 }
 
 .logoTextAlt{

@@ -1,10 +1,10 @@
 import './edituser.css';
 import { Box, CircularProgress, Container, Grid, IconButton, InputAdornment, MenuItem, TextField } from '@mui/material';
 import { Visibility, Done, VisibilityOff } from '@mui/icons-material';
-import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetUserQuery, useUpdateUserMutation } from '../../features/users/usersApiSlice';
+import styled from '@emotion/styled';
 import useTitle from '../../hooks/useTitle';
 
 const CustomInput = styled(TextField)(({ theme }) => ({
@@ -55,7 +55,7 @@ const CustomInput = styled(TextField)(({ theme }) => ({
 export default function EditPost() {
   const { id } = useParams();
   const [updateUser, { isLoading }] = useUpdateUserMutation();
-  const { data: user, isLoading: loadingUser, isSuccess: userDone } = useGetUserQuery({ id }, {
+  const { data: user, isLoading: loadingUser, isError: userError, isSuccess: userDone } = useGetUserQuery({ id }, {
     refetchOnMountOrArgChange: true
   });
   const [username, setUsername] = useState("");
@@ -74,6 +74,7 @@ export default function EditPost() {
 
   useEffect(() => {
     if (userDone && user && !loadingUser) {
+      if (user.isAdmin) navigate("/error");
       setUsername(user?.username);
       setEmail(user?.email);
       setFullName(user?.fullName);
@@ -85,6 +86,10 @@ export default function EditPost() {
     const valid = password === rePassword;
     setValidPass(valid);
   }, [password, rePassword])
+
+  useEffect(() => {
+    if (userError && !loadingUser) navigate("/error");
+  }, [userError])
 
   const handleClick = () => setShowPassword((showPassword) => !showPassword);
   const handleClickRe = () => setShowRePassword((showRePassword) => !showRePassword);
@@ -124,7 +129,7 @@ export default function EditPost() {
       </IconButton>
     </InputAdornment>
 
-  //Post
+  //User
   const validUser = [username, email, fullName].every(Boolean) && !isLoading
 
   const handleSubmit = async (e) => {
@@ -138,10 +143,10 @@ export default function EditPost() {
           email,
           isAdmin: role,
           fullName,
-          ...(password && {password: password})
+          ...(password && { password: password })
         }
 
-        await updateUser({id, updatedUser}).unwrap();
+        await updateUser({ id, updatedUser }).unwrap();
         setUsername('');
         setPassword('');
         setRePassword('');
@@ -268,7 +273,7 @@ export default function EditPost() {
 
             <Box display="flex" alignItems="center">
               <button className="submitButton" disabled={!validUser || isLoading}>
-                Chỉnh sửa <Done sx={{marginLeft: 1}}/>
+                Chỉnh sửa <Done sx={{ marginLeft: 1 }} />
                 {isLoading && (
                   <CircularProgress
                     size={24}

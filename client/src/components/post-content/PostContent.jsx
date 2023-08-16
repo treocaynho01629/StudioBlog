@@ -1,5 +1,5 @@
 import './postcontent.css'
-import { Box, CircularProgress } from '@mui/material';
+import { Box, CircularProgress, Grid } from '@mui/material';
 import { CalendarMonth, Chat as ChatIcon, Edit as EditIcon, Delete as DeleteIcon, Sell as SellIcon } from '@mui/icons-material';
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -36,8 +36,8 @@ export default function PostContent({ post, commentsCount, previewMode }) {
         <h1 className="postContentTitle">
           {post.title}
         </h1>
-        <div className="postContentInfo">
-          <Box className="leftInfo" display="flex" alignItems="center">
+        <Grid container className="postContentInfo">
+          <Grid item className="leftInfo">
             <div className="info">
               <CalendarMonth sx={{ marginRight: 1 }} />
               Đăng vào lúc: {date.toLocaleDateString("en-GB") + " - " + date.toLocaleTimeString()}
@@ -46,9 +46,9 @@ export default function PostContent({ post, commentsCount, previewMode }) {
               <ChatIcon sx={{ marginRight: 1 }} />
               {commentsCount} lượt bình luận
             </div>
-          </Box>
+          </Grid>
           {((currUser == post.user || isAdmin) && !previewMode) && (
-            <Box className="rightInfo" display="flex" alignItems="center">
+            <Grid item className="rightInfo">
               <Link to={`/edit-post/${post.slug}`} style={{ textDecoration: 'none' }}>
                 <Box className="infoButton" sx={{ color: '#0f3e3c', borderColor: '#0f3e3c' }}>
                   <EditIcon sx={{ marginRight: 1 }} />
@@ -56,7 +56,7 @@ export default function PostContent({ post, commentsCount, previewMode }) {
                 </Box>
               </Link>
               <button className="infoButton"
-                style={{ color: '#f25a5a', borderColor: '#f25a5a' }}
+                style={{ color: '#f25a5a', borderColor: '#f25a5a', marginLeft: '15px'}}
                 disabled={isLoading}
                 onClick={onDeleteClicked}>
                 <DeleteIcon sx={{ marginRight: 1 }} />
@@ -74,9 +74,9 @@ export default function PostContent({ post, commentsCount, previewMode }) {
                   />
                 )}
               </button>
-            </Box>
+            </Grid>
           )}
-        </div>
+        </Grid>
         <div className="postContent">
           <Box display="flex" justifyContent="center">
             <img className="postContentThumbnail" alt=""
@@ -89,7 +89,7 @@ export default function PostContent({ post, commentsCount, previewMode }) {
           <div className="postContentMarkdown" dangerouslySetInnerHTML={{ __html: post.sanitizedHtml }} />
         </div>
         <figure className="authorInfo">
-          <Link to={`/search?author=${post?.author}`}>
+          <Link to={`/search?author=${post?.author ? post.author : ''}`}>
             <figcaption>- Người viết: {post.author ?? "Vô danh"}</figcaption>
           </Link>
         </figure>

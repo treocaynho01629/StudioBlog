@@ -1,15 +1,16 @@
 import './editpost.css';
 import { Grid, MenuItem, Autocomplete, Chip, Box, Container, Dialog, DialogActions, DialogContent, TextField, TextareaAutosize, useMediaQuery, useTheme, CircularProgress } from '@mui/material';
 import { AddCircleOutline as AddCircleOutlineIcon, Visibility, Done, HighlightOff } from '@mui/icons-material';
-import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useRef } from 'react';
 import { marked } from "marked";
-import PostContent from '../../components/post-content/PostContent';
 import { useGetPostQuery, useUpdatePostMutation, useValidatePostMutation } from '../../features/posts/postsApiSlice';
 import { useGetCategoriesQuery } from '../../features/categories/categoriesApiSlice';
+import styled from '@emotion/styled';
+import PostContent from '../../components/post-content/PostContent';
 import useTitle from '../../hooks/useTitle';
+import useAuth from '../../hooks/useAuth';
 
 const CustomInput = styled(TextField)(({ theme }) => ({
   '& .MuiInputBase-root': {
@@ -61,12 +62,13 @@ const allowedExtensions = ['jpeg', 'jpg', 'png', 'gif', 'svg'],
 
 export default function EditPost() {
   const { slug } = useParams();
-  const { data: post, isLoading: loadingPost, isSuccess: postDone } = useGetPostQuery({ slug }, {
+  const { id, isAdmin } = useAuth();
+  const { data: post, isLoading: loadingPost, isError: postError, isSuccess: postDone } = useGetPostQuery({ slug }, {
     refetchOnMountOrArgChange: true
   });
   const { data: categories, isLoading: loadingCates, isSuccess: catesDone } = useGetCategoriesQuery();
-  const [updatePost, {isLoading}] = useUpdatePostMutation();
-  const [validatePost, {isLoading: validating}] = useValidatePostMutation();
+  const [updatePost, { isLoading }] = useUpdatePostMutation();
+  const [validatePost, { isLoading: validating }] = useValidatePostMutation();
   const inputFile = useRef(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -86,6 +88,7 @@ export default function EditPost() {
 
   useEffect(() => {
     if (postDone && post && !loadingPost) {
+      if (!(isAdmin || post.user == id)) navigate("/error");
       setTitle(post?.title);
       setMarkdown(post?.markdown);
       setDescription(post?.description);
@@ -94,6 +97,10 @@ export default function EditPost() {
       setTags(post?.tags);
     }
   }, [postDone])
+
+  useEffect(() => {
+    if (postError && !loadingPost) navigate("/error");
+  }, [postError])
 
   const handlePreview = () => {
     const previewPost = {
@@ -112,12 +119,12 @@ export default function EditPost() {
     const fileExtension = fileName.split(".").pop();
 
     if (!allowedExtensions.includes(fileExtension)) {
-        setErrMsg(`${fileName} sai định dạng ảnh!`);
+      setErrMsg(`${fileName} sai định dạng ảnh!`);
     } else if (fileSize > sizeLimit) {
-        setErrMsg(`${fileName} kích thước quá lớn!`);
+      setErrMsg(`${fileName} kích thước quá lớn!`);
     } else {
-        setThumbnail(URL.createObjectURL(e.target.files[0]));
-        setFile(e.target.files[0]);
+      setThumbnail(URL.createObjectURL(e.target.files[0]));
+      setFile(e.target.files[0]);
     }
   }
 
@@ -152,7 +159,7 @@ export default function EditPost() {
           tags
         }
         const isValidPost = await validatePost(newPost).unwrap();
-       
+
         if (isValidPost?.isValid) {
 
           //Update post
@@ -169,7 +176,7 @@ export default function EditPost() {
             } else {
               form.append('thumbnail', thumbnail);
             }
-      
+
             const updated = await updatePost({ id: post?.id, updatedPost: form }).unwrap();
 
             setTitle('');
@@ -179,23 +186,23 @@ export default function EditPost() {
             setTags([]);
             setFile(null);
             navigate(`/post/${updated.slug}`)
-          } catch (err){
+          } catch (err) {
             console.log(err);
           }
         }
-      } catch (error){
+      } catch (error) {
         //Error handler ...
         if (!error?.status) {
-            setErrMsg('Server không phản hồi');
+          setErrMsg('Server không phản hồi');
         } else if (error?.status === 400) {
-            setErrMsg(error?.data?.msg);
+          setErrMsg(error?.data?.msg);
         } else if (error?.status === 409) {
-            setErrMsg('Bài viết với tiêu đề trên đã tồn tại!');
+          setErrMsg('Bài viết với tiêu đề trên đã tồn tại!');
         } else if (error?.status === 422) {
-            setErrMsg('Sai định dạng thông tin!');  
-            setErr({ ...error, data: new Map(error.data.errors.map(obj => [obj.path, obj.msg]))})
+          setErrMsg('Sai định dạng thông tin!');
+          setErr({ ...error, data: new Map(error.data.errors.map(obj => [obj.path, obj.msg])) })
         } else {
-            setErrMsg('Gửi bài viết thất bại!')
+          setErrMsg('Gửi bài viết thất bại!')
         }
       }
     }
@@ -223,8 +230,8 @@ export default function EditPost() {
 
   return (
     <div className="editPostContainer">
-       <Container fluid maxWidth="lg">
-       <form className="editPost" onSubmit={handleSubmit}>
+      <Container fluid maxWidth="lg">
+        <form className="editPost" onSubmit={handleSubmit}>
           <Box display="flex" alignItems="center" justifyContent="space-between">
             <p className="editPostTitle">Chỉnh sửa bài viết</p>
             <input
@@ -235,16 +242,16 @@ export default function EditPost() {
               style={{ display: "none" }}
               onChange={handleChangeThumbnail}
             />
-            <Box className="fileButton" onClick={handleOpenFile} 
-              sx={{ 
-                color: '#0f3e3c', 
+            <Box className="fileButton" onClick={handleOpenFile}
+              sx={{
+                color: '#0f3e3c',
                 borderColor: '#0f3e3c'
               }}>
               <AddCircleOutlineIcon sx={{ marginRight: 1 }} />
               Ảnh đại diện
             </Box>
           </Box>
-          { errMsg && <p className="errorMsg">{errMsg}</p> }
+          {errMsg && <p className="errorMsg">{errMsg}</p>}
           <Box display="flex" flexDirection="column">
             <Grid container columnSpacing={1}>
               <Grid item xs={12} sm={9}>
@@ -276,15 +283,15 @@ export default function EditPost() {
                 </CustomInput>
               </Grid>
             </Grid>
-            { thumbnail &&
+            {thumbnail &&
               <Box display="flex" justifyContent="center">
-                { file &&
+                {file &&
                   <Box className="removeButton" onClick={handleRemoveThumbnail}>
                     <HighlightOff sx={{ marginRight: 1 }} />
                     Gỡ ảnh
                   </Box>
                 }
-                <img className="thumbnailPreview" src={thumbnail} alt=""/>
+                <img className="thumbnailPreview" src={thumbnail} alt="" />
               </Box>
             }
             <CustomInput
@@ -350,14 +357,14 @@ export default function EditPost() {
               )}
             />
             <Box display="flex" alignItems="center">
-              <button type="button" 
-              className="submitButton" 
-              disabled={validating || isLoading}
-              onClick={handlePreview}>
-                Xem trước <Visibility sx={{marginLeft: 1}}/>
+              <button type="button"
+                className="submitButton"
+                disabled={validating || isLoading}
+                onClick={handlePreview}>
+                Xem trước <Visibility sx={{ marginLeft: 1 }} />
               </button>
               <button className="submitButton" disabled={!validPost || validating || isLoading}>
-                Cập nhât <Done sx={{marginLeft: 1}}/>
+                Cập nhât <Done sx={{ marginLeft: 1 }} />
                 {(validating || isLoading) && (
                   <CircularProgress
                     size={24}

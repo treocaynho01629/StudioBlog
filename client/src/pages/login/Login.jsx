@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { setAuth, setPersist } from '../../features/auth/authSlice';
 import { useLoginMutation } from '../../features/auth/authApiSlice';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import usePersist from '../../hooks/usePersist';
 import useTitle from '../../hooks/useTitle';
@@ -162,7 +162,9 @@ export default function Login() {
                 onChange={handleTogglePersist}/>
                 <label htmlFor="persist">Lưu đăng nhập</label>
               </p>
-              <div className="forgot">Quên mật khẩu?</div>
+              <div className="forgot">
+                <Link to="/register">Chưa có tài khoản?</Link>
+              </div>
             </div>
             <button className="loginButton" disabled={isLoading}>
               Đăng nhập

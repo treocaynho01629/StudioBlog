@@ -1,5 +1,5 @@
 import './images.css';
-import { Box, Container, IconButton, ImageList, ImageListItem, ImageListItemBar } from '@mui/material'
+import { Box, CircularProgress, Container, IconButton, ImageList, ImageListItem, ImageListItemBar, useMediaQuery, useTheme } from '@mui/material'
 import { AddCircleOutline as AddCircleOutlineIcon, HighlightOff, Block, CheckCircleOutline } from '@mui/icons-material';
 import { useDeleteImageMutation, useGetImagesQuery, useUploadImagesMutation } from '../../features/images/imagesApiSlice'
 import { useEffect, useRef, useState } from 'react';
@@ -7,18 +7,21 @@ import BreadCrumbs from '../../components/breadcrumbs/BreadCrumbs';
 import useConfirm from '../../hooks/useConfirm';
 import useTitle from '../../hooks/useTitle';
 
-const allowedExtensions =  ['jpeg','jpg','png','gif','svg'], 
+const allowedExtensions = ['jpeg', 'jpg', 'png', 'gif', 'svg'],
     sizeLimit = 5_242_880; //5MB
 
 export default function Images() {
     useTitle(`Kho ảnh - TAM PRODUCTION`);
-    const { data: images, isLoading, isError, error, isSuccess } = useGetImagesQuery({
+    const theme = useTheme();
+    const phoneBreakpoint = useMediaQuery(theme.breakpoints.down('sm'));
+    const { data: images, isLoading, isError, isSuccess } = useGetImagesQuery({
         pollingInterval: 15000,
         refetchOnFocus: true,
         refetchOnMountOrArgChange: true
     });
     const [uploadImages, { isLoading: uploading }] = useUploadImagesMutation();
-    const [deleteImage, { isLoading: deleteing }] = useDeleteImageMutation();
+    const [deleteImage, { isLoading: deleting }] = useDeleteImageMutation();
+    const [deletedImage, setDeletedImage] = useState("");
     const [files, setFiles] = useState([]);
     const [errMsg, setErrMsg] = useState("");
     const inputFile = useRef(null);
@@ -34,6 +37,7 @@ export default function Images() {
     const handleDeleteImage = async (name) => {
         const confirmation = await confirmDelete()
         if (confirmation) {
+            setDeletedImage(name);
             await deleteImage(name).unwrap();
         } else {
             console.log('cancel delete');
@@ -76,7 +80,7 @@ export default function Images() {
     const handleUploadImages = async () => {
         if (files.length === 0) return;
         const form = new FormData();
-        
+
         files.forEach((file, i) => {
             form.append('file', file, file.name);
         });
@@ -96,7 +100,7 @@ export default function Images() {
     } else if (isSuccess) {
         content = images?.length
             ? images?.map((item) => (
-                <ImageListItem key={item.url}>
+                <ImageListItem key={item.url} sx={{ position: 'relative' }}>
                     <img
                         src={`${item.url}?w=50%&fit=crop&auto=format`}
                         srcSet={`${item.url}?w=50%&fit=crop&auto=format&dpr=2 2x`}
@@ -116,6 +120,7 @@ export default function Images() {
                                 className="deleteImageButton"
                                 sx={{ color: '#f25a5a' }}
                                 aria-label={`delete ${item.name}`}
+                                disabled={(deleting && deletedImage === item.name)}
                                 onClick={() => handleDeleteImage(item.name)}
                             >
                                 <HighlightOff />
@@ -123,6 +128,21 @@ export default function Images() {
                         }
                         actionPosition="left"
                     />
+                    {(deleting && deletedImage === item.name) && (
+                        <CircularProgress
+                            size={40}
+                            sx={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                padding: '5px',
+                                marginTop: '-25px',
+                                marginLeft: '-25px',
+                                backgroundColor: '#000000a1',
+                                borderRadius: '50%'
+                            }}
+                        />
+                    )}
                 </ImageListItem>
             ))
             : null
@@ -145,13 +165,14 @@ export default function Images() {
                         'linear-gradient(to bottom, rgba(252,227,0,0.7) 0%, ' +
                         'rgba(252,227,0,0.3) 70%, rgba(252,227,0,0) 100%)',
                 }}
-                title={`Xem trước ${item.name}`}
+                title={`${uploading ? 'Đang tải ' : 'Xem trước '} ${item.name}`}
                 position="top"
                 actionIcon={
                     <IconButton
                         className="deleteImageButton"
                         sx={{ color: '#f25a5a' }}
                         aria-label={`remove ${item.name}`}
+                        disabled={uploading}
                         onClick={() => handleRemoveImage(item.name)}
                     >
                         <Block />
@@ -159,6 +180,22 @@ export default function Images() {
                 }
                 actionPosition="left"
             />
+            {uploading && (
+                <CircularProgress
+                    size={40}
+                    color="secondary"
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        padding: '5px',
+                        marginTop: '-25px',
+                        marginLeft: '-25px',
+                        backgroundColor: '#000000a1',
+                        borderRadius: '50%'
+                    }}
+                />
+            )}
         </ImageListItem>
     ))
 
@@ -169,15 +206,27 @@ export default function Images() {
                 <Box display="flex" alignItems="center" justifyContent="space-between">
                     <h1 className="alternativeTitle">KHO ẢNH</h1>
                     {files.length !== 0 ?
-                    <Box className="addButton" onClick={handleUploadImages}>
-                        <CheckCircleOutline sx={{ marginRight: 1 }} />
-                        Xác nhận
-                    </Box>
-                    :
-                    <Box className="addButton" onClick={handleOpenFile}>
-                        <AddCircleOutlineIcon sx={{ marginRight: 1 }} />
-                        Tải ảnh lên
-                    </Box>
+                        <button className="addButton" disabled={uploading} onClick={handleUploadImages}>
+                            <CheckCircleOutline sx={{ marginRight: 1 }} />
+                            Xác nhận
+                            {uploading && (
+                                <CircularProgress
+                                    size={22}
+                                    sx={{
+                                        position: 'absolute',
+                                        top: '50%',
+                                        left: '50%',
+                                        marginTop: '-12px',
+                                        marginLeft: '-12px',
+                                    }}
+                                />
+                            )}
+                        </button>
+                        :
+                        <Box className="addButton" onClick={handleOpenFile}>
+                            <AddCircleOutlineIcon sx={{ marginRight: 1 }} />
+                            Tải ảnh lên
+                        </Box>
                     }
                 </Box>
                 <input
@@ -193,7 +242,7 @@ export default function Images() {
                 />
                 {errMsg && <span className="errorMsg">{errMsg}</span>}
                 <Box sx={{ width: 'auto', height: 900, overflowY: 'scroll' }}>
-                    <ImageList variant="masonry" cols={2} gap={6}>
+                    <ImageList variant="masonry" cols={phoneBreakpoint ? 1 : 2} gap={6}>
                         {content}
                         {preview}
                     </ImageList>

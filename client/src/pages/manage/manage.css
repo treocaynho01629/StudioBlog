@@ -1,0 +1,31 @@
+.manageContainer {
+    margin-top: 150px;
+    margin-bottom: 50px;
+}
+
+.alternativeTitle {
+    font-size: 24px;
+    font-weight: 450;
+    color: #0f3e3c;
+    margin-bottom: 30px;
+}
+
+.tabButton {
+    border: dashed 3px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 450;
+    text-transform: uppercase;
+    transition: all ease-in-out 0.2s;
+}
+
+.tabButton:hover {
+    border-style: solid;
+    font-size: 26px;
+    opacity: 0.9;
+    background-color: whitesmoke;
+    text-decoration: underline;
+}

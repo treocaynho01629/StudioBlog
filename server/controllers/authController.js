@@ -14,6 +14,13 @@ function generateRefreshToken(user) {
 
 //Register
 const register = async (req, res) => {
+    const { username, email, password, fullName } = req.body;
+
+    //Authorization
+    if (!username || !email || !password || !fullName) {
+        return res.status(400).json({message: "All field is required!"});
+    }
+
     try {
         const salt = await bcrypt.genSalt(10);
         const encryptPass = await bcrypt.hash(req.body.password, salt);

@@ -8,12 +8,12 @@ export default function Post({ post }) {
             <div className="postContainer">
                 <Paper elevation={2} square >
                     <Grid container>
-                        <Grid item xs={12} sm={4} sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                        <Grid item xs={12} sm={5} md={4} sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                             <img className="postThumbnail"
                                 src={post.thumbnail}
                                 alt="" />
                         </Grid>
-                        <Grid item xs={12} sm={8} sx={{display: 'flex', alignItems: 'center'}}>
+                        <Grid item xs={12} sm={7} md={8} sx={{display: 'flex', alignItems: 'center'}}>
                             <Box p={3}>
                                 <Link to={`/post/${post.slug}`} className="postTitle">{post.title}</Link>
                                 <p className="postSummary">{post.description}</p>

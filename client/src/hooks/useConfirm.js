@@ -28,7 +28,7 @@ const useConfirm = (title, message) => {
             open={promise !== null}
         >
             <DialogTitle>{title}</DialogTitle>
-            <DialogContent>
+            <DialogContent sx={{padding: '0 20px'}}>
                 <DialogContentText>{message}</DialogContentText>
             </DialogContent>
             <DialogActions>

@@ -1,19 +1,20 @@
 import './navbar.css'
 import { AppBar, Stack, Grid, Collapse, useScrollTrigger, Typography, Container, Menu, MenuItem, ListItemIcon } from '@mui/material'
-import { Phone as PhoneIcon, Mail as MailIcon, Menu as MenuIcon, Logout, AddCircleOutline, Person } from '@mui/icons-material'
+import { Phone as PhoneIcon, Mail as MailIcon, Menu as MenuIcon, Logout, Speed, Portrait, Person, ManageAccounts as AdminIcon } from '@mui/icons-material'
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useSignoutMutation } from '../../features/auth/authApiSlice';
-import useAuth from '../../hooks/useAuth';
 import { useGetCategoriesQuery } from '../../features/categories/categoriesApiSlice';
-import usePersist from '../../hooks/usePersist';
 import { setPersist } from '../../features/auth/authSlice';
 import { useDispatch } from 'react-redux';
+import useAuth from '../../hooks/useAuth';
 
 function HideOnScroll(props) {
     const { children, window } = props;
 
     const trigger = useScrollTrigger({
+        disableHysteresis: true,
+        threshold: 100,
         target: window ? window() : undefined,
     });
 
@@ -52,7 +53,6 @@ const menuStyle = {
 export default function NavBar(props) {
     const { username, isAdmin } = useAuth();
     const [anchorEl, setAnchorEl] = useState(null);
-    const persist = usePersist();
     const [signout, { isSuccess: loggedOut }] = useSignoutMutation();
     const { data: categories, isLoading, isSuccess } = useGetCategoriesQuery();
     const open = Boolean(anchorEl);
@@ -66,13 +66,8 @@ export default function NavBar(props) {
     }, [loggedOut, navigate])
 
     const handleSignout = () => {
-        console.log('da');
         dispatch(setPersist(false));
         signout();
-    }
-
-    const handleNewPost = () => {
-        navigate('/new-post');
     }
 
     const handleClick = (event) => {
@@ -95,12 +90,13 @@ export default function NavBar(props) {
                 const cate = entities[cateId];
 
                 return (
-                <li className="tab" key={cateId}>
-                    <NavLink className="link" to={`/category/${cate.type}`}>{cate.name}</NavLink>
-                </li>
-            )})
+                    <li className="tab" key={cateId}>
+                        <NavLink className="link" to={`/category/${cate.type}`}>{cate.name}</NavLink>
+                    </li>
+                )
+            })
             : null
-    } 
+    }
 
     return (
         <div className="navContainer">
@@ -146,8 +142,9 @@ export default function NavBar(props) {
                                     <MenuIcon sx={{ fontSize: 26 }} />
                                 </button>
                                 <button className="signUpButton" onClick={handleClick}>
-                                    { username ? username : 'Đăng nhập' }
-                                    <Person sx={{ fontSize: 26, marginLeft: 1 }} />
+                                    <p>{username ? username : 'Đăng nhập'}</p>
+                                    {isAdmin ? <AdminIcon sx={{ fontSize: 26, marginLeft: 1 }} />
+                                        : <Person sx={{ fontSize: 26, marginLeft: 1 }} />}
                                 </button>
                                 <Menu
                                     anchorEl={anchorEl}
@@ -161,11 +158,21 @@ export default function NavBar(props) {
                                     transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                                     anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                                 >
-                                    <MenuItem onClick={handleNewPost}>
-                                        <ListItemIcon>
-                                            <AddCircleOutline fontSize="small" />
-                                        </ListItemIcon>
-                                        Thêm bài viết
+                                    <MenuItem>
+                                        <Link to="/profile" style={{ display: 'flex', alignItems: 'center' }}>
+                                            <ListItemIcon>
+                                                <Portrait fontSize="small" />
+                                            </ListItemIcon>
+                                            Hồ sơ
+                                        </Link>
+                                    </MenuItem>
+                                    <MenuItem>
+                                        <Link to="/manage" style={{ display: 'flex', alignItems: 'center' }}>
+                                            <ListItemIcon>
+                                                <Speed fontSize="small" />
+                                            </ListItemIcon>
+                                            Quản lý
+                                        </Link>
                                     </MenuItem>
                                     <MenuItem onClick={handleSignout}>
                                         <ListItemIcon>

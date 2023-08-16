@@ -25,6 +25,18 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 }
             }
         }),
+        register: builder.mutation({
+            query: initialUser => ({
+                url: '/auth/register',
+                method: 'POST',
+                body: {
+                    ...initialUser,
+                }
+            }),
+            invalidatesTags: [
+                { type: 'User', id: "LIST" }
+            ]
+        }),
         signout: builder.mutation({
             query: () => ({
                 url: '/auth/logout',
@@ -48,5 +60,6 @@ export const authApiSlice = apiSlice.injectEndpoints({
 export const {
     useLoginMutation,
     useSignoutMutation,
+    useRegisterMutation,
     useRefreshMutation,
 } = authApiSlice 
