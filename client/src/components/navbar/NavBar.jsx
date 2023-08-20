@@ -1,5 +1,5 @@
 import './navbar.css'
-import { AppBar, Stack, Grid, Collapse, useScrollTrigger, Typography, Container, Menu, MenuItem, ListItemIcon } from '@mui/material'
+import { AppBar, Stack, Grid, Collapse, useScrollTrigger, Typography, Container, Menu, MenuItem, ListItemIcon, Divider, ListItem, List, ListItemText, ListItemButton, SwipeableDrawer } from '@mui/material'
 import { Phone as PhoneIcon, Mail as MailIcon, Menu as MenuIcon, Logout, Speed, Portrait, Person, ManageAccounts as AdminIcon } from '@mui/icons-material'
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -8,6 +8,20 @@ import { useGetCategoriesQuery } from '../../features/categories/categoriesApiSl
 import { setPersist } from '../../features/auth/authSlice';
 import { useDispatch } from 'react-redux';
 import useAuth from '../../hooks/useAuth';
+
+const drawerWidth = 240;
+const tabs = [{
+    name: 'TRANG CHỦ',
+    url: '/'
+},
+{
+    name: 'GIỚI THIỆU',
+    url: '/about'
+},
+{
+    name: 'VIDEO',
+    url: '/videos'
+}]
 
 function HideOnScroll(props) {
     const { children, window } = props;
@@ -51,7 +65,9 @@ const menuStyle = {
 }
 
 export default function NavBar(props) {
+    const { window } = props;
     const { username, isAdmin } = useAuth();
+    const [openDrawer, setOpenDrawer] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
     const [signout, { isSuccess: loggedOut }] = useSignoutMutation();
     const { data: categories, isLoading, isSuccess } = useGetCategoriesQuery();
@@ -64,6 +80,15 @@ export default function NavBar(props) {
             navigate('/')
         }
     }, [loggedOut, navigate])
+
+    const toggleDrawer = (open) => (e) => {
+        setOpenDrawer(open);
+    };
+
+    const handleNavigate = (url) => (e) => {
+        navigate(url);
+        setOpenDrawer(false);
+    }
 
     const handleSignout = () => {
         dispatch(setPersist(false));
@@ -79,9 +104,11 @@ export default function NavBar(props) {
     };
 
     let catesList;
+    let catesTab;
 
     if (isLoading) {
         catesList = <p>Loading...</p>
+        catesTab = <p>Loading...</p>
     } else if (isSuccess) {
         const { ids, entities } = categories;
 
@@ -96,10 +123,114 @@ export default function NavBar(props) {
                 )
             })
             : null
+
+        catesTab = ids?.length
+            ? ids?.map(cateId => {
+                const cate = entities[cateId];
+
+                return (
+                    <ListItem key={cateId} disablePadding>
+                        <ListItemButton className="tabDrawer" onClick={handleNavigate(`/category/${cate.type}`)}>
+                            <ListItemText sx={{textTransform: 'uppercase'}} inset primary={cate.name} />
+                        </ListItemButton>
+                    </ListItem>
+                )
+            })
+            : null
     }
+
+    const container = window !== undefined ? () => window().document.body : undefined;
+
+    const drawer = (
+        <div>
+            <div className="fullLogo">
+                <img className="fullLogoImage" alt="logo" src={require(`../../assets/logo.png`)}/>
+                <div className="logoText">AM 
+                    <div className="logoTextAlt">
+                        <span className="logoTextSmall">PRODUCTION</span>
+                        <span className="logoInfo">WEEDING-EVENT-TVC-LIVESTREAM</span>
+                    </div>
+                </div>
+            </div>
+            <Divider />
+            <List>
+                {tabs.map((tab) => (
+                    <ListItem key={tab.name} disablePadding>
+                        <ListItemButton className="tabDrawer" onClick={handleNavigate(tab.url)}>
+                            <ListItemText inset primary={tab.name} />
+                        </ListItemButton>
+                    </ListItem>
+                ))}
+                {catesTab}
+                <ListItem disablePadding>
+                    <ListItemButton className="tabDrawer" onClick={handleNavigate('/contact')}>
+                        <ListItemText inset primary={'LIÊN HỆ'} />
+                    </ListItemButton>
+                </ListItem>
+            </List>
+            <Divider />
+            <List>
+                { username ?
+                <>
+                    <ListItem disablePadding>
+                        <ListItemButton className="tabDrawer" onClick={handleNavigate('profile')}>
+                            <ListItemIcon>
+                                <Portrait />
+                            </ListItemIcon>
+                            <ListItemText primary={'HỒ SƠ'} />
+                        </ListItemButton>
+                    </ListItem>
+                    <ListItem disablePadding>
+                        <ListItemButton className="tabDrawer" onClick={handleNavigate('/manage')}>
+                            <ListItemIcon>
+                                <Speed />
+                            </ListItemIcon>
+                            <ListItemText primary={'QUẢN LÝ'} />
+                        </ListItemButton>
+                    </ListItem>
+                    <ListItem disablePadding>
+                        <ListItemButton className="tabDrawer" onClick={handleSignout}>
+                            <ListItemIcon>
+                                <Logout />
+                            </ListItemIcon>
+                            <ListItemText primary={'ĐĂNG XUẤT'} />
+                        </ListItemButton>
+                    </ListItem>
+                </>
+                :
+                <ListItem disablePadding>
+                    <ListItemButton className="tabDrawer" onClick={handleNavigate('/login')}>
+                        <ListItemIcon>
+                            {isAdmin ? <AdminIcon /> : <Person />}
+                        </ListItemIcon>
+                        <ListItemText sx={{textTransform: 'uppercase'}} primary={username ? username : 'ĐĂNG NHẬP'} />
+                    </ListItemButton>
+                </ListItem>
+                }
+            </List>
+        </div>
+    );
 
     return (
         <div className="navContainer">
+            <SwipeableDrawer
+            container={container}
+            variant="temporary"
+            open={openDrawer}
+            onOpen={toggleDrawer(true)}
+            onClose={toggleDrawer(false)}
+            disableSwipeToOpen={false}
+            ModalProps={{
+                keepMounted: true,
+            }}
+            sx={{
+                display: 'block',
+                '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+                ["@media (min-width:768px)"]: { display: 'none' }
+            }}
+            >
+                {drawer}
+            </SwipeableDrawer>
             <AppBar sx={{ backgroundColor: 'white' }} position="fixed">
                 <Container fluid maxWidth="lg">
                     <Stack sx={{ width: '100%' }}>
@@ -130,15 +261,15 @@ export default function NavBar(props) {
                             </div>
                             <div className="bottomCenter">
                                 <ul className="tabList">
-                                    <li className="tab"><NavLink className="link" to="/">TRANG CHỦ</NavLink></li>
-                                    <li className="tab"><NavLink className="link" to="/about">GIỚI THIỆU</NavLink></li>
-                                    <li className="tab"><NavLink className="link" to="/videos">VIDEO</NavLink></li>
+                                    {tabs.map((tab) => (
+                                        <li className="tab" key={tab.name}><NavLink className="link" to={tab.url}>{tab.name}</NavLink></li>
+                                    ))}
                                     {catesList}
                                     <li className="tab"><NavLink className="link" to="/contact">LIÊN HỆ</NavLink></li>
                                 </ul>
                             </div>
                             <div className="bottomRight">
-                                <button className="drawerButton">
+                                <button className="drawerButton" onClick={toggleDrawer(true)}>
                                     <MenuIcon sx={{ fontSize: 26 }} />
                                 </button>
                                 <button className="signUpButton" onClick={handleClick}>

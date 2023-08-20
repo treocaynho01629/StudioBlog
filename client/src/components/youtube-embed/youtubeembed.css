@@ -15,3 +15,10 @@
     position: absolute;
     border: 0;
 }
+
+.video-skeleton {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    margin-bottom: 30px;
+    box-shadow: 6px 6px 10px hsl(206.5, 0%, 75%);
+}

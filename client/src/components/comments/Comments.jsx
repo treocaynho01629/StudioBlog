@@ -59,7 +59,7 @@ export default function Comments({ postId, setCommentsCount }) {
         pageSize: defaultSize,
         numberOfPages: 0,
     });
-    const { data: comments, isLoading, isSuccess, isError } = useGetCommentsQuery({ 
+    const { data: comments, isLoading, isSuccess, isError } = useGetCommentsQuery({
         post: postId,
         page: pagination.currPage,
         size: pagination.pageSize,
@@ -74,15 +74,15 @@ export default function Comments({ postId, setCommentsCount }) {
     const [errMsg, setErrMsg] = useState("");
 
     useEffect(() => {
-        if (!isLoading && isSuccess && comments){
-            setPagination({ ...pagination, numberOfPages: comments?.info?.numberOfPages});
+        if (!isLoading && isSuccess && comments) {
+            setPagination({ ...pagination, numberOfPages: comments?.info?.numberOfPages });
             setCommentsCount(comments?.info?.totalElements);
         }
     }, [comments])
 
     const handleLoadMore = () => {
-        if (pagination.currPage < pagination.numberOfPages){
-            setPagination({ ...pagination, currPage: pagination.currPage + 1});
+        if (pagination.currPage < pagination.numberOfPages) {
+            setPagination({ ...pagination, currPage: pagination.currPage + 1 });
         }
     }
 
@@ -144,27 +144,23 @@ export default function Comments({ postId, setCommentsCount }) {
         }
     }
 
-    let commentsContainer;
+    let commentsList;
 
     if (isLoading) {
-        commentsContainer = <p>Loading...</p>
+        commentsList = [...new Array(pagination.pageSize)].map((element, index) => {
+            return (<Comment key={index} />)
+        })
     } else if (isSuccess) {
         const { ids, entities } = comments;
 
-        const commentsList = ids?.length
+        commentsList = ids?.length
             ? ids.map(commendId => {
                 const comment = entities[commendId];
-                return (<Comment key={comment.id} comment={comment} reloadComments={reloadComments}/>)
+                return (<Comment key={comment.id} comment={comment} reloadComments={reloadComments} />)
             })
-            : null
-
-        commentsContainer = (
-            <div className="commentsContainer">
-                {commentsList}
-            </div>
-        )
+            : <p>Chưa có ý kiến nào</p>
     } else if (isError) {
-        commentsContainer = null;
+        commentsList = <p>Đã xảy ra lỗi khi tải ý kiến!</p>
     }
 
     return (
@@ -172,21 +168,23 @@ export default function Comments({ postId, setCommentsCount }) {
             <p className="commentTitle">
                 <ChatIcon sx={{ marginRight: 1 }} />Ý kiến bạn đọc ({comments?.info?.totalElements || 0} bình luận)
             </p>
-            {commentsContainer}
-            { ((pagination.currPage < pagination.numberOfPages) && pagination.numberOfPages > 1) &&
+            <div className="commentsContainer">
+                {commentsList}
+            </div>
+            {((pagination.currPage < pagination.numberOfPages) && pagination.numberOfPages > 1) &&
                 <button className="showMore" onClick={handleLoadMore} disabled={isLoading}>
                     Xem các ý kiến cũ
                     {isLoading && (
-                    <CircularProgress
-                        size={24}
-                        sx={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            marginTop: '-12px',
-                            marginLeft: '-12px',
-                        }}
-                    />
+                        <CircularProgress
+                            size={24}
+                            sx={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                marginTop: '-12px',
+                                marginLeft: '-12px',
+                            }}
+                        />
                     )}
                 </button>
             }
@@ -238,7 +236,7 @@ export default function Comments({ postId, setCommentsCount }) {
                         id="content"
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        error={ err?.data?.has('content')}
+                        error={err?.data?.has('content')}
                         helperText={err?.data?.has('content') && err?.data?.get('content')}
                         label="Ý kiến của bạn*"
                     />

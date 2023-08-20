@@ -2,30 +2,32 @@ import { useGetVideosQuery } from '../../features/google/googleApiSlice';
 import YoutubeEmbed from '../youtube-embed/YoutubeEmbed';
 
 export default function YoutubeList({ amount, refetchOnMountOrArgChange }) {
-    const { data: videos, isLoading, isSuccess, isError, error } = useGetVideosQuery(
+    const { data: videos, isLoading, isSuccess, isError } = useGetVideosQuery(
         { amount: amount ?? 5 },
         { refetchOnMountOrArgChange: refetchOnMountOrArgChange ?? false }
     );
 
-    let content;
+    let videosList;
 
-    if (isLoading) {
-        content = <p>Loading ...</p>
+    if (isLoading || isError) {
+        videosList = [...new Array(amount ?? 5)].map((element, index) => {
+            return (
+                <YoutubeEmbed key={index} />
+            )
+        })
     } else if (isSuccess) {
-        const videosList = videos?.length
+        videosList = videos?.length
             ? videos.map(video => (
                 <YoutubeEmbed key={video.id} video={video} />
             ))
-            : null
-
-        content = (
-            <div className="youtubeContainer">
-                {videosList}
-            </div>
-        )
-    } else if (isError){
-        content = <p>{error}</p>
+            : [...new Array(amount ?? 5)].map((element, index) => (
+                    <YoutubeEmbed key={index} />
+            ))
     }
 
-  return content;
+    return (
+        <div className="youtubeContainer">
+            {videosList}
+        </div>
+    );
 }

@@ -13,12 +13,12 @@ export default function Footer() {
                 <Grid item xs={12} sm={8} md={6}>
                     <div className="footerLeft">
                         <Link to="/">
-                            <div className="fullLogo">
-                                <img className="fullLogoImage" alt="logo" src={require(`../../assets/logo.png`)}/>
-                                <div className="logoText">AM 
-                                    <div className="logoTextAlt">
-                                        <span className="logoTextSmall">PRODUCTION</span>
-                                        <span className="logoInfo">WEEDING-EVENT-TVC-LIVESTREAM</span>
+                            <div className="footerFullLogo">
+                                <img className="footerFullLogoImage" alt="logo" src={require(`../../assets/logo.png`)}/>
+                                <div className="footerLogoText">AM 
+                                    <div className="footerLogoTextAlt">
+                                        <span className="footerLogoTextSmall">PRODUCTION</span>
+                                        <span className="footerLogoInfo">WEEDING-EVENT-TVC-LIVESTREAM</span>
                                     </div>
                                 </div>
                             </div>

@@ -53,8 +53,8 @@ export default function BreadCrumbs({ route, post }) {
 
   return (
     <div className="breadCrumbsContainer">
-      <Breadcrumbs aria-label="breadcrumb" 
-        className="breadcrumbs" 
+      <Breadcrumbs aria-label="breadcrumb"
+        className="breadcrumbs"
         separator={<span className="crumb-seperator">&nbsp;</span>}
       >
         {breadcrumbs}

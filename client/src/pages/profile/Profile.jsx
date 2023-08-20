@@ -1,6 +1,6 @@
 import './profile.css'
 import { useEffect, useState } from 'react';
-import { Box, CircularProgress, Container, Grid, IconButton, InputAdornment, Paper, Stack, TextField } from '@mui/material'
+import { Box, CircularProgress, Container, Grid, IconButton, InputAdornment, Paper, Skeleton, Stack, TextField, Typography } from '@mui/material'
 import { Edit as EditIcon, Delete as DeleteIcon, Done, VisibilityOff, Visibility } from '@mui/icons-material';
 import { useDeleteUserMutation, useGetUserQuery, useUpdateUserMutation } from '../../features/users/usersApiSlice';
 import { useRefreshMutation, useSignoutMutation } from '../../features/auth/authApiSlice';
@@ -102,7 +102,7 @@ export default function Profile() {
 
   useEffect(() => {
     if (loggedOut) {
-        navigate('/')
+      navigate('/')
     }
   }, [loggedOut, navigate])
 
@@ -204,9 +204,12 @@ export default function Profile() {
       <Container fluid maxWidth="lg">
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <h1 className="alternativeTitle">HỒ SƠ {username.toUpperCase()}</h1>
-          <button className="infoButton" onClick={handleToggleEdit} sx={{ color: '#0f3e3c', borderColor: '#0f3e3c' }}>
+          <button className="infoButton"
+            onClick={handleToggleEdit}
+            disabled={loadingUser || updating || deleting}
+            sx={{ color: '#0f3e3c', borderColor: '#0f3e3c' }}>
             <EditIcon sx={{ marginRight: 1 }} />
-            Cập nhật
+            {editMode ? 'Huỷ cập nhật' : 'Cập nhật'}
           </button>
         </Box>
 
@@ -241,7 +244,14 @@ export default function Profile() {
                         size="small"
                         fullWidth
                       />
-                      : <p>{username}</p>}
+                      :
+                      <p>
+                        { (userDone && user) ?
+                          username
+                          :
+                          <Typography component="div" variant={'body1'}><Skeleton width="120px" /></Typography>
+                        }
+                      </p>}
                   </div>
                   <div className="profileInfoStack">
                     {(editMode && isAdmin) ?
@@ -255,7 +265,14 @@ export default function Profile() {
                         size="small"
                         fullWidth
                       />
-                      : <p>{email}</p>}
+                      :
+                      <p>
+                        { (userDone && user) ?
+                          email
+                          :
+                          <Typography component="div" variant={'body1'}><Skeleton width="220px" /></Typography>
+                        }
+                      </p>}
                   </div>
                   <div className="profileInfoStack">
                     {editMode ?
@@ -268,7 +285,14 @@ export default function Profile() {
                         size="small"
                         fullWidth
                       />
-                      : <p>{fullName}</p>}
+                      :
+                      <p>
+                        { (userDone && user) ?
+                          fullName
+                          :
+                          <Typography component="div" variant={'body1'}><Skeleton width="150px" /></Typography>
+                        }
+                      </p>}
                   </div>
                   {editMode ?
                     <>

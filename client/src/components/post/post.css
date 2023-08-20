@@ -54,3 +54,8 @@
 .readmoreButton:hover {
     background-color: #387e5d;
 }
+
+.readmoreButton:disabled {
+    background-color: lightgray;
+    color: lightgray;
+}

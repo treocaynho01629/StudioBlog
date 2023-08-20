@@ -59,7 +59,9 @@ export default function Category() {
     let content;
     
     if (isLoading) {
-        content = <p>Loading...</p>
+        content = [...new Array(pagination.pageSize)].map((element, index) => {
+            return (<Post key={index}/>)
+        })
     } else if (isSuccess) {
         const { ids, entities } = posts;
 
@@ -69,8 +71,8 @@ export default function Category() {
                 return (<Post key={post.id} post={post}/>)
             })
             : <p>Không có bài viết nào</p>
-    } else if (isError){
-        content = <p>Đã có lỗi xảy ra</p>
+    } else if (isError) {
+        content = <p>Đã xảy ra lỗi khi tải bài viết!</p>;
     }
 
     return (

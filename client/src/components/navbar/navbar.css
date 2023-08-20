@@ -62,7 +62,7 @@
 
 .bottomCenter {
     display: none;
-    
+
     @media (min-width: 768px) {
         display: block;
     }
@@ -91,6 +91,60 @@
     transform: rotate(4deg);
 }
 
+.fullLogoImage {
+    height: 60px;
+    width: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.fullLogo {
+    margin: 5px 0px 5px 20px;
+    position: relative;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    transition: ease-in-out all 0.25s;
+    cursor: pointer;
+    justify-content: flex-start;
+}
+
+.fullLogo:hover {
+    filter: drop-shadow(1px 1px 5px #0d3c3985);
+}
+
+.logoText {
+    letter-spacing: 2px;
+    color: #FF6600;
+    font-size: 23px;
+    font-weight: 450;
+    position: absolute;
+    top: 13px;
+    left: 38px;
+    filter: drop-shadow(1px 1px 10px #0d3c3985);
+    display: flex;
+    align-items: center;
+}
+
+.logoTextAlt{
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    margin-left: 5px;
+}
+
+.logoTextSmall {
+    font-size: 13px;
+}
+
+.logoInfo {
+    font-size: 4px;
+    color: white;
+    background-color: #0f3e3c;
+    padding: 2px 1px 1px 2px;
+    letter-spacing: 1px;
+}
+
 .tabList {
     display: flex;
     align-items: center;
@@ -99,6 +153,12 @@
     padding: 0;
     list-style: none;
     overflow-x: scroll;
+    -ms-overflow-style: none; 
+    scrollbar-width: none;
+}
+
+.tabList::-webkit-scrollbar {
+    display: none;
 }
 
 .tab {
@@ -135,10 +195,17 @@
     background-color: white;
     color: black;
     border-radius: 10%;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
 
     @media (min-width: 768px) {
         display: none;
     }
+}
+
+.drawerButton:hover {
+    color: #387e5d;
+    background-color: whitesmoke;
 }
 
 .signUpButton {
@@ -182,4 +249,12 @@
     font-weight: 400;
     color: #0f3e3c;
     text-decoration: underline;
+}
+
+.tabDrawer {
+    text-transform: uppercase;
+}
+
+.tabDrawer:hover {
+    color: #387e5d;
 }

@@ -1,4 +1,5 @@
 import './youtubeembed.css';
+import { Skeleton } from '@mui/material';
 
 export default function YoutubeEmbed({ key, video }) {
   if (video) {
@@ -69,6 +70,10 @@ export default function YoutubeEmbed({ key, video }) {
           title={video.title}
         />
       </div>
+    )
+  } else {
+    return (
+      <Skeleton variant="rectangular" className="video-skeleton" height={'100%'} />
     )
   }
 }

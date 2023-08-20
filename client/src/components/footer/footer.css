@@ -15,14 +15,14 @@
     border-bottom: 0.5px solid lightgray;
 }
 
-.fullLogoImage {
+.footerFullLogoImage {
     height: 120px;
     width: 120px;
     border-radius: 50%;
     object-fit: cover;
 }
 
-.fullLogo {
+.footerFullLogo {
     position: relative;
     display: flex;
     text-align: center;
@@ -36,11 +36,11 @@
     }
 }
 
-.fullLogo:hover {
+.footerFullLogo:hover {
     filter: drop-shadow(1px 1px 20px #0d3c3985);
 }
 
-.logoText {
+.footerLogoText {
     letter-spacing: 4px;
     color: #FF6600;
     font-size: 46px;
@@ -57,18 +57,18 @@
     }
 }
 
-.logoTextAlt{
+.footerLogoTextAlt{
     display: flex;
     flex-direction: column;
     text-align: left;
     margin-left: 5px;
 }
 
-.logoTextSmall {
+.footerLogoTextSmall {
     font-size: 27px;
 }
 
-.logoInfo {
+.footerLogoInfo {
     font-size: 9px;
     color: white;
     background-color: #0f3e3c;
