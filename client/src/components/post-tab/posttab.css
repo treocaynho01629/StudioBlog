@@ -2,6 +2,11 @@
     margin: 20px 0;
 }
 
+.postLine {
+    display: flex;
+    align-items: center;
+}
+
 .postInfo {
     padding: 5px;
     padding-bottom: 0px;

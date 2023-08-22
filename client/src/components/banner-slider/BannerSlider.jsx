@@ -23,7 +23,8 @@ export default function BannerSlider() {
                     <div key={index} className="bannerSliderWrapper">
                         <img className="bannerImage"
                             src={banner.image}
-                            alt="" />
+                            alt={`banner-${index}`}
+                            loading="lazy" />
                     </div>
                 ))}
             </Slider>

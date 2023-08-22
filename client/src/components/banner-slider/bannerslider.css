@@ -1,5 +1,6 @@
 .bannerSliderContainer {
     box-shadow: 6px 6px 10px hsl(206.5, 0%, 75%);
+    border-bottom: 0.5px lightblue solid;
     overflow: hidden;
 }
 

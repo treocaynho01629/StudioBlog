@@ -47,11 +47,6 @@
     align-items: center;
 }
 
-.errorMsg {
-    color: #f25a5a;
-    margin-top: 0;
-}
-
 .successMsg {
     color: #4fc54b;
     margin-top: 0;

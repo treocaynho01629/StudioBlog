@@ -61,7 +61,7 @@ const defaultSize = 8;
 export default function Search() {
     const { id, isAdmin } = useAuth();
     const [searchParams, setSearchParams] = useSearchParams();
-    const { data: categories, isLoading: loadingCates, isSuccess: catesDone } = useGetCategoriesQuery();
+    const { data: categories, isLoading: loadingCates, isSuccess: catesDone, isError: catesError } = useGetCategoriesQuery();
     const [pagination, setPagination] = useState({
         currPage: searchParams.get("page") || 1,
         pageSize: searchParams.get("size") || defaultSize,
@@ -164,7 +164,7 @@ export default function Search() {
     let catesList;
 
     if (loadingCates) {
-        catesList = <p>Loading...</p>
+        catesList = <MenuItem disabled value="">Đang tải...</MenuItem>
     } else if (catesDone) {
         const { ids, entities } = categories;
 
@@ -178,13 +178,17 @@ export default function Search() {
                     </MenuItem>
                 )
             })
-            : null
+            : <MenuItem disabled value="">Danh mục trống</MenuItem>
+    } else if (catesError) {
+        catesList = <MenuItem disabled value="">Lỗi danh mục</MenuItem>
     }
 
     let content;
 
     if (isLoading) {
-        content = <p>Loading...</p>
+        content = [...new Array(pagination.pageSize)].map((element, index) => {
+            return (<PostTab key={index} />)
+        })
     } else if (isSuccess) {
         const { ids, entities } = posts;
 
@@ -199,7 +203,7 @@ export default function Search() {
             })
             : <p>Không có bài viết nào</p>
     } else if (isError) {
-        content = <p>Đã có lỗi xảy ra</p>
+        content = <p>Đã có lỗi xảy ra khi tải bài viết!</p>
     }
 
     return (

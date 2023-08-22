@@ -3,6 +3,11 @@
     padding: 0px 5px;
 }
 
+.userLine {
+    display: flex;
+    align-items: center;
+}
+
 .userInfo {
     padding: 5px;
     padding-bottom: 0px;

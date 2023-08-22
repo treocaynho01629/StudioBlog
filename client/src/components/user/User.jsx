@@ -1,5 +1,5 @@
 import './user.css';
-import { Box, CircularProgress, Paper } from '@mui/material';
+import { Box, CircularProgress, Paper, Skeleton, Typography } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon, Person as UserIcon, ManageAccounts as AdminIcon } from '@mui/icons-material';
 import { useDeleteUserMutation } from '../../features/users/usersApiSlice';
 import { Link } from 'react-router-dom';
@@ -21,18 +21,34 @@ export default function User({ user }) {
     }
   }
 
-  if (user) {
-    return (
-      <Paper square elevation={2} className="userContainer">
-        <div className="userInfo">
+  return (
+    <Paper square elevation={2} className="userContainer">
+      <div className="userInfo">
+        {user ?
           <h3 className="usernameInfo" style={{ color: user.isAdmin ? '#0f3e3c' : 'black' }}>
             {user.isAdmin ? <AdminIcon /> : <UserIcon />}{user.username}
           </h3>
-          <p><b>Tên: </b>{user.fullName}</p>
-        </div>
-        <Box display="flex" justifyContent="space-between" sx={{ padding: '0px 5px' }}>
-          <p style={{ marginTop: 0 }}><b>Ngày tham gia: </b>{new Date(user.createdAt).toLocaleDateString()}</p>
-          {!user.isAdmin ?
+          :
+          <Typography variant={'h5'}><Skeleton width="150px" /></Typography>
+        }
+        <p className="userLine"><b>Tên:&nbsp;</b>
+          {user ?
+            user.fullName
+            :
+            <Typography variant={'body1'}><Skeleton width="150px" /></Typography>
+          }
+        </p>
+      </div>
+      <Box display="flex" justifyContent="space-between" sx={{ padding: '0px 5px' }}>
+        <p className="userLine" style={{ marginTop: 0 }}><b>Ngày tham gia:&nbsp;</b>
+          {user ?
+            new Date(user.createdAt).toLocaleDateString()
+            :
+            <Typography variant={'body1'}><Skeleton width="120px" /></Typography>
+          }
+        </p>
+        {user ?
+          (!user.isAdmin ?
             <div className=" userAction">
               <Link to={`/edit-user/${user.id}`}>
                 <button className="userInfoButton" style={{ color: '#0f3e3c', borderColor: '#0f3e3c' }}>
@@ -59,10 +75,15 @@ export default function User({ user }) {
               </button>
             </div>
             : null
-          }
-        </Box>
-        <ConfirmationDialog/>
-      </Paper>
-    )
-  }
+          )
+          :
+          <div className="userAction">
+            <button className="userInfoButton" disabled><EditIcon /></button>
+            <button className="userInfoButton" disabled><DeleteIcon /></button>
+          </div>
+        }
+      </Box>
+      <ConfirmationDialog />
+    </Paper>
+  )
 }

@@ -1,12 +1,12 @@
 import './login.css'
 import { CircularProgress, Container, IconButton, InputAdornment, Paper, TextField } from '@mui/material';
-import styled from '@emotion/styled';
 import { useEffect, useRef, useState } from 'react';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { setAuth, setPersist } from '../../features/auth/authSlice';
 import { useLoginMutation } from '../../features/auth/authApiSlice';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import styled from '@emotion/styled';
 import usePersist from '../../hooks/usePersist';
 import useTitle from '../../hooks/useTitle';
 
@@ -56,6 +56,7 @@ const CustomInput = styled(TextField)(({ theme }) => ({
 }));
 
 export default function Login() {
+  useTitle(`Đăng nhập - TAM PRODUCTION`);
   const errRef = useRef();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -63,11 +64,10 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [errMsg, setErrMsg] = useState("");
   const [login, { isLoading }] = useLoginMutation();
-  const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/"; //Previous route
+  const navigate = useNavigate();
   const dispatch = useDispatch();
-  useTitle(`Đăng nhập - TAM PRODUCTION`);
 
   useEffect(() => {
     setErrMsg("");

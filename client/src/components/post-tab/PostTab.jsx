@@ -1,5 +1,5 @@
 import './posttab.css';
-import { Box, CircularProgress, Paper } from '@mui/material';
+import { Box, CircularProgress, Paper, Skeleton, Typography } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
@@ -23,19 +23,39 @@ export default function PostTab({ post }) {
         }
     }
 
-    if (post) {
-        return (
-            <Paper elevation={2} square className="postContainer">
-                <div className="postInfo">
-                    <Link to={`/post/${post.slug}`}>
-                        <h3>{post.title}</h3>
-                    </Link>
-                    <p><b>Danh mục: </b>{post.category}</p>
-                    <p><b>Id người viết: </b>{post.user}</p>
-                </div>
-                <Box display="flex" justifyContent="space-between" sx={{padding: '0px 5px'}}>
-                    <p style={{marginTop: 0}}><b>Sửa đổi lần cuối: </b>{new Date(post.updatedAt).toLocaleDateString()}</p>
-                    { (isAdmin || post.user == id) ?
+    return (
+        <Paper elevation={2} square className="postContainer">
+            <div className="postInfo">
+                { post ?
+                <Link to={`/post/${post.slug}`}><h3>{post.title}</h3></Link>
+                :
+                <Typography component="div" variant={'h4'}><Skeleton width="40%" /></Typography>
+                }
+                <p className="postLine"><b>Danh mục:&nbsp;</b>
+                    {post ?
+                        post.category
+                        :
+                        <Typography variant={'body1'}><Skeleton width="120px" /></Typography>
+                    }
+                </p>
+                <p className="postLine"><b>Id người viết:&nbsp;</b>
+                    {post ?
+                        post.user
+                        :
+                        <Typography variant={'body1'}><Skeleton width="200px" /></Typography>
+                    }
+                </p>
+            </div>
+            <Box display="flex" justifyContent="space-between" sx={{ padding: '0px 5px' }}>
+                <p className="postLine" style={{ marginTop: 0 }}><b>Sửa đổi lần cuối:&nbsp;</b>
+                    {post ?
+                        new Date(post.updatedAt).toLocaleDateString()
+                        :
+                        <Typography variant={'body1'}><Skeleton width="120px" /></Typography>
+                    }
+                </p>
+                {post ?
+                    ((isAdmin || post.user == id) ?
                         <div className="postAction">
                             <Link to={`/edit-post/${post.slug}`}>
                                 <button className="postInfoButton" style={{ color: '#0f3e3c', borderColor: '#0f3e3c' }}>
@@ -62,10 +82,15 @@ export default function PostTab({ post }) {
                             </button>
                         </div>
                         : null
-                    }
-                </Box>
-                <ConfirmationDialog/>
-            </Paper>
-        )
-    } else return null;
+                    )
+                    :
+                    <div className="postAction">
+                        <button className="postInfoButton" disabled><EditIcon /></button>
+                        <button className="postInfoButton" disabled><DeleteIcon /></button>
+                    </div>
+                }
+            </Box>
+            <ConfirmationDialog />
+        </Paper>
+    )
 }

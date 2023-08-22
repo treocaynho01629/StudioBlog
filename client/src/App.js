@@ -26,6 +26,7 @@ import EditUser from "./pages/edit-user/EditUser";
 import Images from "./pages/images/Images";
 import Manage from "./pages/manage/Manage";
 import Profile from "./pages/profile/Profile";
+import ScrollToTop from "./components/scroll-to-top/ScrollToTop";
 
 function App() {
   useTitle("TAM PRODUCTION");
@@ -34,6 +35,7 @@ function App() {
   return (
     <>
       <NavBar />
+      <ScrollToTop />
       <Routes>
         <Route path="/login" element={username ? <Home /> : <Login />} />
         <Route path="/register" element={<Register />} />

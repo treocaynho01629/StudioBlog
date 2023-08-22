@@ -90,7 +90,9 @@ export default function PostContent({ post, commentsCount, previewMode }) {
       <div className="postContent">
         <Box display="flex" justifyContent="center">
           { post ?
-            <img className="postContentThumbnail" alt=""
+            <img className="postContentThumbnail" 
+              alt={`${post.slug}-thumbnail`} 
+              loading="lazy"
               src={post.thumbnail}
             />
             :
@@ -102,7 +104,6 @@ export default function PostContent({ post, commentsCount, previewMode }) {
               width="100%"
             />
           }
-
         </Box>
         <div className="postContentDescription">
           { post ?

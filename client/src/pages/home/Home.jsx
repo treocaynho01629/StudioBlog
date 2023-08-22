@@ -1,6 +1,7 @@
 import './home.css'
 import { Container, Grid } from '@mui/material';
 import { Lightbulb, AttachMoney, HelpCenter, ArrowRight } from '@mui/icons-material';
+import { Link } from 'react-router-dom';
 import ServicePosts from '../../components/service-posts/ServicePosts';
 import BannerSlider from '../../components/banner-slider/BannerSlider';
 import YoutubeList from '../../components/youtube-list/YoutubeList';
@@ -79,7 +80,7 @@ export default function Home() {
             </div>
             <div className="contactTab">
                 <h3 className="contactTitle">Đăng ký nhận báo giá các gói dịch vụ của chúng tôi!</h3>
-                <button className="contactButton">Liên hệ ngay<ArrowRight/></button>
+                <Link to="/contact"><button className="contactButton">Liên hệ ngay<ArrowRight/></button></Link>
             </div>
         </div>
     )

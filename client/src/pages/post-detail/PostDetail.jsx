@@ -4,9 +4,9 @@ import BreadCrumbs from '../../components/breadcrumbs/BreadCrumbs'
 import Comments from '../../components/comments/Comments'
 import useTitle from '../../hooks/useTitle'
 import { Container } from '@mui/material'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Navigate, useParams } from 'react-router-dom'
 import { useGetPostQuery } from '../../features/posts/postsApiSlice'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 export default function PostDetail() {
   const { slug } = useParams();
@@ -14,20 +14,17 @@ export default function PostDetail() {
     refetchOnMountOrArgChange: true
   });
   const [commentsCount, setCommentsCount] = useState(0);
-  const navigate = useNavigate();
   useTitle(`${post?.title || 'Bài viết'} - TAM PRODUCTION`);
 
   console.log(isSuccess);
-
-  useEffect(() => {
-    if (isError && !isLoading) navigate("/error");
-  }, [isError])
 
   let content;
   if (isLoading) {
     content = <PostContent />
   } else if (isSuccess) {
     content = <PostContent post={post} commentsCount={commentsCount} />
+  } else if (isError) {
+    content = <Navigate to="/error"/>
   }
 
   return (

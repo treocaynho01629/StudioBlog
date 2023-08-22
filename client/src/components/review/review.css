@@ -17,8 +17,6 @@
     width: 62px;
     height: 62px;
     margin-right: 25px;
-    border-radius: 50%;
-    box-shadow: 2px 2px 2px hsl(206.5, 0%, 75%);
 }
 
 .authorName {

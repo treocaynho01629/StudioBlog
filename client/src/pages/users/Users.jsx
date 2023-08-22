@@ -59,7 +59,9 @@ export default function Users() {
     let content;
     
     if (isLoading) {
-        content = <p>Loading...</p>
+        content = [...new Array(pagination.pageSize)].map((element, index) => {
+            return (<User key={index} />)
+        })
     } else if (isSuccess) {
         const { ids, entities } = users;
 
@@ -68,9 +70,9 @@ export default function Users() {
                 const user = entities[userId];
                 return (<User key={user.id} user={user}/>)
             })
-            : null
+            : <p>Không có người dùng nào</p>
     } else if (isError){
-        content = <p>Đã có lỗi xảy ra</p>
+        content = <p>Đã có lỗi xảy ra khi tải người dùng!</p>
     }
 
     return (

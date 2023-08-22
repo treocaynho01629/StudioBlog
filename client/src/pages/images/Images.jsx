@@ -1,5 +1,5 @@
 import './images.css';
-import { Box, CircularProgress, Container, IconButton, ImageList, ImageListItem, ImageListItemBar, useMediaQuery, useTheme } from '@mui/material'
+import { Box, CircularProgress, Container, Dialog, DialogContent, IconButton, ImageList, ImageListItem, ImageListItemBar, Skeleton, useMediaQuery, useTheme } from '@mui/material'
 import { AddCircleOutline as AddCircleOutlineIcon, HighlightOff, Block, CheckCircleOutline } from '@mui/icons-material';
 import { useDeleteImageMutation, useGetImagesQuery, useUploadImagesMutation } from '../../features/images/imagesApiSlice'
 import { useEffect, useRef, useState } from 'react';
@@ -25,6 +25,8 @@ export default function Images() {
     const [files, setFiles] = useState([]);
     const [errMsg, setErrMsg] = useState("");
     const inputFile = useRef(null);
+    const [open, setOpen] = useState(false);
+    const [image, setImage] = useState("");
     const [ConfirmationDialog, confirmDelete] = useConfirm(
         'Xoá ảnh?',
         'Bạn có muốn xoá tấm ảnh này?',
@@ -89,6 +91,15 @@ export default function Images() {
         setFiles([]);
     }
 
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const enlargeImage = (url) => (e) => {
+        setImage(url);
+        setOpen(true);
+    }
+
     const handleOpenFile = () => {
         inputFile.current.click();
         setErrMsg("");
@@ -96,16 +107,33 @@ export default function Images() {
 
     let content;
     if (isLoading) {
-        content = <p>Loading...</p>
+        content = [...new Array(8)].map((element, index) => {
+            return (
+                <ImageListItem key={index} sx={{ position: 'relative' }}>
+                    <Skeleton variant="rectangular" height={Math.floor(Math.random() * (420 - 250 + 1)) + 250} />
+                    <ImageListItemBar
+                        sx={{
+                            background:
+                                'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, ' +
+                                'rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
+                        }}
+                        title={"Đang tải..."}
+                        position="top"
+                        actionPosition="left"
+                    />
+                </ImageListItem>
+            )
+        })
     } else if (isSuccess) {
         content = images?.length
             ? images?.map((item) => (
                 <ImageListItem key={item.url} sx={{ position: 'relative' }}>
                     <img
-                        src={`${item.url}?w=50%&fit=crop&auto=format`}
-                        srcSet={`${item.url}?w=50%&fit=crop&auto=format&dpr=2 2x`}
+                        src={`${item.url}?w=575&fit=crop&auto=format`}
+                        srcSet={`${item.url}?w=575&fit=crop&auto=format&dpr=2 2x`}
                         alt={item.name}
                         loading="lazy"
+                        onClick={enlargeImage(item.url)}
                     />
                     <ImageListItemBar
                         sx={{
@@ -145,9 +173,9 @@ export default function Images() {
                     )}
                 </ImageListItem>
             ))
-            : null
+            : <p>Không có hình ảnh nào</p>
     } else if (isError) {
-        content = <p>Đã xảy ra lỗi</p>
+        content = <p>Đã xảy ra lỗi khi tải ảnh!</p>
     }
 
     const preview = files?.map((item) => (
@@ -249,6 +277,25 @@ export default function Images() {
                 </Box>
                 <ConfirmationDialog />
             </Container>
+            <Dialog
+                fullScreen={phoneBreakpoint}
+                fullWidth
+                keepMounted
+                maxWidth="xl"
+                open={open}
+                onClose={handleClose}
+                onClick={handleClose}
+            >
+                <DialogContent sx={{display: 'flex', alignItems: 'center'}}>
+                    { image ?
+                        <img className="imageEnlarge" 
+                        loading="lazy"
+                        src={image}
+                        />
+                        : null
+                    }
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

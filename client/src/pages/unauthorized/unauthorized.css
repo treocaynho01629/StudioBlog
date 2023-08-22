@@ -9,12 +9,3 @@
     color: #0f3e3c;
     margin-bottom: 30px;
 }
-
-.option {
-    color: #0f3e3c;
-}
-
-.option:hover {
-    color: #387e5d;
-    text-decoration: underline;
-}

@@ -4,6 +4,7 @@ import { useRefreshMutation } from './authApiSlice';
 import { useSelector } from 'react-redux';
 import { selectCurrentToken } from './authSlice';
 import usePersist from '../../hooks/usePersist';
+import { Backdrop, CircularProgress, Container } from '@mui/material';
 
 export default function PersistLogin() {
     const persist = usePersist();
@@ -44,22 +45,46 @@ export default function PersistLogin() {
 
     if (!persist) {
         content = <Outlet />
-    } else if (isLoading) { 
+    } else if (isLoading) {
         console.log("Đang xác thực đăng nhập!");
-        content = <b style={{marginTop: '250px'}}>Loading ...</b>
-    } else if (isError) { 
+        content = (
+            <>
+                <div style={{ height: '1000px' }}>&nbsp;</div>
+                <Backdrop
+                    sx={{ color: '#fff', zIndex: 9999, position: 'fixed' }}
+                    open={true}
+                >
+                    <CircularProgress color="inherit" />&nbsp;Đang xác thực đăng nhập
+                </Backdrop>
+            </>
+        )
+    } else if (isError) {
         console.log("Lỗi xác thực!");
         content = (
-            <p className='errmsg'>
-                {`${error?.data?.message} - `}
-                <Link to="/login">Please login again</Link>.
-            </p>
+            <div style={{marginTop: '150px'}}>
+                <Container fluid maxWidth="lg">
+                    <p className="errMsg">{`Đã xảy ra lỗi khi xác thực đăng nhập: ${error?.data?.message}`}</p>
+                    <p>Vui lòng <Link to="/login"><b className="option">ĐĂNG NHẬP LẠI</b></Link></p>
+                </Container>
+            </div>
         )
     } else if (isSuccess && trueSuccess) {
         console.log("Xác thực hoàn tất!");
         content = <Outlet />
     } else if (token && isUninitialized) {
         content = <Outlet />
+    } else {
+        content = (
+            <>
+                <div style={{ height: '1000px' }}>&nbsp;</div>
+                <Backdrop
+                    sx={{ color: '#fff', zIndex: 9999, position: 'fixed' }}
+                    open={true}
+                >
+                    <CircularProgress color="inherit" />&nbsp;Đang xác thực đăng nhập
+                </Backdrop>
+            </>
+        )
     }
 
     return content
