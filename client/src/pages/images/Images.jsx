@@ -1,48 +1,56 @@
 import './images.css';
-import { Box, CircularProgress, Container, Dialog, DialogContent, IconButton, ImageList, ImageListItem, ImageListItemBar, Skeleton, useMediaQuery, useTheme } from '@mui/material'
-import { AddCircleOutline as AddCircleOutlineIcon, HighlightOff, Block, CheckCircleOutline } from '@mui/icons-material';
-import { useDeleteImageMutation, useGetImagesQuery, useUploadImagesMutation } from '../../features/images/imagesApiSlice'
+import { Box, CircularProgress, Container, Dialog, DialogContent, ImageList, useMediaQuery, useTheme } from '@mui/material'
+import { AddCircleOutline as AddCircleOutlineIcon, CheckCircleOutline } from '@mui/icons-material';
+import { useGetImagesQuery, useUploadImagesMutation } from '../../features/images/imagesApiSlice'
 import { useEffect, useRef, useState } from 'react';
 import BreadCrumbs from '../../components/breadcrumbs/BreadCrumbs';
-import useConfirm from '../../hooks/useConfirm';
 import useTitle from '../../hooks/useTitle';
+import ImageItem from '../../components/image-item/ImageItem';
 
 const allowedExtensions = ['jpeg', 'jpg', 'png', 'gif', 'svg'],
     sizeLimit = 5_242_880; //5MB
+const defaultSize = 8;
 
 export default function Images() {
     useTitle(`Kho ảnh - TAM PRODUCTION`);
     const theme = useTheme();
     const phoneBreakpoint = useMediaQuery(theme.breakpoints.down('sm'));
+    const [pagination, setPagination] = useState({
+        currPage: 1,
+        pageSize: defaultSize,
+        numberOfPages: 0,
+        totalElements: 0
+    });
     const { data: images, isLoading, isError, isSuccess } = useGetImagesQuery({
-        pollingInterval: 15000,
-        refetchOnFocus: true,
-        refetchOnMountOrArgChange: true
+        page: pagination.currPage,
+        size: pagination.pageSize
     });
     const [uploadImages, { isLoading: uploading }] = useUploadImagesMutation();
-    const [deleteImage, { isLoading: deleting }] = useDeleteImageMutation();
-    const [deletedImage, setDeletedImage] = useState("");
     const [files, setFiles] = useState([]);
     const [errMsg, setErrMsg] = useState("");
     const inputFile = useRef(null);
     const [open, setOpen] = useState(false);
     const [image, setImage] = useState("");
-    const [ConfirmationDialog, confirmDelete] = useConfirm(
-        'Xoá ảnh?',
-        'Bạn có muốn xoá tấm ảnh này?',
-    )
+
+    useEffect(() => {
+        if (!isLoading && isSuccess && images) {
+            setPagination({ ...pagination, 
+                numberOfPages: images?.info?.numberOfPages,
+                totalElements: images?.info?.totalElements
+            })   
+        }
+    }, [isSuccess])
 
     useEffect(() => {
         return () => files.forEach(file => URL.revokeObjectURL(file.preview)); //prevent memory leaks
     }, []);
 
-    const handleDeleteImage = async (name) => {
-        const confirmation = await confirmDelete()
-        if (confirmation) {
-            setDeletedImage(name);
-            await deleteImage(name).unwrap();
-        } else {
-            console.log('cancel delete');
+    const handleScroll = (e) => {
+        const bottom = e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight;
+        if (bottom) {
+            if (pagination.currPage < pagination.numberOfPages) {
+                setPagination({ ...pagination, currPage: pagination.currPage + 1 });
+            }
         }
     }
 
@@ -105,127 +113,44 @@ export default function Images() {
         setErrMsg("");
     }
 
+    const preview = files?.map((image) => {
+        return (<ImageItem
+            preview={true}
+            key={image.preview}
+            image={image}
+            uploading={uploading}
+            enlargeImage={enlargeImage}
+            handleRemoveImage={handleRemoveImage} />)
+    })
+
     let content;
     if (isLoading) {
         content = [...new Array(8)].map((element, index) => {
-            return (
-                <ImageListItem key={index} sx={{ position: 'relative' }}>
-                    <Skeleton variant="rectangular" height={Math.floor(Math.random() * (420 - 250 + 1)) + 250} />
-                    <ImageListItemBar
-                        sx={{
-                            background:
-                                'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, ' +
-                                'rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
-                        }}
-                        title={"Đang tải..."}
-                        position="top"
-                        actionPosition="left"
-                    />
-                </ImageListItem>
-            )
+            return (<ImageItem key={index} />)
         })
     } else if (isSuccess) {
-        content = images?.length
-            ? images?.map((item) => (
-                <ImageListItem key={item.url} sx={{ position: 'relative' }}>
-                    <img
-                        src={`${item.url}?w=575&fit=crop&auto=format`}
-                        srcSet={`${item.url}?w=575&fit=crop&auto=format&dpr=2 2x`}
-                        alt={item.name}
-                        loading="lazy"
-                        onClick={enlargeImage(item.url)}
-                    />
-                    <ImageListItemBar
-                        sx={{
-                            background:
-                                'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, ' +
-                                'rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
-                        }}
-                        title={item.name}
-                        position="top"
-                        actionIcon={
-                            <IconButton
-                                className="deleteImageButton"
-                                sx={{ color: '#f25a5a' }}
-                                aria-label={`delete ${item.name}`}
-                                disabled={(deleting && deletedImage === item.name)}
-                                onClick={() => handleDeleteImage(item.name)}
-                            >
-                                <HighlightOff />
-                            </IconButton>
-                        }
-                        actionPosition="left"
-                    />
-                    {(deleting && deletedImage === item.name) && (
-                        <CircularProgress
-                            size={40}
-                            sx={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                padding: '5px',
-                                marginTop: '-25px',
-                                marginLeft: '-25px',
-                                backgroundColor: '#000000a1',
-                                borderRadius: '50%'
-                            }}
-                        />
-                    )}
-                </ImageListItem>
-            ))
-            : <p>Không có hình ảnh nào</p>
+        const { ids, entities } = images;
+
+        content = ids?.length
+            ? ids?.map(imageId => {
+                const image = entities[imageId];
+
+                return (<ImageItem
+                    key={image.url}
+                    image={image}
+                    queryParams={{
+                        page: pagination.currPage,
+                        size: pagination.pageSize
+                    }}
+                    enlargeImage={enlargeImage} />)
+            })
+            : (preview.length === 0 ?
+                <p>Không có hình ảnh nào</p>
+                : null
+            )
     } else if (isError) {
         content = <p>Đã xảy ra lỗi khi tải ảnh!</p>
     }
-
-    const preview = files?.map((item) => (
-        <ImageListItem key={item.preview}>
-            <img
-                src={item.preview}
-                srcSet={item.preview}
-                alt={`preview ${item.name}`}
-                loading="lazy"
-                onLoad={() => { URL.revokeObjectURL(item.preview) }}
-            />
-            <ImageListItemBar
-                sx={{
-                    background:
-                        'linear-gradient(to bottom, rgba(252,227,0,0.7) 0%, ' +
-                        'rgba(252,227,0,0.3) 70%, rgba(252,227,0,0) 100%)',
-                }}
-                title={`${uploading ? 'Đang tải ' : 'Xem trước '} ${item.name}`}
-                position="top"
-                actionIcon={
-                    <IconButton
-                        className="deleteImageButton"
-                        sx={{ color: '#f25a5a' }}
-                        aria-label={`remove ${item.name}`}
-                        disabled={uploading}
-                        onClick={() => handleRemoveImage(item.name)}
-                    >
-                        <Block />
-                    </IconButton>
-                }
-                actionPosition="left"
-            />
-            {uploading && (
-                <CircularProgress
-                    size={40}
-                    color="secondary"
-                    sx={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        padding: '5px',
-                        marginTop: '-25px',
-                        marginLeft: '-25px',
-                        backgroundColor: '#000000a1',
-                        borderRadius: '50%'
-                    }}
-                />
-            )}
-        </ImageListItem>
-    ))
 
     return (
         <div className="imagesContainer">
@@ -269,13 +194,19 @@ export default function Images() {
                     onChange={handleChangeImages}
                 />
                 {errMsg && <span className="errorMsg">{errMsg}</span>}
-                <Box sx={{ width: 'auto', height: 900, overflowY: 'scroll' }}>
+                <Box sx={{ 
+                    width: 'auto', 
+                    height: 900, 
+                    overflowY: 'scroll',
+                    border: '0.5px solid lightblue',
+                    padding: '0 10px'
+                }} 
+                onScroll={handleScroll}>
                     <ImageList variant="masonry" cols={phoneBreakpoint ? 1 : 2} gap={6}>
-                        {content}
                         {preview}
+                        {content}
                     </ImageList>
                 </Box>
-                <ConfirmationDialog />
             </Container>
             <Dialog
                 fullScreen={phoneBreakpoint}
@@ -286,11 +217,12 @@ export default function Images() {
                 onClose={handleClose}
                 onClick={handleClose}
             >
-                <DialogContent sx={{display: 'flex', alignItems: 'center'}}>
-                    { image ?
-                        <img className="imageEnlarge" 
-                        loading="lazy"
-                        src={image}
+                <DialogContent sx={{ display: 'flex', alignItems: 'center' }}>
+                    {image ?
+                        <img className="imageEnlarge"
+                            alt={`${image.name}-enlarged`}
+                            loading="lazy"
+                            src={image}
                         />
                         : null
                     }

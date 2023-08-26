@@ -88,11 +88,13 @@ export default function PostContent({ post, commentsCount, previewMode }) {
         )}
       </Grid>
       <div className="postContent">
-        <Box display="flex" justifyContent="center">
+        <Box display="flex" justifyContent="center" height="100%" width="100%">
           { post ?
             <img className="postContentThumbnail" 
-              alt={`${post.slug}-thumbnail`} 
+              width="950"
+              height="550"
               loading="lazy"
+              alt={`${post.slug}-thumbnail`} 
               src={post.thumbnail}
             />
             :

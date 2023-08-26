@@ -1,9 +1,9 @@
 import { createSelector, createEntityAdapter } from "@reduxjs/toolkit";
 import { apiSlice } from "../../app/api/apiSlice";
 
-const commentsAdapater = createEntityAdapter({});
-
-const initialState = commentsAdapater.getInitialState({
+const commentsAdapter = createEntityAdapter({});
+const commentsSelector = commentsAdapter.getSelectors();
+const commentsInitialState = commentsAdapter.getInitialState({
     info: {
       currPage: 0,
       pageSize: 0,
@@ -25,14 +25,7 @@ export const commentsApiSlice = apiSlice.injectEndpoints({
                 const comment = { ...responseData, id: responseData._id};
                 return comment;
             },
-            providesTags: (result, error, arg) => {
-                if (result?.id) {
-                    return [
-                        { type: 'Comment', id: 'LIST' },
-                        { type: 'Comment', id: result?.id }
-                    ]
-                } else return [{ type: 'Comment', id: 'LIST' }]
-            }
+            providesTags: (result, error, id) => [{ type: 'Comment', id }]
         }),
         getComments: builder.query({
             query: (args) => {
@@ -51,23 +44,19 @@ export const commentsApiSlice = apiSlice.injectEndpoints({
                     comment.id = comment._id
                     return comment
                 });
-                return commentsAdapater.setAll({ ...initialState, info }, loadedComments)
+                return commentsAdapter.setAll({ ...commentsInitialState, info }, loadedComments)
             },
-            serializeQueryArgs: ({ endpointName }) => {
-                return endpointName;
+            serializeQueryArgs: ({ endpointName, queryArgs }) => {
+                return `${endpointName}-${queryArgs?.post}`
             },
-            merge: (currentCache, newItems, { arg }) => {
-                if (arg.page > 1) { //Only merge on load more
-                    currentCache.ids.filter(e => !newItems.ids.includes(e));
-                    currentCache.ids.push(...newItems.ids);
-                    currentCache.entities = {...currentCache.entities, ...newItems.entities};
-                    currentCache.info = newItems.info;
-                    return currentCache;
-                }
-                return newItems;
+            merge: (currentCache, newItems) => {
+                currentCache.info = newItems.info;
+                commentsAdapter.addMany(
+                    currentCache, commentsSelector.selectAll(newItems)
+                )
             },
             forceRefetch({ currentArg, previousArg }) {
-                return ((currentArg !== previousArg))
+                return (currentArg?.page !== previousArg?.page)
             },
             providesTags: (result, error, arg) => {
                 if (result?.ids) {
@@ -96,9 +85,15 @@ export const commentsApiSlice = apiSlice.injectEndpoints({
                 url: `/comments/${id}`,
                 method: 'DELETE'
             }),
-            invalidatesTags: (result, error, arg) => [
-                { type: 'Comment', id: arg.id }
-            ]
+            async onQueryStarted({ id, ...searchParams }, { dispatch, queryFulfilled  }) {
+                try {
+                    const { data: deleted } = await queryFulfilled
+                    const patchResult = dispatch(commentsApiSlice.util.updateQueryData("getComments", searchParams, (draft) => {
+                        commentsAdapter.removeOne(draft, id)
+                    }))
+                } catch {
+                }
+            }
         }),
     }),
 })
@@ -122,4 +117,10 @@ export const {
     selectById: selectCommentById,
     selectIds: selectCommentIds,
     selectEntities: selectCommentEntities
-} = commentsAdapater.getSelectors(state => selectCommentsData(state) ?? initialState)
+} = commentsAdapter.getSelectors(state => selectCommentsData(state) ?? commentsInitialState)
+
+export {
+    commentsSelector,
+    commentsAdapter,
+    commentsInitialState
+}

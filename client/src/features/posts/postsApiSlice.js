@@ -25,14 +25,7 @@ export const postsApiSlice = apiSlice.injectEndpoints({
                 const post = { ...responseData, id: responseData._id};
                 return post;
             },
-            providesTags: (result, error, arg) => {
-                if (result?.id) {
-                    return [
-                        { type: 'Post', id: 'LIST' },
-                        { type: 'Post', id: result?.id }
-                    ]
-                } else return [{ type: 'Post', id: 'LIST' }]
-            }
+            providesTags: (result, error, id) => [{ type: 'Post', id: result?.id }]
         }),
         getPosts: builder.query({
             query: (args) => {
@@ -101,17 +94,17 @@ export const postsApiSlice = apiSlice.injectEndpoints({
                 body: updatedPost,
                 formData: true
             }),
-            invalidatesTags: (result, error, arg) => [
-                { type: 'Post', id: arg.id }
+            invalidatesTags: (result, error, { id }) => [
+                { type: 'Post', id }
             ]
         }),
         deletePost: builder.mutation({
-            query: ({ id }) => ({
+            query: (id) => ({
                 url: `/posts/${id}`,
                 method: 'DELETE'
             }),
-            invalidatesTags: (result, error, arg) => [
-                { type: 'Post', id: arg.id }
+            invalidatesTags: (result, error, id) => [
+                { type: 'Post', id }
             ]
         }),
     }),
@@ -123,7 +116,8 @@ export const {
     useValidatePostMutation,
     useCreatePostMutation,
     useUpdatePostMutation,
-    useDeletePostMutation
+    useDeletePostMutation,
+    usePrefetch: usePrefetchPosts
 } = postsApiSlice
 
 export const selectPostsResult = postsApiSlice.endpoints.getPosts.select()

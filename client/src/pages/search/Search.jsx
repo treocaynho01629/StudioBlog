@@ -80,13 +80,14 @@ export default function Search() {
     useTitle(`Tìm kiếm - TAM PRODUCTION`);
 
     useEffect(() => {
-        if (!isLoading && isSuccess && posts) {
+        if (!isLoading && isSuccess && posts.info) {
             setPagination({ ...pagination, numberOfPages: posts?.info?.numberOfPages });
         }
-    }, [isSuccess])
+    }, [posts?.info])
 
     //#region handle
     const handlePageChange = (page) => {
+        setPagination({ ...pagination, currPage: page });
         if (page === 1) {
             searchParams.delete("page");
             setSearchParams(searchParams);
@@ -94,11 +95,11 @@ export default function Search() {
             searchParams.set("page", page);
             setSearchParams(searchParams);
         }
-        setPagination({ ...pagination, currPage: page });
     }
 
     const handleChangeSize = (newValue) => {
-        handlePageChange(1);
+        setPagination({...pagination, pageSize: newValue, currPage: 1});
+        searchParams.delete("page");
         if (newValue === defaultSize) {
             searchParams.delete("size");
             setSearchParams(searchParams);
@@ -106,11 +107,12 @@ export default function Search() {
             searchParams.set("size", newValue);
             setSearchParams(searchParams);
         }
-        setPagination({ ...pagination, pageSize: newValue });
     }
 
     const handleChangeTags = (event, value) => {
-        handlePageChange(1);
+        setFilters({ ...filters, tags: value });
+        setPagination({...pagination, currPage: 1});
+        searchParams.delete("page");
 
         if (value.length === 0) {
             searchParams.delete("tags");
@@ -119,14 +121,14 @@ export default function Search() {
             searchParams.set("tags", value);
             setSearchParams(searchParams);
         }
-        setFilters({ ...filters, tags: value });
     }
 
     const handleChangeAuthor = (event) => {
         event.preventDefault();
-        handlePageChange(1);
-
         const newAuthor = authorRef.current.value;
+        setFilters({ ...filters, author: newAuthor });
+        setPagination({...pagination, currPage: 1});
+        searchParams.delete("page");
 
         if (newAuthor === "") {
             searchParams.delete("author");
@@ -135,13 +137,14 @@ export default function Search() {
             searchParams.set("author", newAuthor);
             setSearchParams(searchParams);
         }
-        setFilters({ ...filters, author: newAuthor });
     }
 
     const handleChangeCate = (event) => {
         handlePageChange(1);
-
         const newCate = event.target.value;
+        setFilters({ ...filters, cate: newCate });
+        setPagination({...pagination, currPage: 1});
+        searchParams.delete("page");
 
         if (newCate === undefined) {
             searchParams.delete("cate");
@@ -150,7 +153,6 @@ export default function Search() {
             searchParams.set("cate", newCate);
             setSearchParams(searchParams);
         }
-        setFilters({ ...filters, cate: newCate });
     }
     //#endregion
 

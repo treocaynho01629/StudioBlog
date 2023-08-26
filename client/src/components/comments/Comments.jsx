@@ -1,10 +1,10 @@
 import './comments.css'
 import { Box, CircularProgress, TextField, TextareaAutosize } from '@mui/material';
 import { Chat as ChatIcon, Done } from '@mui/icons-material';
-import styled from '@emotion/styled';
-import Comment from '../comment/Comment';
 import { useEffect, useState } from 'react';
 import { useCreateCommentMutation, useGetCommentsQuery } from '../../features/comments/commentsApiSlice';
+import styled from '@emotion/styled';
+import Comment from '../comment/Comment';
 
 const CustomInput = styled(TextField)(({ theme }) => ({
     '& .MuiInputBase-root': {
@@ -58,6 +58,7 @@ export default function Comments({ postId, setCommentsCount }) {
         currPage: 1,
         pageSize: defaultSize,
         numberOfPages: 0,
+        totalElements: 0
     });
     const { data: comments, isLoading, isSuccess, isError } = useGetCommentsQuery({
         post: postId,
@@ -75,19 +76,27 @@ export default function Comments({ postId, setCommentsCount }) {
 
     useEffect(() => {
         if (!isLoading && isSuccess && comments) {
-            setPagination({ ...pagination, numberOfPages: comments?.info?.numberOfPages });
-            setCommentsCount(comments?.info?.totalElements);
+            setPagination({ ...pagination, 
+                numberOfPages: comments?.info?.numberOfPages,
+                totalElements: comments?.info?.totalElements
+            });
         }
     }, [comments])
+
+    useEffect(() => {
+        setCommentsCount(pagination?.totalElements);
+    }, [pagination.totalElements])
+
+    const decreaseCount = () => {
+        setPagination({ ...pagination, 
+            totalElements: pagination.totalElements - 1
+        });
+    }
 
     const handleLoadMore = () => {
         if (pagination.currPage < pagination.numberOfPages) {
             setPagination({ ...pagination, currPage: pagination.currPage + 1 });
         }
-    }
-
-    const reloadComments = () => {
-        setPagination({ ...pagination, currPage: 1 });
     }
 
     const handleToggleRemember = () => {
@@ -105,8 +114,6 @@ export default function Comments({ postId, setCommentsCount }) {
         e.preventDefault();
 
         if (validComment) {
-            reloadComments();
-
             try {
                 const newComment = {
                     fullName,
@@ -156,7 +163,16 @@ export default function Comments({ postId, setCommentsCount }) {
         commentsList = ids?.length
             ? ids.map(commendId => {
                 const comment = entities[commendId];
-                return (<Comment key={comment.id} comment={comment} reloadComments={reloadComments} />)
+                return (<Comment 
+                    key={comment.id} 
+                    comment={comment} 
+                    queryParams={{
+                        post: postId,
+                        page: pagination.currPage,
+                        size: pagination.pageSize
+                    }}
+                    decreaseCount={decreaseCount}
+                />)
             })
             : <p>Chưa có ý kiến nào</p>
     } else if (isError) {
@@ -166,7 +182,7 @@ export default function Comments({ postId, setCommentsCount }) {
     return (
         <div className="postComments">
             <p className="commentTitle">
-                <ChatIcon sx={{ marginRight: 1 }} />Ý kiến bạn đọc ({comments?.info?.totalElements || 0} bình luận)
+                <ChatIcon sx={{ marginRight: 1 }} />Ý kiến bạn đọc ({pagination.totalElements || 0} bình luận)
             </p>
             <div className="commentsContainer">
                 {commentsList}

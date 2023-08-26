@@ -30,6 +30,8 @@ Các dịch vụ **chụp ảnh, quay phim Đà Lạt** do <span style="color:or
 Chúng tôi sở hữu đội ngũ nhân viên giàu kinh nghiệm và đam mê với công việc. Ngoài ra, chúng tôi còn sở hữu thiết bị quay phim, chụp hình hiện đại, bắt trọn kỉ niệm đáng nhớ cho khách hàng.
 
 Với sự tận tâm và nhiệt huyết, <span style="color:darkblue">**TAM PRODUCTION**</span> cam kết sẽ đáp ứng mọi yêu cầu của khách hàng về dịch vụ chụp hình, quay phim Đà Lạt mang đến những sản phẩm chất lượng cao, đẳng cấp nhất.
+
+<span style="color:red">**ĐÂY LÀ TRANG TAM PRODUCTION CLONE**</span>
 `
 
 export default function About() {

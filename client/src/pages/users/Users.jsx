@@ -1,8 +1,8 @@
 import './user.css';
 import { Box, Container } from '@mui/material';
 import { AddCircleOutline as AddCircleOutlineIcon } from '@mui/icons-material';
-import { useEffect, useState } from 'react';
-import { useGetUsersQuery } from '../../features/users/usersApiSlice';
+import { useCallback, useEffect, useState } from 'react';
+import { useGetUsersQuery, usePrefetchUsers } from '../../features/users/usersApiSlice';
 import { Link, useSearchParams } from 'react-router-dom';
 import BreadCrumbs from '../../components/breadcrumbs/BreadCrumbs';
 import CustomPagination from '../../components/custom-pagination/CustomPagination';
@@ -11,6 +11,7 @@ import User from '../../components/user/User';
 
 const defaultSize = 8;
 export default function Users() {
+    useTitle(`Quản lý người dùng - TAM PRODUCTION`);
     const[searchParams, setSearchParams] = useSearchParams();
     const[pagination, setPagination] = useState({
         currPage: searchParams.get("page") || 1,
@@ -25,15 +26,35 @@ export default function Users() {
         refetchOnFocus: true,
         refetchOnMountOrArgChange: true
     });
-    useTitle(`Quản lý người dùng - TAM PRODUCTION`);
+    const prefetchPage = usePrefetchUsers('getUsers');
 
     useEffect(() => {
-        if (!isLoading && isSuccess && users){
+        if (!isLoading && isSuccess && users.info){
             setPagination({ ...pagination, numberOfPages: users?.info?.numberOfPages});
         }
-    }, [isSuccess])
+    }, [users?.info])
+
+    const prefetchNext = useCallback((page) => {
+        prefetchPage({
+            page,
+            size: pagination.pageSize 
+        })
+    }, [prefetchPage, pagination.currPage])
+
+    useEffect(() => {
+        if (pagination?.numberOfPages > 1 && (pagination?.currPage !== pagination?.numberOfPages)) {
+            prefetchNext(pagination?.currPage  + 1);
+        }
+    }, [users, pagination, prefetchNext])
+
+    const handlePrefetchNext = (page) => {
+        if (pagination?.numberOfPages > 1 && page >= 1 && (page <= pagination?.numberOfPages)) {
+            prefetchNext(page);
+        }
+    }
 
     const handlePageChange = (page) => {
+        setPagination({...pagination, currPage: page});
         if (page === 1){
             searchParams.delete("page");
             setSearchParams(searchParams);
@@ -41,11 +62,11 @@ export default function Users() {
             searchParams.set("page", page);
             setSearchParams(searchParams);
         }
-        setPagination({...pagination, currPage: page});
     }
 
     const handleChangeSize = (newValue) => {
-        handlePageChange(1);
+        setPagination({...pagination, pageSize: newValue, currPage: 1});
+        searchParams.delete("page");
         if (newValue === defaultSize){
             searchParams.delete("size");
             setSearchParams(searchParams);
@@ -53,7 +74,6 @@ export default function Users() {
             searchParams.set("size", newValue);
             setSearchParams(searchParams);
         }
-        setPagination({...pagination, pageSize: newValue});
     }
 
     let content;
@@ -89,7 +109,9 @@ export default function Users() {
                 {content}
                 <CustomPagination pagination={pagination}
                     onPageChange={handlePageChange}
-                    onSizeChange={handleChangeSize} />
+                    onSizeChange={handleChangeSize} 
+                    onPrefetch={handlePrefetchNext}
+                />
             </Container>
         </div>
     )

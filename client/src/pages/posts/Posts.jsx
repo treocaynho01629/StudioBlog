@@ -3,8 +3,8 @@ import BreadCrumbs from '../../components/breadcrumbs/BreadCrumbs';
 import { Autocomplete, Chip, Container, TextField, Grid, MenuItem, Box } from '@mui/material';
 import { AddCircleOutline as AddCircleOutlineIcon } from '@mui/icons-material';
 import { Link, useSearchParams } from 'react-router-dom';
-import { useGetPostsQuery } from '../../features/posts/postsApiSlice';
-import { useEffect, useRef, useState } from 'react';
+import { useGetPostsQuery, usePrefetchPosts } from '../../features/posts/postsApiSlice';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useGetCategoriesQuery } from '../../features/categories/categoriesApiSlice';
 import useTitle from '../../hooks/useTitle';
 import CustomPagination from '../../components/custom-pagination/CustomPagination';
@@ -59,6 +59,7 @@ const CustomInput = styled(TextField)(({ theme }) => ({
 
 const defaultSize = 8;
 export default function Search() {
+    useTitle(`Quản lý bài viết - TAM PRODUCTION`);
     const { id, isAdmin } = useAuth();
     const [searchParams, setSearchParams] = useSearchParams();
     const { data: categories, isLoading: loadingCates, isSuccess: catesDone, isError: catesError } = useGetCategoriesQuery();
@@ -66,6 +67,10 @@ export default function Search() {
         currPage: searchParams.get("page") || 1,
         pageSize: searchParams.get("size") || defaultSize,
         numberOfPages: 0,
+    }, {
+        pollingInterval: 15000,
+        refetchOnFocus: true,
+        refetchOnMountOrArgChange: true
     });
     const [filters, setFilters] = useState({
         tags: searchParams.get("tags") ? searchParams.get("tags").split(',') : [],
@@ -78,22 +83,41 @@ export default function Search() {
         cate: filters.cate,
         page: pagination.currPage,
         size: pagination.pageSize
-    }, {
-        pollingInterval: 15000,
-        refetchOnFocus: true,
-        refetchOnMountOrArgChange: true
     });
+    const prefetchPage = usePrefetchPosts('getPosts');
     const authorRef = useRef(null);
-    useTitle(`Quản lý bài viết - TAM PRODUCTION`);
 
     useEffect(() => {
-        if (!isLoading && isSuccess && posts) {
+        if (!isLoading && isSuccess && posts.info) {
             setPagination({ ...pagination, numberOfPages: posts?.info?.numberOfPages });
         }
-    }, [isSuccess])
+    }, [posts?.info])
+
+    const prefetchNext = useCallback((page) => {
+        prefetchPage({
+            tags: filters.tags.length !== 0 ? filters.tags : undefined,
+            author: filters.author ? filters.author : undefined,
+            cate: filters.cate,
+            page,
+            size: pagination.pageSize
+        })
+    }, [prefetchPage, pagination.currPage])
+
+    useEffect(() => {
+        if (pagination?.numberOfPages > 1 && (pagination?.currPage !== pagination?.numberOfPages)) {
+            prefetchNext(pagination?.currPage  + 1);
+        }
+    }, [posts, pagination, prefetchNext])
 
     //#region handle
+    const handlePrefetchNext = (page) => {
+        if (pagination?.numberOfPages > 1 && page >= 1 && (page <= pagination?.numberOfPages)) {
+            prefetchNext(page);
+        }
+    }
+
     const handlePageChange = (page) => {
+        setPagination({ ...pagination, currPage: page });
         if (page === 1) {
             searchParams.delete("page");
             setSearchParams(searchParams);
@@ -101,11 +125,11 @@ export default function Search() {
             searchParams.set("page", page);
             setSearchParams(searchParams);
         }
-        setPagination({ ...pagination, currPage: page });
     }
 
     const handleChangeSize = (newValue) => {
-        handlePageChange(1);
+        setPagination({ ...pagination, pageSize: newValue, currPage: 1 });
+        searchParams.delete("page");
         if (newValue === defaultSize) {
             searchParams.delete("size");
             setSearchParams(searchParams);
@@ -113,11 +137,12 @@ export default function Search() {
             searchParams.set("size", newValue);
             setSearchParams(searchParams);
         }
-        setPagination({ ...pagination, pageSize: newValue });
     }
 
     const handleChangeTags = (event, value) => {
-        handlePageChange(1);
+        setFilters({ ...filters, tags: value });
+        setPagination({ ...pagination, currPage: 1 });
+        searchParams.delete("page");
 
         if (value.length === 0) {
             searchParams.delete("tags");
@@ -126,14 +151,14 @@ export default function Search() {
             searchParams.set("tags", value);
             setSearchParams(searchParams);
         }
-        setFilters({ ...filters, tags: value });
     }
 
     const handleChangeAuthor = (event) => {
         event.preventDefault();
-        handlePageChange(1);
-
         const newAuthor = authorRef.current.value;
+        setFilters({ ...filters, author: newAuthor });
+        setPagination({ ...pagination, currPage: 1 });
+        searchParams.delete("page");
 
         if (newAuthor === "") {
             searchParams.delete("author");
@@ -142,13 +167,14 @@ export default function Search() {
             searchParams.set("author", newAuthor);
             setSearchParams(searchParams);
         }
-        setFilters({ ...filters, author: newAuthor });
     }
 
     const handleChangeCate = (event) => {
         handlePageChange(1);
-
         const newCate = event.target.value;
+        setFilters({ ...filters, cate: newCate });
+        setPagination({ ...pagination, currPage: 1 });
+        searchParams.delete("page");
 
         if (newCate === undefined) {
             searchParams.delete("cate");
@@ -157,12 +183,11 @@ export default function Search() {
             searchParams.set("cate", newCate);
             setSearchParams(searchParams);
         }
-        setFilters({ ...filters, cate: newCate });
     }
     //#endregion
 
+    //#region cates
     let catesList;
-
     if (loadingCates) {
         catesList = <MenuItem disabled value="">Đang tải...</MenuItem>
     } else if (catesDone) {
@@ -182,9 +207,10 @@ export default function Search() {
     } else if (catesError) {
         catesList = <MenuItem disabled value="">Lỗi danh mục</MenuItem>
     }
+    //#endregion
 
+    //#region content
     let content;
-
     if (isLoading) {
         content = [...new Array(pagination.pageSize)].map((element, index) => {
             return (<PostTab key={index} />)
@@ -205,6 +231,7 @@ export default function Search() {
     } else if (isError) {
         content = <p>Đã có lỗi xảy ra khi tải bài viết!</p>
     }
+    //#endregion
 
     return (
         <div className="postsContainer">
@@ -270,7 +297,9 @@ export default function Search() {
                 {content}
                 <CustomPagination pagination={pagination}
                     onPageChange={handlePageChange}
-                    onSizeChange={handleChangeSize} />
+                    onSizeChange={handleChangeSize} 
+                    onPrefetch={handlePrefetchNext}
+                />
             </Container>
         </div>
     )

@@ -5,7 +5,7 @@ import { useDeleteCommentMutation } from '../../features/comments/commentsApiSli
 import useAuth from '../../hooks/useAuth';
 import useConfirm from '../../hooks/useConfirm';
 
-export default function Comment({ comment, reloadComments }) {
+export default function Comment({ comment, queryParams, decreaseCount }) {
     const { isAdmin } = useAuth();
     const [deleteComment, { isLoading }] = useDeleteCommentMutation();
     const [ConfirmationDialog, confirmDelete] = useConfirm(
@@ -16,8 +16,11 @@ export default function Comment({ comment, reloadComments }) {
     const onDeleteClicked = async () => {
         const confirmation = await confirmDelete();
         if (confirmation) {
-            reloadComments();
-            await deleteComment({ id: comment?.id });
+            await deleteComment({ 
+                ...queryParams,
+                id: comment?.id 
+            });
+            decreaseCount();
         } else {
             console.log('cancel delete');
         }

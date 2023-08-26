@@ -54,7 +54,7 @@ export default function PersistLogin() {
                     sx={{ color: '#fff', zIndex: 9999, position: 'fixed' }}
                     open={true}
                 >
-                    <CircularProgress color="inherit" />&nbsp;Đang xác thực đăng nhập
+                    <CircularProgress color="inherit" />&nbsp;&nbsp;Đang xác thực đăng nhập
                 </Backdrop>
             </>
         )

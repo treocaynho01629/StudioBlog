@@ -1,0 +1,7 @@
+.imageItem {
+    min-height: 200px;
+    cursor: pointer;
+    background-color: whitesmoke;
+    height: 100%!important;
+    width: 100%!important;
+}

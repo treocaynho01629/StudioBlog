@@ -1,9 +1,9 @@
 import './breadcrumbs.css'
 import { Breadcrumbs, Typography } from "@mui/material";
 import { Link } from 'react-router-dom';
-import HomeIcon from '@mui/icons-material/Home';
 import { useSelector } from 'react-redux';
 import { selectCategoryById } from '../../features/categories/categoriesApiSlice';
+import HomeIcon from '@mui/icons-material/Home';
 
 export default function BreadCrumbs({ route, post }) {
   const category = useSelector(state => selectCategoryById(state, post?.category));

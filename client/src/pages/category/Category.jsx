@@ -28,12 +28,13 @@ export default function Category() {
     useTitle(`${category?.name.toUpperCase() || 'Danh mục'} - TAM PRODUCTION`);
 
     useEffect(() => {
-        if (!isLoading && isSuccess && posts){
+        if (!isLoading && isSuccess && posts.info){
             setPagination({ ...pagination, numberOfPages: posts?.info?.numberOfPages});
         }
-    }, [isSuccess])
+    }, [posts?.info])
 
     const handlePageChange = (page) => {
+        setPagination({...pagination, currPage: page});
         if (page === 1){
             searchParams.delete("page");
             setSearchParams(searchParams);
@@ -41,11 +42,11 @@ export default function Category() {
             searchParams.set("page", page);
             setSearchParams(searchParams);
         }
-        setPagination({...pagination, currPage: page});
     }
 
     const handleChangeSize = (newValue) => {
-        handlePageChange(1);
+        setPagination({...pagination, pageSize: newValue, currPage: 1});
+        searchParams.delete("page");
         if (newValue === defaultSize){
             searchParams.delete("size");
             setSearchParams(searchParams);
@@ -53,7 +54,6 @@ export default function Category() {
             searchParams.set("size", newValue);
             setSearchParams(searchParams);
         }
-        setPagination({...pagination, pageSize: newValue});
     }
 
     let content;

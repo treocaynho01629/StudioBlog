@@ -78,7 +78,7 @@ a {
 
 .postContentThumbnail {
     width: 90%!important;
-    min-height: 20vh;
+    height: 90%!important;
     object-fit: cover;
     border: 1px solid lightsteelblue;
     padding: 10px;

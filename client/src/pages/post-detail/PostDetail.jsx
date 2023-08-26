@@ -16,8 +16,6 @@ export default function PostDetail() {
   const [commentsCount, setCommentsCount] = useState(0);
   useTitle(`${post?.title || 'Bài viết'} - TAM PRODUCTION`);
 
-  console.log(isSuccess);
-
   let content;
   if (isLoading) {
     content = <PostContent />

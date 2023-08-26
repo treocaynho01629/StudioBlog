@@ -1,7 +1,7 @@
 import './custom-pagination.css';
 import { PaginationItem, Stack, TextField, MenuItem, Pagination } from '@mui/material';
-import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
+import styled from '@emotion/styled';
 
 const StyledPageItem = styled(PaginationItem)(({ theme }) => ({
     borderRadius: 0,
@@ -78,9 +78,16 @@ const CustomInput = styled(TextField)(({ theme }) => ({
 }));
 
 export default function CustomPagination(props) {
-    const { pagination, onPageChange, onSizeChange } = props;
+    const { pagination, onPageChange, onSizeChange, onPrefetch } = props;
     const [page, setPage] = useState(pagination.currPage);
     const [count, setCount] = useState(pagination.numberOfPages);
+
+    const handlePrefetch = (event, page) => {
+        const prefetchPage = Number(event.target.textContent);
+        if (prefetchPage && onPrefetch) {
+            onPrefetch(prefetchPage);
+        }
+    }
 
     const handlePageChange = (event, page) => {
         if (onPageChange) {
@@ -108,6 +115,7 @@ export default function CustomPagination(props) {
                     onChange={handlePageChange}
                     renderItem={(item) => (
                         <StyledPageItem
+                            onMouseEnter={handlePrefetch}
                             {...item}
                         />
                     )} />

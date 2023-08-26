@@ -2,12 +2,6 @@
     margin-top: 150px;
 }
 
-.imagesContainer img {
-    min-height: 200px;
-    cursor: pointer;
-    background-color: whitesmoke;
-}
-
 .imageEnlarge {
     width: 100%;
     object-fit: cover;

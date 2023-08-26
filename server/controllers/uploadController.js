@@ -46,23 +46,35 @@ const getListImages = async (req, res) => {
 
     const database = mongoClient.db(process.env.DATABASE_NAME);
     const images = database.collection('images' + ".files");
+    const total = await database.collection('images' + ".files").estimatedDocumentCount() || 0;
 
-    const cursor = images.find({});
+    if (total === 0) return res.status(500).json({ message: "Not found any images!" });
 
-    if ((await cursor.count()) === 0) {
-      return res.status(500).json({ message: "Not found any images!" });
-    }
+    //Pagination
+    const page = req.query.page ? (Number(req.query.page) - 1) : 0;
+    const size = req.query.size ? Number(req.query.size) : 8;
+    const startIndex = page * size;
+    const cursor = images.find({}).sort({ _id: -1 }).limit(size).skip(startIndex);
 
     const baseUrl = req.protocol + "://" + req.headers.host + "/api/images/"
     let fileInfos = [];
     await cursor.forEach((doc) => {
       fileInfos.push({
+        id: doc._id,
         name: doc.filename,
         url: baseUrl + doc.filename,
       });
     });
 
-    return res.status(200).json(fileInfos);
+    res.status(200).json({ 
+        data: fileInfos, 
+        info: {
+            currPage: page, 
+            pageSize: size,
+            totalElements: total,
+            numberOfPages: Math.ceil(total / size)
+        }
+    });
   } catch (err) {
     return res.status(500).json(err);
   }
