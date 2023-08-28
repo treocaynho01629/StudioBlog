@@ -1,5 +1,5 @@
 const allowedOrigins = [
-    'http://localhost:3000'
+    process.env.FRONT_URL
 ]
 
 const corsOptions = {
