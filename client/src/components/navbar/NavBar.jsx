@@ -1,5 +1,5 @@
 import './navbar.css'
-import { AppBar, Stack, Grid, Collapse, useScrollTrigger, Typography, Container, Menu, MenuItem, ListItemIcon, Divider, ListItem, List, ListItemText, ListItemButton, SwipeableDrawer } from '@mui/material'
+import { AppBar, Stack, Grid, Collapse, useScrollTrigger, Typography, Container, Menu, MenuItem, ListItemIcon, Divider, ListItem, List, ListItemText, ListItemButton, SwipeableDrawer, Skeleton, Backdrop, CircularProgress } from '@mui/material'
 import { Phone as PhoneIcon, Mail as MailIcon, Menu as MenuIcon, Logout, Speed, Portrait, Person, ManageAccounts as AdminIcon } from '@mui/icons-material'
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -69,7 +69,7 @@ export default function NavBar(props) {
     const { username, isAdmin } = useAuth();
     const [openDrawer, setOpenDrawer] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
-    const [signout, { isSuccess: loggedOut }] = useSignoutMutation();
+    const [signout, { isLoading: signingOut, isSuccess: loggedOut }] = useSignoutMutation();
     const { data: categories, isLoading, isSuccess } = useGetCategoriesQuery();
     const open = Boolean(anchorEl);
     const navigate = useNavigate();
@@ -107,8 +107,16 @@ export default function NavBar(props) {
     let catesTab;
 
     if (isLoading) {
-        catesList = <p>Loading...</p>
-        catesTab = <p>Loading...</p>
+        catesList = <Typography component="div" variant={'body1'} marginX={2}><Skeleton width="90px" /></Typography>
+        catesTab = (
+            <ListItem disablePadding>
+                <ListItemButton className="tabDrawer">
+                    <ListItemText inset>
+                        <Typography component="div" variant={'body1'}><Skeleton width="90px" /></Typography>
+                    </ListItemText>
+                </ListItemButton>
+            </ListItem>
+        )
     } else if (isSuccess) {
         const { ids, entities } = categories;
 
@@ -189,11 +197,11 @@ export default function NavBar(props) {
                         </ListItemButton>
                     </ListItem>
                     <ListItem disablePadding>
-                        <ListItemButton className="tabDrawer" onClick={handleSignout}>
+                        <ListItemButton className="tabDrawer" onClick={handleSignout} disabled={signingOut}>
                             <ListItemIcon>
                                 <Logout />
                             </ListItemIcon>
-                            <ListItemText primary={'ĐĂNG XUẤT'} />
+                            <ListItemText primary={ signingOut ? 'ĐANG ĐĂNG XUẤT' : 'ĐĂNG XUẤT'} />
                         </ListItemButton>
                     </ListItem>
                 </>
@@ -305,11 +313,11 @@ export default function NavBar(props) {
                                             Quản lý
                                         </Link>
                                     </MenuItem>
-                                    <MenuItem onClick={handleSignout}>
+                                    <MenuItem onClick={handleSignout} disabled={signingOut}>
                                         <ListItemIcon>
                                             <Logout fontSize="small" />
                                         </ListItemIcon>
-                                        Đăng xuất
+                                        { signingOut ? 'Đang đăng xuất' : 'Đăng xuất'}
                                     </MenuItem>
                                 </Menu>
                             </div>
@@ -317,6 +325,15 @@ export default function NavBar(props) {
                     </Stack>
                 </Container>
             </AppBar>
+            { signingOut 
+            ? 
+            <Backdrop
+                sx={{ color: '#fff', zIndex: 9999, position: 'fixed' }}
+                open={signingOut}
+            >
+                <CircularProgress color="inherit" />&nbsp;&nbsp;Đang đăng xuất...
+            </Backdrop>
+            : null}
         </div>
     )
 }
