@@ -21,6 +21,8 @@ const PORT = process.env.PORT || 5000;
 
 connectDB();
 
+app.enable('trust proxy');
+
 app.use(logger);
 
 app.use(cors(corsOptions));
