@@ -67,10 +67,6 @@ export default function Search() {
         currPage: searchParams.get("page") || 1,
         pageSize: searchParams.get("size") || defaultSize,
         numberOfPages: 0,
-    }, {
-        pollingInterval: 15000,
-        refetchOnFocus: true,
-        refetchOnMountOrArgChange: true
     });
     const [filters, setFilters] = useState({
         tags: searchParams.get("tags") ? searchParams.get("tags").split(',') : [],
@@ -83,6 +79,10 @@ export default function Search() {
         cate: filters.cate,
         page: pagination.currPage,
         size: pagination.pageSize
+    }, {
+        pollingInterval: 15000,
+        refetchOnFocus: true,
+        refetchOnMountOrArgChange: true
     });
     const prefetchPage = usePrefetchPosts('getPosts');
     const authorRef = useRef(null);
