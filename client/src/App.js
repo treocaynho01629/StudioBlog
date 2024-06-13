@@ -27,6 +27,7 @@ import Images from "./pages/images/Images";
 import Manage from "./pages/manage/Manage";
 import Profile from "./pages/profile/Profile";
 import ScrollToTop from "./components/scroll-to-top/ScrollToTop";
+import CustomSnackbar from "./components/custom-snackbar/CustomSnackbar";
 
 function App() {
   useTitle("TAM PRODUCTION");
@@ -34,6 +35,7 @@ function App() {
 
   return (
     <>
+      <CustomSnackbar {...{ variant: 'warning', message: 'Server có thể mất một lúc để khởi động!', duration: 30000 }} />
       <NavBar />
       <ScrollToTop />
       <Routes>
