@@ -8,7 +8,7 @@
     "date-fns": "^2.30.0",
     "dompurify": "^3.0.5",
     "dotenv": "^16.3.1",
-    "express": "^4.18.2",
+    "express": "^4.21.1",
     "express-rate-limit": "^6.8.0",
     "express-validator": "^7.0.1",
     "googleapis": "^122.0.0",
