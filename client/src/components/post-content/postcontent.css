@@ -29,6 +29,7 @@ a {
 .leftInfo {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .rightInfo {
@@ -42,6 +43,10 @@ a {
     align-items: center;
     margin-right: 15px;
     color: #666666;
+
+    @media (max-width: 768px) {
+        font-size: 14px;
+    }
 }
 
 .infoButton {
@@ -56,6 +61,19 @@ a {
     border: dashed 1px;
     cursor: pointer;
     position: relative;
+
+    @media (max-width: 768px) {
+        padding: 0 8px;
+        font-size: 14px;
+    }
+}
+
+.infoButton.delete {
+    margin-left: 15px;
+
+    @media (max-width: 768px) {
+        margin-left: 8px;
+    }
 }
 
 .infoButton:hover {
@@ -148,6 +166,11 @@ a {
     transition: all ease-in-out 0.1s;
     cursor: pointer;
     white-space: nowrap;
+
+    @media (max-width: 768px) {
+        font-size: 14px;
+        padding: 2px 5px;
+    }
 }
 
 .smallTag:hover {

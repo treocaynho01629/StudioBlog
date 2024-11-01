@@ -332,7 +332,7 @@ export default function Profile() {
               </Grid>
             </Grid>
             {editMode ?
-              <Box display="flex" alignItems="center">
+              <Box display="flex" alignItems="center" mt={2}>
                 <button
                   className="mainButton"
                   disabled={updating || deleting || !validProfile}

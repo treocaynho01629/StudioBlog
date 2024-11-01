@@ -1,33 +1,36 @@
+import { lazy } from "react";
 import { Route, Routes } from "react-router-dom";
+import useTitle from "./hooks/useTitle";
+import useAuth from "./hooks/useAuth";
+import Loadable from "./components/layout/Loadable";
 import Footer from "./components/footer/Footer";
 import NavBar from "./components/navbar/NavBar";
-import Home from "./pages/home/Home";
-import Category from "./pages/category/Category";
-import NewPost from "./pages/new-post/NewPost";
-import PostDetail from "./pages/post-detail/PostDetail";
-import Login from "./pages/login/Login";
-import Register from "./pages/register/Register";
-import EditPost from "./pages/edit-post/EditPost";
 import PersistLogin from "./features/auth/PersistLogin";
 import RequireAuth from "./features/auth/RequireAuth";
-import useAuth from "./hooks/useAuth";
 import Unauthorized from "./pages/unauthorized/Unauthorized";
 import Error from "./pages/error/Error";
 import Prefetch from "./features/auth/Prefetch";
-import Video from "./pages/video/Video";
-import useTitle from "./hooks/useTitle";
-import Contact from "./pages/contact/Contact";
-import About from "./pages/about/About";
-import Search from "./pages/search/Search";
-import Posts from "./pages/posts/Posts";
-import Users from "./pages/users/Users";
-import NewUser from "./pages/new-user/NewUser";
-import EditUser from "./pages/edit-user/EditUser";
-import Images from "./pages/images/Images";
-import Manage from "./pages/manage/Manage";
-import Profile from "./pages/profile/Profile";
 import ScrollToTop from "./components/scroll-to-top/ScrollToTop";
-import CustomSnackbar from "./components/custom-snackbar/CustomSnackbar";
+import Reachable from "./components/layout/Reachable";
+
+const Video = Loadable(lazy(() => import("./pages/video/Video")));
+const Contact = Loadable(lazy(() => import("./pages/contact/Contact")));
+const About = Loadable(lazy(() => import("./pages/about/About")));
+const Search = Loadable(lazy(() => import("./pages/search/Search")));
+const Posts = Loadable(lazy(() => import("./pages/posts/Posts")));
+const Users = Loadable(lazy(() => import("./pages/users/Users")));
+const NewUser = Loadable(lazy(() => import("./pages/new-user/NewUser")));
+const EditUser = Loadable(lazy(() => import("./pages/edit-user/EditUser")));
+const Images = Loadable(lazy(() => import("./pages/images/Images")));
+const Manage = Loadable(lazy(() => import("./pages/manage/Manage")));
+const Profile = Loadable(lazy(() => import("./pages/profile/Profile")));
+const Home = Loadable(lazy(() => import("./pages/home/Home")));
+const Category = Loadable(lazy(() => import("./pages/category/Category")));
+const NewPost = Loadable(lazy(() => import("./pages/new-post/NewPost")));
+const PostDetail = Loadable(lazy(() => import("./pages/post-detail/PostDetail")));
+const Login = Loadable(lazy(() => import("./pages/login/Login")));
+const Register = Loadable(lazy(() => import("./pages/register/Register")));
+const EditPost = Loadable(lazy(() => import("./pages/edit-post/EditPost")));
 
 function App() {
   useTitle("TAM PRODUCTION");
@@ -35,7 +38,7 @@ function App() {
 
   return (
     <>
-      <CustomSnackbar {...{ variant: 'warning', message: 'Server có thể mất một lúc để khởi động!', duration: 30000 }} />
+      <Reachable/>
       <NavBar />
       <ScrollToTop />
       <Routes>

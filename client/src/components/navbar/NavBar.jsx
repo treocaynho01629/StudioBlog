@@ -1,15 +1,17 @@
 import './navbar.css'
-import { AppBar, Stack, Grid, Collapse, useScrollTrigger, Typography, Container, Menu, MenuItem, ListItemIcon, Divider, ListItem, List, ListItemText, ListItemButton, SwipeableDrawer, Skeleton, Backdrop, CircularProgress } from '@mui/material'
-import { Phone as PhoneIcon, Mail as MailIcon, Menu as MenuIcon, Logout, Speed, Portrait, Person, ManageAccounts as AdminIcon } from '@mui/icons-material'
+import { AppBar, Grid, Typography, Container, Menu, MenuItem, ListItemIcon, Skeleton, useMediaQuery } from '@mui/material'
+import { Phone as PhoneIcon, Mail as MailIcon, Menu as MenuIcon, Logout, Speed, Portrait, Person, ManageAccounts } from '@mui/icons-material'
 import { NavLink, Link, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState, lazy } from 'react';
 import { useSignoutMutation } from '../../features/auth/authApiSlice';
 import { useGetCategoriesQuery } from '../../features/categories/categoriesApiSlice';
 import { setPersist } from '../../features/auth/authSlice';
 import { useDispatch } from 'react-redux';
 import useAuth from '../../hooks/useAuth';
 
-const drawerWidth = 240;
+const NavDrawer = lazy(() => import("./NavDrawer"));
+const Pending = lazy(() => import("../layout/Pending"));
+
 const tabs = [{
     name: 'TRANG CHỦ',
     url: '/'
@@ -22,23 +24,6 @@ const tabs = [{
     name: 'VIDEO',
     url: '/videos'
 }]
-
-function HideOnScroll(props) {
-    const { children, window } = props;
-
-    const trigger = useScrollTrigger({
-        disableHysteresis: true,
-        threshold: 100,
-        target: window ? window() : undefined,
-    });
-
-    return (
-        <Collapse className={"top-header"}
-            in={!trigger}>
-            {children}
-        </Collapse>
-    );
-}
 
 const menuStyle = {
     overflow: 'visible',
@@ -65,12 +50,12 @@ const menuStyle = {
 }
 
 export default function NavBar(props) {
-    const { window } = props;
     const { username, isAdmin } = useAuth();
     const [openDrawer, setOpenDrawer] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
     const [signout, { isLoading: signingOut, isSuccess: loggedOut }] = useSignoutMutation();
     const { data: categories, isLoading, isSuccess } = useGetCategoriesQuery();
+    const mobileMode = useMediaQuery('(max-width:768px)');
     const open = Boolean(anchorEl);
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -104,19 +89,8 @@ export default function NavBar(props) {
     };
 
     let catesList;
-    let catesTab;
-
     if (isLoading) {
         catesList = <Typography component="div" variant={'body1'} marginX={2}><Skeleton width="90px" /></Typography>
-        catesTab = (
-            <ListItem disablePadding>
-                <ListItemButton className="tabDrawer">
-                    <ListItemText inset>
-                        <Typography component="div" variant={'body1'}><Skeleton width="90px" /></Typography>
-                    </ListItemText>
-                </ListItemButton>
-            </ListItem>
-        )
     } else if (isSuccess) {
         const { ids, entities } = categories;
 
@@ -131,160 +105,57 @@ export default function NavBar(props) {
                 )
             })
             : null
-
-        catesTab = ids?.length
-            ? ids?.map(cateId => {
-                const cate = entities[cateId];
-
-                return (
-                    <ListItem key={cateId} disablePadding>
-                        <ListItemButton className="tabDrawer" onClick={handleNavigate(`/category/${cate.type}`)}>
-                            <ListItemText sx={{textTransform: 'uppercase'}} inset primary={cate.name} />
-                        </ListItemButton>
-                    </ListItem>
-                )
-            })
-            : null
     }
 
-    const container = window !== undefined ? () => window().document.body : undefined;
-
-    const drawer = (
-        <div>
-            <div className="fullLogo">
-                <img className="fullLogoImage" alt="logo" src={require(`../../assets/logo.png`)}/>
-                <div className="logoText">AM 
-                    <div className="logoTextAlt">
-                        <span className="logoTextSmall">PRODUCTION</span>
-                        <span className="logoInfo">WEEDING-EVENT-TVC-LIVESTREAM</span>
-                    </div>
-                </div>
-            </div>
-            <Divider />
-            <List>
-                {tabs.map((tab) => (
-                    <ListItem key={tab.name} disablePadding>
-                        <ListItemButton className="tabDrawer" onClick={handleNavigate(tab.url)}>
-                            <ListItemText inset primary={tab.name} />
-                        </ListItemButton>
-                    </ListItem>
-                ))}
-                {catesTab}
-                <ListItem disablePadding>
-                    <ListItemButton className="tabDrawer" onClick={handleNavigate('/contact')}>
-                        <ListItemText inset primary={'LIÊN HỆ'} />
-                    </ListItemButton>
-                </ListItem>
-            </List>
-            <Divider />
-            <List>
-                { username ?
-                <>
-                    <ListItem disablePadding>
-                        <ListItemButton className="tabDrawer" onClick={handleNavigate('profile')}>
-                            <ListItemIcon>
-                                <Portrait />
-                            </ListItemIcon>
-                            <ListItemText primary={'HỒ SƠ'} />
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem disablePadding>
-                        <ListItemButton className="tabDrawer" onClick={handleNavigate('/manage')}>
-                            <ListItemIcon>
-                                <Speed />
-                            </ListItemIcon>
-                            <ListItemText primary={'QUẢN LÝ'} />
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem disablePadding>
-                        <ListItemButton className="tabDrawer" onClick={handleSignout} disabled={signingOut}>
-                            <ListItemIcon>
-                                <Logout />
-                            </ListItemIcon>
-                            <ListItemText primary={ signingOut ? 'ĐANG ĐĂNG XUẤT' : 'ĐĂNG XUẤT'} />
-                        </ListItemButton>
-                    </ListItem>
-                </>
-                :
-                <ListItem disablePadding>
-                    <ListItemButton className="tabDrawer" onClick={handleNavigate('/login')}>
-                        <ListItemIcon>
-                            {isAdmin ? <AdminIcon /> : <Person />}
-                        </ListItemIcon>
-                        <ListItemText sx={{textTransform: 'uppercase'}} primary={username ? username : 'ĐĂNG NHẬP'} />
-                    </ListItemButton>
-                </ListItem>
-                }
-            </List>
-        </div>
-    );
-
     return (
-        <div className="navContainer">
-            <SwipeableDrawer
-            container={container}
-            variant="temporary"
-            open={openDrawer}
-            onOpen={toggleDrawer(true)}
-            onClose={toggleDrawer(false)}
-            disableSwipeToOpen={false}
-            ModalProps={{
-                keepMounted: true,
-            }}
-            sx={{
-                display: 'block',
-                '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-                ["@media (min-width:768px)"]: { display: 'none' }
-            }}
-            >
-                {drawer}
-            </SwipeableDrawer>
-            <AppBar sx={{ backgroundColor: 'white' }} position="fixed">
+        <>
+            {mobileMode ?
+                <Suspense fallback={null}>
+                    <NavDrawer {...{
+                        openDrawer, toggleDrawer, handleNavigate, isLoading, isSuccess, categories,
+                        tabs, username, isAdmin, signingOut, handleSignout
+                    }} />
+                </Suspense>
+                :
+                <div className="top">
+                    <Container fluid maxWidth="lg">
+                        <Grid container>
+                            <Grid item xs={12} md={6}>
+                                <div className="topLeft">
+                                    <div className="contact"><PhoneIcon sx={{ fontSize: 14, marginRight: '5px' }} />0908747742</div>
+                                    <div className="contact"><MailIcon sx={{ fontSize: 14, marginRight: '5px' }} /> tamproduction102@gmail.com</div>
+                                </div>
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <div className="topRight">
+                                    <div className="contact">
+                                        <Typography className="description">TAM PRODUCTION – Cung cấp dịch vụ quay phim, chụp ảnh chuyên nghiệp tại Đà Lạt</Typography>
+                                    </div>
+                                </div>
+                            </Grid>
+                        </Grid>
+                    </Container>
+                </div>
+            }
+            <AppBar sx={{ backgroundColor: 'white' }} position="sticky" top={-0.5}>
                 <Container fluid maxWidth="lg">
-                    <Stack sx={{ width: '100%' }}>
-                        <HideOnScroll {...props}>
-                            <div className="top">
-                                <Grid container>
-                                    <Grid item xs={12} md={6}>
-                                        <div className="topLeft">
-                                            <div className="contact"><PhoneIcon sx={{ fontSize: 14, marginRight: '5px' }} />0908747742</div>
-                                            <div className="contact"><MailIcon sx={{ fontSize: 14, marginRight: '5px' }} /> tamproduction102@gmail.com</div>
-                                        </div>
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <div className="topRight">
-                                            <div className="contact">
-                                                <Typography className="description">TAM PRODUCTION – Cung cấp dịch vụ quay phim, chụp ảnh chuyên nghiệp tại Đà Lạt</Typography>
-                                            </div>
-                                        </div>
-                                    </Grid>
-                                </Grid>
-                            </div>
-                        </HideOnScroll>
-                        <div className="bottom">
-                            <div className="bottomLeft">
-                                <Link to="/">
-                                    <img className="logoImage" alt="logo" src={require(`../../assets/logo.png`)} />
-                                </Link>
-                            </div>
-                            <div className="bottomCenter">
-                                <ul className="tabList">
-                                    {tabs.map((tab) => (
-                                        <li className="tab" key={tab.name}><NavLink className="link" to={tab.url}>{tab.name}</NavLink></li>
-                                    ))}
-                                    {catesList}
-                                    <li className="tab"><NavLink className="link" to="/contact">LIÊN HỆ</NavLink></li>
-                                </ul>
-                            </div>
-                            <div className="bottomRight">
-                                <button className="drawerButton" onClick={toggleDrawer(true)}>
-                                    <MenuIcon sx={{ fontSize: 26 }} />
-                                </button>
-                                <button className="signUpButton" onClick={handleClick}>
-                                    <p>{username ? username : 'Đăng nhập'}</p>
-                                    {isAdmin ? <AdminIcon sx={{ fontSize: 26, marginLeft: 1 }} />
-                                        : <Person sx={{ fontSize: 26, marginLeft: 1 }} />}
-                                </button>
+                    <div className="bottom">
+                        <div className="bottomLeft">
+                            <Link to="/">
+                                <img className="logoImage" alt="logo" src={require(`../../assets/logo.png`)} />
+                            </Link>
+                        </div>
+                        {!mobileMode &&
+                            <>
+                                <div className="bottomCenter">
+                                    <ul className="tabList">
+                                        {tabs.map((tab) => (
+                                            <li className="tab" key={tab.name}><NavLink className="link" to={tab.url}>{tab.name}</NavLink></li>
+                                        ))}
+                                        {catesList}
+                                        <li className="tab"><NavLink className="link" to="/contact">LIÊN HỆ</NavLink></li>
+                                    </ul>
+                                </div>
                                 <Menu
                                     anchorEl={anchorEl}
                                     open={open}
@@ -317,23 +188,25 @@ export default function NavBar(props) {
                                         <ListItemIcon>
                                             <Logout fontSize="small" />
                                         </ListItemIcon>
-                                        { signingOut ? 'Đang đăng xuất' : 'Đăng xuất'}
+                                        {signingOut ? 'Đang đăng xuất' : 'Đăng xuất'}
                                     </MenuItem>
                                 </Menu>
-                            </div>
+                            </>
+                        }
+                        <div className="bottomRight">
+                            <button className="drawerButton" onClick={toggleDrawer(true)}>
+                                <MenuIcon sx={{ fontSize: 26 }} />
+                            </button>
+                            <button className="signUpButton" onClick={handleClick}>
+                                <p>{username ? username : 'Đăng nhập'}</p>
+                                {isAdmin ? <ManageAccounts sx={{ fontSize: 26, marginLeft: 1 }} />
+                                    : <Person sx={{ fontSize: 26, marginLeft: 1 }} />}
+                            </button>
                         </div>
-                    </Stack>
+                    </div>
                 </Container>
             </AppBar>
-            { signingOut 
-            ? 
-            <Backdrop
-                sx={{ color: '#fff', zIndex: 9999, position: 'fixed' }}
-                open={signingOut}
-            >
-                <CircularProgress color="inherit" />&nbsp;&nbsp;Đang đăng xuất...
-            </Backdrop>
-            : null}
-        </div>
+            {signingOut && <Suspense fallback={null}><Pending open={signingOut} message={'Đang đăng xuất...'} /></Suspense>}
+        </>
     )
 }

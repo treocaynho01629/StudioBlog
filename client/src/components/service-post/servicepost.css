@@ -11,6 +11,10 @@
     height: 280px;
     object-fit: cover;
     transition: all 0.25s ease;
+
+    @media (max-width: 768px) {
+        height: 180px;
+    }
 }
 
 .servicePostTitle {
@@ -27,6 +31,10 @@
     background-color: rgba(0, 0, 0, 0.5);
     font-family: 'Roboto', sans-serif;
     transition: all 0.25s ease;
+
+    @media (max-width: 768px) {
+        font-size: 12px;
+    }
 }
 
 .servicePostContainer:hover > .servicePostImage {

@@ -3,6 +3,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
 const cors = require("cors");
+const cron = require('node-cron');
+const compression = require('compression');
 const corsOptions = require("./configs/corsOption");
 const { logger, logEvents } = require("./middlewares/logger");
 const errorHandler = require("./middlewares/errorHandler");
@@ -21,11 +23,18 @@ const PORT = process.env.PORT || 5000;
 
 connectDB();
 
+cron.schedule('*/12 * * * *', () => {
+    const currentTime = new Date().toLocaleString();
+    console.log(`Health check at: ${currentTime}`);
+});
+
 app.enable('trust proxy');
 
 app.use(logger);
 
 app.use(cors(corsOptions));
+
+app.use(compression());
 
 app.use(express.json());
 

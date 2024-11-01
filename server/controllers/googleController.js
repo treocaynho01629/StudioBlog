@@ -1,5 +1,5 @@
 const { default: axios } = require("axios");
-const {google} = require("googleapis");
+const { google } = require("googleapis");
 
 const apiKey = process.env.API_KEY;
 const youtube = google.youtube({
@@ -20,15 +20,15 @@ const getVideos = async (req, res, next) => {
             maxResults: amount
         });
 
-        const videos = response.data.items.map((item) => { 
-            return { 
-                videoId: item.snippet.resourceId.videoId, 
+        const videos = response.data.items.map((item) => {
+            return {
+                videoId: item.snippet.resourceId.videoId,
                 title: item.snippet.title,
                 thumbnail: item.snippet.thumbnails.maxres.url
-            } 
+            }
         });
         res.status(200).json(videos);
-    } catch(err) {
+    } catch (err) {
         next(err);
     }
 }
@@ -38,18 +38,18 @@ const getReviews = async (req, res, next) => {
         const placeId = 'ChIJs-ARcbATcTERIH6s54a3f00';
         const url = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&language=vi&key=${apiKey}`
         const response = await axios.get(url);
-        const reviews = response.data.result?.reviews?.map((review) => { 
-            return { 
-                author: review.author_name, 
+        const reviews = response.data.result?.reviews?.map((review) => {
+            return {
+                author: review.author_name,
                 content: review.text,
                 rating: review.rating,
                 time: review.relative_time_description,
                 avatar: review.profile_photo_url,
                 url: review.author_url
-            } 
+            }
         });
-	    res.status(200).json(reviews);
-    } catch(err) {
+        res.status(200).json(reviews);
+    } catch (err) {
         next(err);
     }
 }

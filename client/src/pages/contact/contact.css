@@ -1,6 +1,10 @@
 .contactContainer {
-    margin-top: 150px;
     margin-bottom: 150px;
+    margin-top: 16px;
+
+    @media (min-width: 768px) {
+        margin-top: 24px;
+    }
 }
 
 .contactForm {

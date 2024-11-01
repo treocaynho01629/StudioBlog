@@ -61,7 +61,7 @@ export default function PersistLogin() {
     } else if (isError) {
         console.log("Lỗi xác thực!");
         content = (
-            <div style={{marginTop: '150px'}}>
+            <div style={{marginTop: '16px'}}>
                 <Container fluid maxWidth="lg">
                     <p className="errMsg">{`Đã xảy ra lỗi khi xác thực đăng nhập: ${error?.data?.message}`}</p>
                     <p>Vui lòng <Link to="/login"><b className="option">ĐĂNG NHẬP LẠI</b></Link></p>

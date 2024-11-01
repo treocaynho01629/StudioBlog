@@ -1,7 +1,7 @@
 import './comments.css'
 import { Box, CircularProgress, TextField, TextareaAutosize } from '@mui/material';
 import { Chat as ChatIcon, Done } from '@mui/icons-material';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { useCreateCommentMutation, useGetCommentsQuery } from '../../features/comments/commentsApiSlice';
 import styled from '@emotion/styled';
 import Comment from '../comment/Comment';
@@ -76,7 +76,8 @@ export default function Comments({ postId, setCommentsCount }) {
 
     useEffect(() => {
         if (!isLoading && isSuccess && comments) {
-            setPagination({ ...pagination, 
+            setPagination({
+                ...pagination,
                 numberOfPages: comments?.info?.numberOfPages,
                 totalElements: comments?.info?.totalElements
             });
@@ -88,7 +89,8 @@ export default function Comments({ postId, setCommentsCount }) {
     }, [pagination.totalElements])
 
     const decreaseCount = () => {
-        setPagination({ ...pagination, 
+        setPagination({
+            ...pagination,
             totalElements: pagination.totalElements - 1
         });
     }
@@ -155,7 +157,11 @@ export default function Comments({ postId, setCommentsCount }) {
 
     if (isLoading) {
         commentsList = [...new Array(pagination.pageSize)].map((element, index) => {
-            return (<Comment key={index} />)
+            return (
+                <Fragment key={index}>
+                    <Comment />
+                </Fragment>
+            )
         })
     } else if (isSuccess) {
         const { ids, entities } = comments;
@@ -163,16 +169,19 @@ export default function Comments({ postId, setCommentsCount }) {
         commentsList = ids?.length
             ? ids.map(commendId => {
                 const comment = entities[commendId];
-                return (<Comment 
-                    key={comment.id} 
-                    comment={comment} 
-                    queryParams={{
-                        post: postId,
-                        page: pagination.currPage,
-                        size: pagination.pageSize
-                    }}
-                    decreaseCount={decreaseCount}
-                />)
+                return (
+                    <Fragment key={comment.id}>
+                        <Comment
+                            comment={comment}
+                            queryParams={{
+                                post: postId,
+                                page: pagination.currPage,
+                                size: pagination.pageSize
+                            }}
+                            decreaseCount={decreaseCount}
+                        />
+                    </Fragment>
+                )
             })
             : <p>Chưa có ý kiến nào</p>
     } else if (isError) {

@@ -2,6 +2,7 @@ import './reviews.css';
 import Review from '../review/Review';
 import Slider from 'react-slick';
 import { useGetReviewsQuery } from '../../features/google/googleApiSlice';
+import { Fragment } from 'react';
 
 const settings = {
     infinite: true,
@@ -12,6 +13,7 @@ const settings = {
     speed: 500,
     slidesToShow: 2,
     slidesToScroll: 1,
+    arrows: false,
     responsive: [
         {
             breakpoint: 900,
@@ -71,26 +73,36 @@ export default function Reviews() {
 
     if (isLoading) {
         reviewsList = [...new Array(2)].map((element, index) => {
-            return <Review key={index} />
+            return (
+                <Fragment key={index}>
+                    <Review key={index} />
+                </Fragment>
+            )
         })
     } else if (isSuccess) {
         reviewsList = (reviews && reviews?.length !== 0)
             ? reviews?.map((review, index) => (
-                <Review key={review.url} review={review} />
+                <Fragment key={review.url}>
+                    <Review review={review} />
+                </Fragment>
             ))
             : tempReviews.map((review, index) => (
-                <Review key={review.url} review={review} />
+                <Fragment key={review.url}>
+                    <Review review={review} />
+                </Fragment>
             ))
-    } else if (isError){
+    } else if (isError) {
         reviewsList = tempReviews.map((review, index) => (
-            <Review key={review.url} review={review} />
+            <Fragment key={review.url}>
+                <Review review={review} />
+            </Fragment>
         ))
     }
 
     return (
         <div className="reviews">
             <Slider {...settings}>
-            {reviewsList}
+                {reviewsList}
             </Slider>
         </div>
     )

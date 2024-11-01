@@ -65,8 +65,8 @@ export default function PostContent({ post, commentsCount, previewMode }) {
                 Chỉnh sửa
               </Box>
             </Link>
-            <button className="infoButton"
-              style={{ color: '#f25a5a', borderColor: '#f25a5a', marginLeft: '15px' }}
+            <button className="infoButton delete"
+              style={{ color: '#f25a5a', borderColor: '#f25a5a'}}
               disabled={isLoading}
               onClick={onDeleteClicked}>
               <DeleteIcon sx={{ marginRight: 1 }} />

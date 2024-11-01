@@ -4,16 +4,18 @@ const User = require("../models/User");
 
 //Get single post
 const getPost = async (req, res) => {
+    const baseUrl = req.protocol + "://" + req.headers.host + "/api/images/";
+
     try {
         const post = await Post.findOne({ slug: req.params.slug }).lean();
         if (!post) return res.status(400).json({ message: "No post found!" });
 
         //Map author
-        const author = await User.findById(post.user, {fullName:1, _id:0}).lean().exec();
-        const resultPost = { ...post, author: author ? author.fullName : undefined };
+        const author = await User.findById(post.user, { fullName: 1, _id: 0 }).lean().exec();
+        const resultPost = { ...post, thumbnail: baseUrl + post.thumbnail, author: author ? author.fullName : undefined };
 
         res.status(200).json(resultPost);
-    } catch(err) {
+    } catch (err) {
         res.status(500).json({ err });
     }
 }
@@ -21,51 +23,57 @@ const getPost = async (req, res) => {
 //Get multiple posts
 const getPosts = async (req, res) => {
     const { author, cate: category, tags } = req.query;
+    const baseUrl = req.protocol + "://" + req.headers.host + "/api/images/";
 
     try {
+        const projection = { tags: 0, category: 0, sanitizedHtml: 0, user: 0, markdown: 0 };
         const page = req.query.page ? (Number(req.query.page) - 1) : 0;
         const size = req.query.size ? Number(req.query.size) : 8;
         const startIndex = page * size;
         let condition = {};
         let total;
         let posts;
-        
+
         //Apply condition
-        if (author) condition = { ...condition, 'author.fullName': {'$regex': author, '$options': 'i'}};
+        if (author) condition = { ...condition, 'author.fullName': { '$regex': author, '$options': 'i' } };
         if (category) condition = { ...condition, category };
         if (tags) {
             const tagsArr = [].concat(tags);
             condition = { ...condition, tags: { "$in": tagsArr } }
         }
-        
+
         if (author) {
             const agg = await Post.aggregate().lookup({ from: 'users', localField: 'user', foreignField: '_id', as: 'author' })
-            .unwind({ path: '$author', preserveNullAndEmptyArrays: true })
-            .match(condition)
-            .facet({
-                data: [{ $skip: startIndex }, { $limit: size }, { $sort: { _id: -1 }}],
-                info: [{ $count: 'totalElements'}]
-            })
-            .project({ author: 0 })
-            .exec();
+                .unwind({ path: '$author', preserveNullAndEmptyArrays: true })
+                .match(condition)
+                .facet({
+                    data: [{ $skip: startIndex }, { $limit: size }, { $sort: { _id: -1 } }, { $project: projection }],
+                    info: [{ $count: 'totalElements' }]
+                })
+                .project({ author: 0 })
+                .exec();
 
-            posts = agg[0].data;
+            //Map result's thumbnail
+            posts = agg[0].data.map(post => ({...post, thumbnail: baseUrl + post.thumbnail }));
             total = agg[0]?.info[0]?.totalElements || 0;
         } else {
-            posts = await Post.find(condition).sort({ _id: -1 }).limit(size).skip(startIndex).lean();
+            const results = await Post.find({ ...condition }, { ...projection}).sort({ _id: -1 }).limit(size).skip(startIndex).lean();
+
+            //Map result's thumbnail
+            posts = results.map(post => ({...post, thumbnail: baseUrl + post.thumbnail }));
             total = await Post.countDocuments(condition) || 0;
         }
 
-        res.status(200).json({ 
-            data: posts, 
+        res.status(200).json({
+            data: posts,
             info: {
-                currPage: page, 
+                currPage: page,
                 pageSize: size,
                 totalElements: total,
                 numberOfPages: Math.ceil(total / size)
             }
         });
-    } catch(err) {
+    } catch (err) {
         console.log(err);
         res.status(500).send(err);
     }
@@ -74,7 +82,6 @@ const getPosts = async (req, res) => {
 //Create new post
 const createPost = async (req, res) => {
     const { title, description, markdown, category, tags } = req.body;
-    const baseUrl = req.protocol + "://" + req.headers.host + "/api/images/";
 
     //Authorization
     if (!title || !description || !markdown || !category) {
@@ -83,7 +90,7 @@ const createPost = async (req, res) => {
 
     //Check if post existed
     const post = await Post.findOne({ title }).collation({ locale: 'en', strength: 2 }).lean().exec();
-    if (post) return res.status(409).json({ message: "Post with this Title already existed!"});
+    if (post) return res.status(409).json({ message: "Post with this Title already existed!" });
 
     //Create new post
     const newPost = new Post({
@@ -91,7 +98,7 @@ const createPost = async (req, res) => {
         description,
         markdown,
         category,
-        thumbnail: baseUrl + req.file.filename,
+        thumbnail: req.file.filename,
         tags: tags.split(","),
         user: req.auth.id
     });
@@ -99,7 +106,7 @@ const createPost = async (req, res) => {
     try {
         const post = await newPost.save();
         res.status(200).json(post);
-    } catch(err) {
+    } catch (err) {
         res.status(500).send(err);
     }
 }
@@ -108,7 +115,6 @@ const createPost = async (req, res) => {
 const updatePost = async (req, res) => {
     const { title, description, markdown, category, thumbnail, tags } = req.body;
     const { id } = req.params;
-    const baseUrl = req.protocol + "://" + req.headers.host + "/api/images/";
 
     //Authorization
     if (!title || !description || !markdown || !category) {
@@ -117,11 +123,11 @@ const updatePost = async (req, res) => {
 
     //Get original post
     let post = await Post.findById(id).exec();
-    if (!post) return res.status(400).json({ message: "Post not found!"});
+    if (!post) return res.status(400).json({ message: "Post not found!" });
 
     //Check if post existed
     const duplicate = await Post.findOne({ title }).collation({ locale: 'en', strength: 2 }).lean().exec();
-    if (duplicate && duplicate?._id.toString() !== post.id) return res.status(409).json({ message: "Post with this Title already existed!"})
+    if (duplicate && duplicate?._id.toString() !== post.id) return res.status(409).json({ message: "Post with this Title already existed!" })
 
     try {
         post.title = title;
@@ -133,20 +139,20 @@ const updatePost = async (req, res) => {
         if (thumbnail && !req.file) {
             post.thumbnail = thumbnail;
         } else {
-            post.thumbnail = baseUrl + req.file.filename;
+            post.thumbnail = req.file.filename;
         }
 
         if (post.user == req.auth.id || req.auth.isAdmin) {
-            try{
+            try {
                 const updatedPost = await post.save();
                 res.status(200).json(updatedPost);
-            } catch(err){
+            } catch (err) {
                 res.status(500).json(err);
             }
         } else {
-            res.status(401).json({ message: "Wrong user!"});
+            res.status(401).json({ message: "Wrong user!" });
         }
-    } catch(err) {
+    } catch (err) {
         console.log(err);
         res.status(500).send(err);
     }
@@ -157,23 +163,23 @@ const deletePost = async (req, res) => {
     //Get original post
     const { id } = req.params;
     const post = await Post.findById(id).exec();
-    if (!post) return res.status(400).json({ message: "Post not found!"});
+    if (!post) return res.status(400).json({ message: "Post not found!" });
 
     try {
         if (post.user == req.auth.id || req.auth.isAdmin) {
-            try{
+            try {
                 //Delete post's comment
                 await Comment.deleteMany({ post: post._id }).exec();
                 //Delete post
                 await Post.findByIdAndDelete(id);
-                res.status(200).json({ message: "Post deleted"});
-            } catch(err) {
+                res.status(200).json({ message: "Post deleted" });
+            } catch (err) {
                 res.status(500).json(err);
             }
         } else {
             res.status(401).json({ message: "Wrong user!" });
         }
-    } catch(err) {
+    } catch (err) {
         console.log(err);
         res.status(500).send(err);
     }

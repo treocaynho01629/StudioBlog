@@ -20,6 +20,10 @@
         -webkit-line-clamp: 1;
         -webkit-box-orient: vertical;
     }
+
+    @media (max-width: 768px) {
+        font-size: 14px;
+    }
 }
 
 .home-crumb {
@@ -33,9 +37,17 @@
     text-decoration: underline;
 }
 
+.breadcrumbs ol {
+    flex-wrap: nowrap;
+}
+
 .breadcrumbs li {
     position: relative;
     padding: 10px 3px;
+
+    @media (max-width: 768px) {
+        padding: 5px 0;
+    }
 }
 
 .breadcrumbs li:first-child {

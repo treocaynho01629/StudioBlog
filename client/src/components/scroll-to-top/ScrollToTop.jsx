@@ -39,7 +39,6 @@ const ScrollToTop = (props) => {
                     right: 26,
                     zIndex: 99,
                 }}
-                unmountOnExit
             >
                 <Fab
                     onClick={scrollToTop}

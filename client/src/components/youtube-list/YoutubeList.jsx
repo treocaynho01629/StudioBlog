@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { useGetVideosQuery } from '../../features/google/googleApiSlice';
 import YoutubeEmbed from '../youtube-embed/YoutubeEmbed';
 
@@ -12,16 +13,22 @@ export default function YoutubeList({ amount, refetchOnMountOrArgChange }) {
     if (isLoading || isError) {
         videosList = [...new Array(amount ?? 5)].map((element, index) => {
             return (
-                <YoutubeEmbed key={index} />
+                <Fragment key={index}>
+                    <YoutubeEmbed />
+                </Fragment>
             )
         })
     } else if (isSuccess) {
         videosList = videos?.length
             ? videos.map(video => (
-                <YoutubeEmbed key={video.id} video={video} />
+                <Fragment key={video.videoId}>
+                    <YoutubeEmbed video={video} />
+                </Fragment>
             ))
             : [...new Array(amount ?? 5)].map((element, index) => (
-                    <YoutubeEmbed key={index} />
+                <Fragment key={index}>
+                    <YoutubeEmbed />
+                </Fragment>
             ))
     }
 

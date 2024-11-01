@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { isPersist } from "../features/auth/authSlice";
 import { useSelector } from "react-redux";
 

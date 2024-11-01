@@ -2,8 +2,7 @@
     background-image: url('../../assets/wallpaper.jpg');
     background-size: cover;
     background-position: center;
-    margin: 100px auto 0 auto;
-    height: 90vh;
+    height: 110vh;
     display: flex;
     align-items: center;
 }
@@ -30,6 +29,10 @@
     font-size: 22px;
     font-weight: 450;
     color: #333333;
+
+    @media (max-width: 768px) {
+        margin: 4px 0;
+    }
 }
 
 .loginButton {
